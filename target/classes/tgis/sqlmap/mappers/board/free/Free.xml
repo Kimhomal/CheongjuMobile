@@ -1,0 +1,213 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper   PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="tgis.board.free.service.FreeMapper">
+
+	<select id="selectInfoList" parameterType="map" resultType="egovMap">
+	<![CDATA[
+		SELECT ROWNUM  AS NUM, TEMP.*
+		FROM   (SELECT  ROWNUM  AS NUM,
+		               TEMP.*,
+		                COUNT(*) OVER() AS TOTALROWS
+		        FROM   (SELECT
+								SEQ,
+								WRITER_NM,
+								SUBJECT,
+								VISITED,
+								PW,
+								INDATE,
+								FILE_YNO
+						FROM	FREE_BOARD
+	]]>
+	<where>
+		<if test="searchType != '' and searchType != null">
+			<choose>
+				<when test="searchType == 'subject'">
+					<![CDATA[ AND SUBJECT LIKE '%' || #{contSearch} || '%' ]]>
+				</when>
+				<when test="searchType == 'ctt'">
+					<![CDATA[ AND CTT LIKE '%' || #{contSearch} || '%' ]]>
+				</when>
+				<otherwise>
+					<![CDATA[ AND WRITER_NM LIKE '%' || #{contSearch} || '%' ]]>
+				</otherwise>
+			</choose>
+		</if>
+	</where>
+	<![CDATA[
+		                ORDER BY SEQ DESC
+		                ) TEMP)TEMP WHERE NUM BETWEEN #{rows} * ( #{page} - 1 ) + 1 AND #{rows}* #{page}
+	]]>
+	</select>
+	
+	<!-- 최대 조회수 -->
+	<select id="selectMaxVisited" resultType="Integer" parameterType="map">
+		<![CDATA[
+			SELECT NVL(MAX(VISITED)+1, 1) AS VISITED FROM FREE_BOARD
+			WHERE SEQ =#{freeid}
+		]]>
+	</select>
+	<!-- 조회수 업데이트 -->
+	<update id="updateVisited" parameterType="map">
+	<![CDATA[
+		UPDATE FREE_BOARD
+		SET VISITED=#{visited}
+		WHERE SEQ=#{freeid}
+	]]>
+	</update>
+	<!-- FREEID Max 값 가져오기 -->
+	<select id="selectFreeMaxID" resultType="Integer">
+	<![CDATA[
+		SELECT NVL(MAX(SEQ)+1, 1) AS SEQ FROM FREE_BOARD
+	]]>
+	</select>
+	
+	<!-- [게시판 -> 자유게시판 상세조회] -->
+	<select id="selectInfo" parameterType="map" resultType="egovMap">
+	<![CDATA[
+		SELECT
+				SEQ,
+				WRITER,
+				SUBJECT,
+				VISITED,
+				WRITER_NM,
+				PW,
+				REPLACE( DBMS_LOB.SUBSTR( CTT, 4000, 1 ), CHR( 13 )|| CHR( 10 ), '<br>' ) AS CTT,
+				INDATE,
+				EMAIL,
+				(
+				SELECT
+					COUNT( FILE_SEQ ) AS BDCNT
+				FROM
+					BOARD_FILE
+				WHERE
+					GBN = '2'
+					AND SEQ = SEQ ) AS FILECNT
+		FROM
+			FREE_BOARD
+		WHERE
+			SEQ =#{freeid}
+	]]>
+	</select>
+	
+		<!-- [게시판 -> 자유게시판 추가] -->
+	<insert id="insertInfo" parameterType="map">
+	<![CDATA[
+		INSERT INTO FREE_BOARD
+		( 	SEQ,
+			WRITER,
+			SUBJECT,
+			VISITED,
+			PW,
+			CTT,
+			INDATE,
+			WRITER_NM,
+			FILE_YNO,
+			EMAIL
+		 )
+		VALUES
+		(	#{freeid},
+			#{usrId},
+			#{subject},
+			0,
+			#{pw},
+			#{ctt},
+			TO_CHAR(SYSDATE, 'YYYY-MM-DD'),
+			#{writerNm},
+			#{fileYn},
+			#{email}
+		 )
+	]]>
+	</insert>
+	
+	<!-- [게시판 -> 자유게시판 수정] -->
+	<update id="updateInfo" parameterType="map">
+	<![CDATA[
+		UPDATE FREE_BOARD
+		SET SUBJECT=#{subject},
+			CTT=#{ctt},
+			FILE_YNO = #{fileYn},
+			WRITER_NM = #{writerNm},
+			EMAIL = #{email}
+		WHERE SEQ=#{freeid}
+	]]>
+	</update>
+
+	<!-- [게시판 -> 자유게시판 삭제] -->
+	<delete id="deleteInfo" parameterType="map">
+	<![CDATA[
+		DELETE FROM FREE_BOARD
+		WHERE SEQ=#{freeid}
+	]]>
+	</delete>
+	
+		<!-- [게시판 -> 자유게시판 첨부파일 조회] -->
+	<select id="selectFileInfo" parameterType="map" resultType="egovMap">
+	<![CDATA[
+			SELECT
+				FILE_SEQ,
+				GBN,
+				FILE_NAM,
+				SUBSTR(FILE_PATH,18) AS FILE_PATH,
+				OGL_NAM,
+				SEQ
+			FROM
+				BOARD_FILE
+			WHERE GBN = '2'
+			AND SEQ = #{freeid}
+	]]>
+	<if test='arryDelFileId != "" and arryDelFileId != null'>
+	<![CDATA[
+		AND FILE_SEQ IN
+	]]> 
+		<foreach collection="arryDelFileId" item="fileId" open="(" close=")" separator=",">
+				#{fileId}
+		</foreach>
+	</if>
+	</select>
+	
+	<!-- [게시판 -> 자유게시판 첨부파일 등록] -->
+	<insert id="insertFile" parameterType="map">
+	<selectKey resultType="string" keyProperty="fileseq" order="BEFORE">
+		<![CDATA[
+		SELECT NVL(MAX(FILE_SEQ)+1, 1) AS FILE_SEQ FROM BOARD_FILE
+		]]>
+	</selectKey>
+	<![CDATA[
+		INSERT INTO BOARD_FILE (
+			FILE_SEQ,
+			GBN,
+			FILE_NAM,
+			FILE_PATH,
+			OGL_NAM,
+			SEQ
+		)
+		VALUES (
+			#{fileseq},
+			'2',
+			#{fileNam},
+			#{filePath},
+			#{oglNam},
+			#{freeid}
+		)
+	]]>
+	</insert>
+	
+	<!-- [게시판 -> 자유게시판 첨부파일 삭제] -->
+	<delete id="deleteFileInfo" parameterType="map">
+	<![CDATA[
+		DELETE	FROM BOARD_FILE
+		WHERE	GBN = '2'
+	]]>
+	<if test='arryDelFileId != "" and arryDelFileId != null'>
+		AND		FILE_SEQ IN
+		<foreach collection="arryDelFileId" item="fileId" open="(" close=")" separator=",">
+			#{fileId}
+		</foreach>
+	</if>
+	<![CDATA[
+		AND		SEQ = #{freeid}
+	]]>
+	</delete>
+
+</mapper>

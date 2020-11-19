@@ -1,0 +1,182 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper   PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="tgis.system.logMng.service.LogMngMapper">
+
+	<!-- 관리자 > 이력관리 > 업무 이력 리스트 조회 -->
+	<select id="adminUseLogList" parameterType="map" resultType="egovMap">
+			<![CDATA[
+			SELECT * FROM ( SELECT ROWNUM RN, TB.*, COUNT(*) OVER() AS TOTALROWS
+			 FROM (
+						SELECT
+							A.ID,
+							B.USR_NAM,
+							A.IP,
+							FN_GETCODEINFO('USR_PSTN_CDE', A.USR_PSTN_CDE) AS USR_PSTN_NAM,
+							A.USR_PSN,
+							A.ACC_DATE,
+							A.BUSI_CONTENTS
+						FROM
+							TBL_PIPS_MGE A , TBL_USR_MGE B
+						WHERE A.ID = B.USR_ID
+						]]>
+				<if test='stYmd != "" and stYmd != null'>
+						<![CDATA[	AND A.ACC_DATE >= #{stYmd}	]]>
+				</if>
+				<if test='edYmd != "" and edYmd != null'>
+					<![CDATA[	AND A.ACC_DATE <= #{edYmd}	]]>
+				</if>
+				<if test='busiContents != "" and busiContents != null'>
+					<![CDATA[	AND A.BUSI_CONTENTS LIKE '%' || #{busiContents} || '%'	]]>
+				</if>
+		<![CDATA[
+						ORDER BY
+							ACC_DATE DESC
+				) TB ) WHERE RN BETWEEN #{rows} * ( #{page} - 1 ) + 1 AND #{rows}* #{page}
+		]]>
+	</select>
+
+		<!--관리자 > 이력관리 > 접속 이력 관리 페이지 > 대 메뉴 조회 이력 리스트 조회 -->
+	<select id="menuLConnLog" parameterType="map" resultType="egovMap">
+			<![CDATA[
+					SELECT
+						COUNT(CASE WHEN CONN_MENU_L = '소개'  THEN 1 END) AS m_L1 ,
+						COUNT(CASE WHEN CONN_MENU_L = '지도검색'THEN 1 END) AS m_L2 ,
+						COUNT(CASE WHEN CONN_MENU_L = '도로점용관리'THEN 1 END) AS m_L3 ,
+						COUNT(CASE WHEN CONN_MENU_L = '규제관리'THEN 1 END) AS m_L4 ,
+						COUNT(CASE WHEN CONN_MENU_L = '설계관리'THEN 1 END) AS m_L5 ,
+						COUNT(CASE WHEN CONN_MENU_L = '공사관리'THEN 1 END) AS m_L6 ,
+						COUNT(CASE WHEN CONN_MENU_L = '고장관리'THEN 1 END) AS m_L7 ,
+						COUNT(CASE WHEN CONN_MENU_L = '통계관리'THEN 1 END) AS m_L8 ,
+						COUNT(CASE WHEN CONN_MENU_L = '게시판'THEN 1 END) AS m_L9 ,
+						COUNT(CASE WHEN CONN_MENU_L = '업무지원'THEN 1 END) AS m_L10 ,
+						COUNT(CASE WHEN CONN_MENU_L = '교통량관리'THEN 1 END) AS m_L11
+					FROM TBL_CONN_HIS
+					WHERE 1=1
+		]]>
+			<if test='startYmd != "" and startYmd != null'>
+				<![CDATA[  AND CONN_YMD >= REPLACE(#{startYmd},'-')	]]>
+			</if>
+			<if test='endYmd != "" and endYmd != null'>
+				<![CDATA[	AND CONN_YMD <=  REPLACE(#{endYmd},'-')	]]>
+			</if>
+	</select>
+
+	<!--관리자 > 이력관리 > 접속 이력 관리 페이지 > 대 메뉴 이용자수 이력 리스트 조회 -->
+	<select id="menuLUseLog" parameterType="map" resultType="egovMap">
+			<![CDATA[
+					SELECT
+						COUNT(CASE WHEN CONN_MENU_L = '소개'  THEN 1 END) AS m_L1 ,
+						COUNT(CASE WHEN CONN_MENU_L = '지도검색'THEN 1 END) AS m_L2 ,
+						COUNT(CASE WHEN CONN_MENU_L = '도로점용관리'THEN 1 END) AS m_L3 ,
+						COUNT(CASE WHEN CONN_MENU_L = '규제관리'THEN 1 END) AS m_L4 ,
+						COUNT(CASE WHEN CONN_MENU_L = '설계관리'THEN 1 END) AS m_L5 ,
+						COUNT(CASE WHEN CONN_MENU_L = '공사관리'THEN 1 END) AS m_L6 ,
+						COUNT(CASE WHEN CONN_MENU_L = '고장관리'THEN 1 END) AS m_L7 ,
+						COUNT(CASE WHEN CONN_MENU_L = '통계관리'THEN 1 END) AS m_L8 ,
+						COUNT(CASE WHEN CONN_MENU_L = '게시판'THEN 1 END) AS m_L9 ,
+						COUNT(CASE WHEN CONN_MENU_L = '업무지원'THEN 1 END) AS m_L10 ,
+						COUNT(CASE WHEN CONN_MENU_L = '교통량관리'THEN 1 END) AS m_L11
+				FROM (SELECT CONN_YMD,CONN_MENU_L,USR_ID
+				FROM TBL_CONN_HIS
+				GROUP BY CONN_YMD,CONN_MENU_L,USR_ID)
+				WHERE 1=1
+		]]>
+			<if test='startYmd != "" and startYmd != null'>
+				<![CDATA[  AND CONN_YMD >= REPLACE(#{startYmd},'-')	]]>
+			</if>
+			<if test='endYmd != "" and endYmd != null'>
+				<![CDATA[	AND CONN_YMD <=  REPLACE(#{endYmd},'-')	]]>
+			</if>
+	</select>
+
+	<!--관리자 > 이력관리 > 접속 이력 관리 페이지 > 중 메뉴 이름 -->
+	<select id="getMenuNmM" parameterType="map" resultType="egovMap">
+			<![CDATA[
+			SELECT
+				MENU_NM
+			FROM
+				SYS_MENU_MNG
+			WHERE
+				PAR_MENU_ID = (
+				SELECT
+					MENU_ID
+				FROM
+					SYS_MENU_MNG
+				WHERE
+					MENU_NM =#{menuNm} AND MENU_LEVEL = '1')
+			ORDER BY ORDER_NO
+			]]>
+	</select>
+
+		<!--관리자 > 이력관리 > 접속 이력 관리 페이지 > 대 메뉴 조회 이력 리스트 조회 -->
+	<select id="menuMConnLog" parameterType="map" resultType="egovMap">
+			<![CDATA[
+					SELECT
+				]]>
+				<foreach collection="nameList" item="item" index="index" open="" close="" separator=",">
+						COUNT(CASE WHEN CONN_MENU_M = #{item.menuNm} THEN 1 END) AS m_M${index}
+				</foreach>
+			<![CDATA[
+					FROM TBL_CONN_HIS
+					WHERE 1=1
+			]]>
+			<if test='startYmd != "" and startYmd != null'>
+				<![CDATA[  AND CONN_YMD >= REPLACE(#{startYmd},'-')	]]>
+			</if>
+			<if test='endYmd != "" and endYmd != null'>
+				<![CDATA[	AND CONN_YMD <=  REPLACE(#{endYmd},'-')	]]>
+			</if>
+	</select>
+
+	<!--관리자 > 이력관리 > 접속 이력 관리 페이지 > 대 메뉴 이용자수 이력 리스트 조회 -->
+	<select id="menuMUseLog" parameterType="map" resultType="egovMap">
+			<![CDATA[
+					SELECT
+				]]>
+			<foreach collection="nameList" item="item" index="index" open="" close="" separator=",">
+						COUNT(CASE WHEN CONN_MENU_M = #{item.menuNm} THEN 1 END) AS m_M${index}
+			</foreach>
+			<![CDATA[
+				FROM (SELECT CONN_YMD,CONN_MENU_M,USR_ID
+				FROM TBL_CONN_HIS
+				GROUP BY CONN_YMD,CONN_MENU_M,USR_ID)
+				WHERE 1=1
+		]]>
+			<if test='startYmd != "" and startYmd != null'>
+				<![CDATA[  AND CONN_YMD >= REPLACE(#{startYmd},'-')	]]>
+			</if>
+			<if test='endYmd != "" and endYmd != null'>
+				<![CDATA[	AND CONN_YMD <=  REPLACE(#{endYmd},'-')	]]>
+			</if>
+	</select>
+
+
+
+	<!--관리자 > 이력관리 > 접속 이력 관리 페이지 > 사용자 접속 이력 -->
+	<insert id ="insertUseLog" parameterType="map">
+	<selectKey resultType="string" keyProperty="hisId" order="BEFORE">
+		<![CDATA[
+		SELECT NVL(MAX(HIS_ID)+1, 1) AS HIS_ID FROM TBL_CONN_HIS
+		]]>
+	</selectKey>
+	<![CDATA[
+		INSERT INTO TBL_CONN_HIS
+			(HIS_ID,
+			USR_ID,
+			USR_IP,
+			CONN_YMD,
+			CONN_MENU_L,
+			CONN_MENU_M)
+		VALUES (
+		#{hisId},
+			 #{usrId},
+			 #{usrIp},
+			 TO_CHAR(SYSDATE, 'YYYYMMDD'),
+			 #{connMenuL},
+			 #{connMenuM})
+	]]>
+
+
+	</insert>
+</mapper>

@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper   PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="tgis.user.auth.service.LoginMapper">
+
+<!-- 중복로그인 여부 확인 -->
+<select id="memberInfoById" resultType="tgis.user.auth.service.LoginVO">
+	SELECT
+			USRMGEID,
+			USR_ID,
+			PW,
+			USR_NAM,
+			USR_PSN,
+			RMK,
+			USR_TEL,
+			BUSE_NAM,
+			BUSE_CDE,
+			EMAIL,
+			ROLE_CDE,
+			REG_YMD,
+			TRIM(YNO) AS YNO,
+			USEYNO,
+			BSS_NUM,
+			SI_MU_CDE,
+<!-- 			CTK_VCN_CDE, -->
+			USR_PSTN_CDE,
+<!-- 			FN_GETBSSINFO((SELECT PARENT_CDE_TYPE FROM TBL_SYS_CDE WHERE CDE_VAL = USR_PSTN_CDE AND CDE_TYPE = 'USR_PSTN_CDE'),BSS_NUM) BSS_NAM, -->
+<!-- 			CNT, -->
+			LATEST_LOGIN_DATE,
+			LATEST_FAIL_DATE,
+			LOGIN_FAIL_CNT,
+			PW_CHG_YMD
+		FROM TBL_USR_MGE
+		WHERE USR_ID = #{usrId}
+
+</select>
+
+	<update id="updateLoginSuccess">
+		<![CDATA[
+			UPDATE 	TBL_USR_MGE
+			SET 		LATEST_LOGIN_DATE = #{latestLoginDate}, LOGIN_FAIL_CNT = #{loginFailCnt}
+			WHERE 	USR_ID = #{usrId}
+		]]>
+	</update>
+	
+	<!--로그인 접속 날짜 가져옴 -->
+	<select id="selectConnDate" resultType="java.lang.String">
+		<![CDATA[
+				SELECT 	LOGIN_DATE
+				FROM 	TBL_CONN_STAT
+				WHERE 	USR_ID = #{usrId}
+				AND 	TO_CHAR(LOGIN_DATE, 'YYYYMMDD') = TO_CHAR(SYSDATE, 'YYYYMMDD')
+				AND CONN_IP= #{connIp}
+				AND	ROWNUM=1
+		]]>
+	</select>
+	
+	<insert id="insertLoginDate" useGeneratedKeys="true" keyProperty="latestLoginDate">
+	<selectKey resultType="string" keyProperty="latestLoginDate" order="BEFORE">
+		<![CDATA[
+		SELECT TO_CHAR(SYSDATE, 'YYYYMMDD') FROM DUAL
+		]]>
+	</selectKey>
+		<![CDATA[
+			INSERT INTO TBL_CONN_STAT (
+				USR_ID,
+				CONN_IP,
+				LOGIN_DATE,
+				CNT
+			)
+			VALUES (
+			#{usrId},
+			#{connIp},
+			#{latestLoginDate},
+			1)
+		]]>
+	</insert>
+	
+	<update id="updateLoginDate" useGeneratedKeys="true" keyProperty="latestLoginDate">
+		<selectKey resultType="string" keyProperty="latestLoginDate" order="BEFORE">
+			<![CDATA[
+			SELECT TO_CHAR(SYSDATE, 'YYYYMMDD') FROM DUAL
+			]]>
+		</selectKey>
+		<![CDATA[
+			UPDATE TBL_CONN_STAT
+			SET 	CNT = NVL((CNT+1),1)
+			WHERE 	USR_ID = #{usrId}
+			AND 	TO_CHAR(LOGIN_DATE, 'YYYYMMDD') = #{latestLoginDate}
+			AND CONN_IP=#{connIp}
+		]]>
+	</update>
+	
+	<update id="updateLoginFail">
+		<![CDATA[
+			UPDATE 	TBL_USR_MGE
+			SET 		LATEST_FAIL_DATE = #{latestFailDate}, LOGIN_FAIL_CNT = #{loginFailCnt}, YNO = #{yno}
+			WHERE 	USR_ID = #{usrId}
+		]]>
+	</update>
+
+
+<!-- 로그인실행 -->
+<update id="updateAccAdmFail">
+		<![CDATA[
+			UPDATE 	TBL_USR_MGE
+			SET 		YNO = 'N'
+			WHERE 	USR_ID = #{usrId}
+		]]>
+	</update>
+	
+	<update id="updateLogoutDate">
+		<![CDATA[
+			UPDATE 	TBL_CONN_STAT
+			SET	LOGOUT_DATE = SYSDATE
+			WHERE 	USR_ID = #{usrId}
+			AND	TO_CHAR(LOGIN_DATE, 'YYYYMMDD') = #{latestLoginDate}
+			AND CONN_IP=#{connIp}
+		]]>
+	</update>
+
+
+
+
+</mapper>

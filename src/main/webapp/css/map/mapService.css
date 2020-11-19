@@ -1,0 +1,486 @@
+/*도로폭 레이어*/
+.roadWidth {}
+.roadWidth .layer_inner {width:280px;}
+.road_list li {height:30px; padding:0 15px; line-height:30px; font-size:14px; text-align:left;cursor:pointer;}
+.road_list li:hover {background-color:#ddd;}
+
+
+.layer_wrap {position:absolute; left:0px; top:0px; z-index:9999; max-height:300px; overflow : auto;}
+.layer_wrap:after {content:""; display:inline-block; height:100%; vertical-align:middle;}
+
+.layer_wrap .layer_inner {display:inline-block; position:relative; background-color:#fff; vertical-align:middle; text-align:center;}
+.layer_wrap .layer_inner .layer_header h3 {display:block; height:50px; padding:0 15px; font-family:"NotoSansKR-Medium"; color:#fff; font-size:16px; background-color:#2a9dc9; line-height:52px; text-align:left;}
+
+/*중첩 레이어*/
+.layer_mapInfo {}
+.layer_mapInfo .layer_inner {width:280px;}
+.mapInfo_list {margin:0; padding: 0;}
+.mapInfo_list li {height:30px; padding:0 15px; line-height:30px; font-size:14px; text-align:left;cursor:pointer;}
+.mapInfo_list li:hover {background-color:#ddd;}
+
+
+/* map popup style start */
+.lp_inner .lp_header {
+    padding: .5em .5em;
+    background-color: #599700;
+}
+
+.lp_inner .lp_header h1 {
+    font-family: 'Noto Sans KR';
+    font-size: 1.5em;
+    color: #fff;
+}
+
+.lp_inner .lp_close {
+    display: none;
+}
+
+.lp_inner .lp_content {
+    margin: 1em 0;
+    overflow-x: hidden;
+}
+
+.list_tp4 > li {
+    padding: 1em 0;
+    border-bottom: 1px solid #d7d7d7;
+    color: #5d5d5d;
+    line-height: 15px;
+}
+
+.list_tp4 > li .tit {
+    font-family: 'Noto Sans KR';
+    color: #3459ac;
+}
+
+.list_tp4.i_lt > li {
+    padding: 10px 10px 10px 24px;
+    background: url('../../images/common/ico_location.png') left center no-repeat;
+    text-align: center;
+}
+
+.list_tp4 .jibunAddr {
+	display: inline-block;
+	padding-left: 40px;
+	margin-bottom: 0;
+	font-size: 13px;
+	line-height: 1.6;
+	letter-spacing: -0.025em;
+	color: #111;
+	background: url('../../images/mapService/ic_jibun.png') 1px 3px no-repeat;
+}
+
+.list_tp4 .roadAddr {
+    padding-left: 40px;
+    font-size: 13px;
+    font-weight: 300;
+    color: #7b7b7b;
+    letter-spacing: -0.025em;
+    line-height: 1.6;
+    background: url('../../images/mapService/ic_doro.png') 1px 3px no-repeat;
+}
+
+.list_tp5 > li {
+    padding: 15px 0 15px 35px;
+    background: url(../../images/mapService/ico_location.png) 12px 12px no-repeat;
+    border-bottom: 1px solid #d7d7d7;
+    font-size: 12px;
+    color: #5d5d5d;
+}
+
+.list_tp8 {
+	margin: 0px;
+    padding: 0px;
+	text-align: left;
+}
+
+.list_tp8 > li {
+    margin-top: 5px;
+    line-height: 32px;
+}
+
+.list_tp8 > li:first-child {
+    margin-top: 0px;
+}
+
+.list_tp8 > li:after {
+    content: "";
+    display: block;
+    clear: both;
+}
+
+.list_tp8 > li .tit {
+    float: left;
+    width: 16%;
+    color: #5d5d5d;
+}
+
+.list_tp8 > li .cont {
+    float: left;
+    width: 84%;
+}
+
+.list_tp8 > li .cont select {
+    width: 100%;
+}
+
+.list_tp8 > li .cont input[type=text] {
+    width: 100%;
+}
+
+.list_tp8.col_tp1 > li .tit {
+    width: 38%;
+    padding-left: 5px;
+    font-family: 'Noto Sans KR';
+    line-height: 30px;
+}
+
+.list_tp8.col_tp1 > li .cont {
+    width: 62%;
+    color: #5d5d5d;
+}
+
+.list_tp8.col_tp1 > li .cont .txtInfo {
+    height: 30px;
+    line-height: 30px;
+}
+
+.list_tp8 > li.bor_b {
+    border-bottom: 1px solid #c1c1c1;
+}
+
+.list_tp8.pd_tp1 > li .tit {
+    padding: 0;
+}
+
+.btn_wrap:not(.tp2) {
+	display: flex;
+	margin: 1em 0;
+}
+
+.btn_wrap:not(.tp2) .btn {
+	flex: 1;
+	margin: 0 .5em;
+}
+
+.btn_wrap.tp2 {
+	display: flex;
+}
+
+.btn_wrap.tp2 .btn {
+	flex: 1;
+}
+
+.btn.gray_tp4 {
+    background-color: #626262;
+    border: 1px solid #626262;
+    color: #fff;
+}
+
+.btn.bor_blue_tp1 {
+    border: 1px solid #6cae0c;
+    color: #6cae0c;
+    background-color: #fff;
+}
+
+.btn.bor_gray_tp3 {
+    background-color: #fff;
+    border: 1px solid #cecece;
+    color: #5d5d5d;
+    height: 100%;
+    display: inline-block;
+}
+
+.btn.blue {
+    background-color: #6cae0c;
+    border: 1px solid #6cae0c;
+    color: #fff;
+    line-height: 18pt;
+}
+.btn.blue_tp1 {
+    background-color: #424242;
+    border: 1px solid #4184d0;
+    color: #fff;
+    line-height: 18pt;
+}
+
+.btn.blue_tp2 {
+    background-color: #3f6b00;
+    border: 1px solid #2f5786;
+    color: #fff;
+    line-height: 18pt;
+}
+
+.btn.blue_tp3 {
+    background-color: #3f6b00;
+    border: 1px solid #2f5786;
+    color: #fff;
+    line-height: 18pt;
+}
+
+.btn.blue_tp4 {
+    background-color: #103766;
+    border: 1px solid #103766;
+    color: #fff;
+    line-height: 18pt;
+}
+
+.btn.full {
+    width: 100%;
+    height: 30px;
+    font-family: 'Noto Sans KR';
+    line-height: 30px;
+}
+
+.tabCont.active {
+    display: block;
+}
+
+.tabCont {
+    display: none;
+}
+
+ons-modal input[type=text],
+ons-modal input[type=password],
+ons-modal input[type=number] {
+    padding: .5em 1em;
+    border: 1px solid #dcdcdc;
+    font-family: inherit;
+    color: #444;
+    background-color: #ffffff;
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    -o-appearance: none;
+    -webkit-border-radius: 0;
+}
+
+ons-modal input.readonly {
+    background-color: #eff4f8 !important;
+}
+
+ons-modal select {
+    padding: .5em 2em .5em .7em;
+    border: 1px solid #dcdcdc;
+    font-family: inherit;
+    color: #555;
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    -o-appearance: none;
+    -webkit-border-radius: 0;
+    background: #fff url(./../../images/common/ico_select.png) right center no-repeat;
+    background: none\9;
+}
+/* map popup style end */
+
+/* panel popup style start */
+.accordionMenu .imgCheckBox {padding-left:20px;}
+.accordionMenu .imgCheckBox .btn_expand {border: 0px;position:absolute;left:0px; top:3px; width:15px; height:15px; background:url('../../images/mapService/btn_plus.png') no-repeat;}
+.accordionMenu .imgCheckBox .btn_expand.active {background:url('../../images/mapService/btn_minus.png') no-repeat;}
+.accordionMenu .imgCheckBox {position:relative;}
+.accordionMenu .imgCheckBox > input[type=checkbox] {position:absolute; left:-99999px;}
+.accordionMenu .imgCheckBox > label {
+	display:inline-block; *display:inline; *zoom:1;
+	padding-left:20px;
+	background:url('../../images/mapService/ico_checkBox.png') no-repeat;
+}
+
+.accordionMenu .imgCheckBox.chk > label {
+    background-position: left -1.7em;
+    color: #2a9dc9;
+}
+
+.accordionMenu .imgCheckBox > span {
+	display:inline-block; *display:inline; *zoom:1;
+}
+
+.accordionMenu .imgCheckBox.chk > span {
+    background-position: 0 -30px;
+    color: #2a9dc9;
+}
+
+.accordionMenu .accordionMenu_sub {
+    display: none;
+}
+
+.layerList {
+	text-align: left;
+	padding: 0;
+}
+
+.layerList > li {
+    margin-top: 10px;
+}
+
+.layerList > li:first-child {
+    margin-top: 0px;
+}
+
+.layerList > li > a {
+    display: block;
+    padding: 12px 15px;
+    background: url('../../images/common/ico_select.png') right 15px no-repeat;
+    border: 1px solid #e1e1e1;
+    color: #333;
+}
+
+.layerList > li.active {
+    background-color: #b2e481;
+}
+
+.layerList > li.active > a {
+    color: #fff;
+    background-position: right -24px;
+    border: 1px solid #888;
+}
+
+.layerList > li .checkList {
+    padding: 20px;
+    background-color: #f2f2f2;
+    border: 1px solid #e1e1e1;
+    border-top: 0px;
+}
+
+.layerList > li .subList {
+    display: none;
+    padding: 10px 20px;
+}
+
+.layerList > li .subList > li {
+    margin-top: 8px;
+    padding-left: 0px;
+}
+
+.layerList > li .subList > li:first-child {
+    margin-top: 0px;
+}
+
+.acc_wrap {
+	text-align: left;
+}
+
+.acc_wrap .acc_headar {
+    position: relative;
+    padding: 10px 0;
+}
+
+.acc_wrap .acc_headar .tit {
+    position: relative;
+    padding-left: 1.2em;
+    background: url('../../images/mapService/ico_tit_tp1.png') no-repeat;
+    background-position: left center;
+    font-family: 'Noto Sans KR';
+    color: #2f375a;
+}
+
+.acc_wrap .acc_headar .tit:after {
+    content: "";
+    display: block;
+    position: absolute;
+    right: 0px;
+    top: 0px;
+    width: 14px;
+    height: 14px;
+    background: url('../../images/mapService/arrow_tp1.png') no-repeat;
+}
+
+.acc_wrap .acc_headar .cnt {
+    position: absolute;
+    right: 22px;
+    top: 12px;
+    font-family: 'Noto Sans KR';
+    font-size: 12px;
+    color: #5d5d5d;
+}
+
+.acc_wrap .acc_headar .cnt.tp1 {
+    right: 0px;
+}
+
+.acc_wrap .acc_content {
+    display: none;
+    border-top: 1px solid #d7d7d7;
+}
+
+.acc_wrap .acc_content.active {
+    display: block;
+}
+
+.acc_wrap.no_active .acc_headar .tit:after {
+    display: none;
+}
+/* panel popup style end */
+
+.search_tp1 {
+	margin-top: 1em;
+}
+
+.search_tp1 > input {
+    display: block;
+    width: 100%;
+    margin-bottom: 5px;
+}
+
+.search_tp1 > select {
+    width: 100%;
+    margin-bottom: 5px;
+    border: 1px solid #cecece;
+}
+
+.search_tp1 > button {
+    display: block;
+}
+
+.search_tp2 {
+    text-align: center;
+}
+
+.search_tp2 .tit {
+    display: inline-block;
+    margin-right: 3px;
+    font-size: 12px;
+    color: #5d5d5d;
+}
+
+.search_tp2 select {
+    width: 134px;
+}
+
+.search_tp2 .btn_reset {
+    margin-left: 4px;
+}
+
+/* paging */
+.paging {
+    margin: 10px 0;
+    text-align: center;
+}
+
+.paging > a {
+    display: inline-block;
+    height: 15px;
+    font-family: 'Noto Sans KR';
+    font-size: 12px;
+    color: #5d5d5d;
+    line-height: 16px;
+}
+
+.paging > a.btn_first {
+    width: 15px;
+    background: url('../../images/mapService/paging_first.png') no-repeat;
+}
+
+.paging > a.btn_prev {
+    width: 15px;
+    background: url('../../images/mapService/paging_prev.png') no-repeat;
+}
+
+.paging > a.btn_next {
+    width: 15px;
+    background: url('../../images/mapService/paging_next.png') no-repeat;
+}
+
+.paging > a.btn_last {
+    width: 15px;
+    background: url('../../images/mapService/paging_last.png') no-repeat;
+}

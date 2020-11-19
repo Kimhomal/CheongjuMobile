@@ -1,0 +1,159 @@
+body, html {
+	font-family: 'Noto Sans KR' !important;
+	font-size: 16px;
+}
+
+ol, ul {
+    list-style: none;
+}
+
+.page__content {
+    display: flex;
+    flex-direction: column;
+}
+
+.page--full_bg__background {
+	background-image: url(../../images/main/bg_main_visual.jpg);
+	background-repeat: no-repeat;
+	background-size: 100% 40%;
+}
+
+.mtb-auto {
+	margin-top: auto !important;
+	margin-bottom: auto !important;
+}
+
+.sub-top-wrap {
+	display: block;
+	flex: 0;
+	max-width: 100%;
+	z-index: 1;
+}
+
+.sub-top {
+	display: flex;
+	background-image: linear-gradient(0deg, #ccc, #ccc 100%);
+	align-items: center;
+	box-shadow: inset 0px 4px 10px 2px rgba(0,0,0,0.2);
+}
+
+.sub-top .left {
+	flex: 0 0 27%;
+}
+
+.sub-top .center {
+	flex: 0 0 46%;
+	text-align: center;
+	font-weight: 600;
+}
+
+.sub-top .right {
+	flex: 0 0 27%;
+}
+
+.main-wrap .content {
+    padding-top: 1em;
+    font-family: 'Noto Sans KR';
+    font-size: 43px;
+    font-weight: 600;
+    letter-spacing: -3px;
+    line-height: 48px;
+}
+
+.content-wrap {
+	margin-top: 1.0em;
+	margin-bottom: 1.0em;
+}
+
+.content-wrap .ui.horizontal.two.segments .ui.segment {
+	flex: 1 1 50%;
+}
+
+.maintxt {
+    font-family: 'Noto Sans KR';
+    font-size: 30px;
+    letter-spacing: -2px;
+    font-weight: 400;
+    color: #706f6f;
+    line-height: 31px;
+}
+
+.content-txt {
+	font-size: 1.1em;
+    font-weight: 600;
+    padding: 0.8em 0em;
+}
+
+#footer {
+	margin-top: auto;
+	background: #3e3e3e;
+    border-top: 1px solid #dcdcdc;
+}
+
+#footer .f_info {
+    font-family: 'Noto Sans KR';
+    font-size: 12px;
+    color: #e5e5e5;
+}
+
+.flex-list {
+	display: flex;
+	padding: 0 1em;
+}
+
+.flex-list .content {
+	flex: 1;
+}
+
+.flex-list .right {
+	flex: 0;
+}
+
+.flex-list .right.center-aligned {
+	align-self: center;
+}
+
+/*-------------------------- introduce -> --------------------------*/
+.h2_tp1 {
+    height: 26px;
+    padding-left: 32px;
+    background: url(../../images/common/ico_h2.png) left center no-repeat;
+    font-family: 'Noto Sans KR';
+    font-size: 18px;
+    color: #222;
+    line-height: 26px;
+    font-weight: 500;
+}
+
+.h3_tp3 {
+    padding-left: 25px;
+    background: url(../../images/common/ico_h3_tp3.png) left center no-repeat;
+    font-family: 'Noto Sans KR';
+    font-size: 16px;
+    color: #454545;
+    line-height: 22px;
+}
+
+.txt_blue_tp3 {
+    color: #47ac34 !important;
+}
+
+.subTit {
+    margin-top: 6px;
+    font-size: 14px;
+    color: #222;
+    line-height: 23px;
+}
+/*-------------------------- <- introduce --------------------------*/
+
+/*-------------------------- map -> --------------------------*/
+#map {
+	position: absolute;
+	height: 100%;
+	width: 100%;
+}
+
+.w80p {
+	width: 80% !important;
+}
+/*-------------------------- <- map --------------------------*/

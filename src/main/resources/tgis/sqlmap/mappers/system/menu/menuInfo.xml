@@ -1,0 +1,479 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper	PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="tgis.system.menu.service.MenuInfoMapper">
+
+	<!-- 관리 > 메뉴관리 > 메뉴관리 페이지 > 메뉴 리스트 조회 -->
+	<select id="menuInfoList" parameterType="map" resultType="egovMap">
+		 <![CDATA[
+		WITH PROG_LIST
+		AS (
+			 SELECT PROG_ID, PROG_NM, PROG_URL
+			 FROM SYS_PROG_MNG
+		)
+		SELECT
+			 T.MENU_ID
+			 , T.PAR_MENU_ID
+			 , T.ORDER_NO
+			 , T.T_LVL as TREE_LEVEL
+			 , M.MENU_NM
+			 , M.PROG_ID
+			 , M.PROG_NM
+			 , DECODE( M.PROG_NM, '','', '[' || M.PROG_ID || ']' || M.PROG_NM ) AS PROG_NAME
+			 , M.PROG_URL
+			 , M.USE_YN
+			 , M.TOP_MENU_YN
+			 , M.MENU_LEVEL
+			 , 't' AS EX
+			 , DECODE( M.MENU_LEVEL, 3, DECODE(M.USE_YN, 'Y', '사용', 'N', '미사용'), '' ) AS USE_YN_YN
+			 , (SELECT T.PAR_MENU_ID FROM SYS_MENU_MNG T WHERE T.MENU_ID = M.PAR_MENU_ID ) AS TOP_MENU_ID
+			 , (SELECT COUNT(MENU_ID) FROM SYS_MENU_MNG T WHERE T.PAR_MENU_ID = M.MENU_ID ) AS CHILD_COUNT
+			 , (SELECT T.MENU_LEVEL FROM SYS_MENU_MNG T WHERE T.MENU_ID = M.PAR_MENU_ID ) AS PAR_MENU_LEVEL
+			 , (SELECT T.MENU_NM FROM SYS_MENU_MNG T WHERE T.MENU_ID = M.PAR_MENU_ID ) AS PAR_MENU_NM
+			 , T.IS_LEAF
+			 , M.MENU_ORDER_NO
+		FROM
+		(
+			 SELECT
+			  MENU_ID
+			  , MENU_NM
+			  , NVL((SELECT P.PROG_ID FROM PROG_LIST P WHERE P.PROG_ID = I.PROG_ID), '') AS PROG_ID
+			  , NVL((SELECT P.PROG_NM FROM PROG_LIST P WHERE P.PROG_ID = I.PROG_ID), '') AS PROG_NM
+			  , NVL((SELECT P.PROG_URL FROM PROG_LIST P WHERE P.PROG_ID = I.PROG_ID), '') AS PROG_URL
+			  , USE_YN
+			  , MENU_LEVEL
+			  , PAR_MENU_ID
+			  , MENU_ORDER_NO
+			  , TOP_MENU_YN
+			 FROM
+			  SYS_MENU_MNG I
+		) M,
+		(
+			 SELECT ROWNUM TR, A.* FROM (
+			 SELECT MENU_ID, LEVEL AS T_LVL, PAR_MENU_ID, ORDER_NO,
+						  DECODE((SELECT DISTINCT '1'
+							  FROM SYS_MENU_MNG
+							 START WITH PAR_MENU_ID = MT.MENU_ID
+							 CONNECT BY PRIOR MENU_ID = PAR_MENU_ID),NULL,'true','false') AS IS_LEAF
+				FROM SYS_MENU_MNG MT
+			  START WITH PAR_MENU_ID = '0'
+			CONNECT BY PRIOR MENU_ID = PAR_MENU_ID
+			  ORDER SIBLINGS BY ORDER_NO
+			 ) A
+		) T
+		WHERE M.MENU_ID = T.MENU_ID
+		ORDER BY MENU_ORDER_NO
+		]]>
+
+	</select>
+
+	<!-- 	관리 > 메뉴관리 > 메뉴관리 페이지 > 메뉴 추가 팝업 > 대 메뉴 추가 -->
+	<insert id="instMenu_1" parameterType="map" >
+		<![CDATA[
+		  INSERT INTO SYS_MENU_MNG
+			(MENU_ID,
+			 MENU_NM,
+			 MENU_LEVEL,
+			 ORDER_NO,
+			 USE_YN,
+			 TOP_MENU_YN,
+			 MENU_ORDER_NO,
+			 PAR_MENU_ID,
+			 PROG_ID)
+			VALUES	  (
+			(SELECT 'M'  || RPAD(LPAD(( NVL(MAX(ORDER_NO), 0) + 1 ), 3, '0'), 9,  '0') FROM	SYS_MENU_MNG WHERE  MENU_LEVEL = 1),
+			  #{menuNm},
+			  1,
+			  (SELECT NVL(MAX(ORDER_NO), 0) + 1
+				FROM	SYS_MENU_MNG
+				WHERE  MENU_LEVEL = 1),
+			  #{useYn},
+			  #{topMenuYn},
+			  (SELECT NVL(MAX(MENU_ORDER_NO), 0) + 1
+				FROM	SYS_MENU_MNG),
+			  'M000000000',
+			  #{progId}
+			   )
+		]]>
+	</insert>
+
+	<!-- 	관리 > 메뉴관리 > 메뉴관리 페이지 > 메뉴 추가 팝업 > 메뉴 추가 위해 메뉴 순서 변경 -->
+	<update id="instUdtOrd_2">
+		<![CDATA[
+			UPDATE SYS_MENU_MNG
+			SET MENU_ORDER_NO = MENU_ORDER_NO + 1
+			WHERE MENU_ORDER_NO > #{maxMenuOrderNo}
+		 ]]>
+	</update>
+
+	<!-- 	관리 > 메뉴관리 > 메뉴관리 페이지 > 메뉴 추가 팝업 > 중 메뉴 MaxOrder 가져옴 -->
+	<select id="instGetMaxOrd_2" parameterType="map" resultType="int">
+		<![CDATA[
+			SELECT NVL(MAX(MENU_ORDER_NO),0)+1 MAX_MENU_ORDER_NO FROM SYS_MENU_MNG
+			WHERE MENU_ID IN (
+			SELECT MENU_ID FROM SYS_MENU_MNG
+			WHERE MENU_ID LIKE SUBSTR( #{menuId},1,4)||'%' OR PAR_MENU_ID LIKE SUBSTR( #{menuId},1,4)||'%' )
+		]]>
+	</select>
+
+	<!-- 	관리 > 메뉴관리 > 메뉴관리 페이지 > 메뉴 추가 팝업 > 소 메뉴 MaxOrder 가져옴 -->
+	<select id="instGetMaxOrd_3" parameterType="map" resultType="int">
+		<![CDATA[
+				SELECT NVL ((SELECT MAX (MENU_ORDER_NO) + 1 MAX
+							FROM SYS_MENU_MNG
+							  WHERE MENU_ID IN (SELECT MENU_ID
+													 FROM SYS_MENU_MNG
+													WHERE PAR_MENU_ID LIKE SUBSTR(#{menuId},1,7)||'%'	 )),
+							(SELECT MENU_ORDER_NO + 1
+								FROM SYS_MENU_MNG
+							  WHERE MENU_ID = #{menuId})
+					  ) AS MAX
+			  FROM DUAL
+		]]>
+	</select>
+
+	<!-- 	관리 > 메뉴관리 > 메뉴관리 페이지 > 메뉴 추가 팝업 > 중 메뉴 추가 -->
+	<insert id="instMenu_2" parameterType="map" >
+		<![CDATA[
+		INSERT INTO SYS_MENU_MNG
+					(MENU_ID,
+					 MENU_NM,
+					 PROG_ID,
+					 PAR_MENU_ID,
+					 MENU_LEVEL,
+					 ORDER_NO,
+					 USE_YN,
+					 MENU_ORDER_NO,
+					 TOP_MENU_YN
+					)
+		VALUES	  ( (SELECT SUBSTR( #{menuId}, 1, 4)
+							  || (SELECT RPAD(LPAD(( NVL(MAX(ORDER_NO), 0) + 1 ), 3, '0'
+											  ), 6, '0')
+								  FROM	SYS_MENU_MNG
+								  WHERE  PAR_MENU_ID = #{menuId}
+										 AND MENU_LEVEL = 2)
+						FROM	DUAL),
+						#{menuNm},
+						#{progId},
+						#{menuId},
+						2,
+						(SELECT NVL(MAX(ORDER_NO), 0) + 1
+						FROM	SYS_MENU_MNG
+						WHERE  PAR_MENU_ID = #{menuId}
+							  AND MENU_LEVEL = 2),
+					#{useYn},
+					#{maxMenuOrderNo},
+					#{topMenuYn})
+		]]>
+	</insert>
+
+	<!-- 	관리 > 메뉴관리 > 메뉴관리 페이지 > 메뉴 추가 팝업 > 소 메뉴 추가 -->
+		<insert id="instMenu_3" parameterType="map" >
+		 <![CDATA[
+				 INSERT INTO
+					SYS_MENU_MNG (
+					MENU_ID,
+					MENU_NM,
+					PAR_MENU_ID,
+					PROG_ID,
+					MENU_LEVEL,
+					ORDER_NO,
+					USE_YN,
+					MENU_ORDER_NO,
+					TOP_MENU_YN)
+				VALUES ( (
+				SELECT
+					SUBSTR( #{menuId}, 1, 7) || LPAD( NVL( (
+					SELECT ( TO_NUMBER(SUBSTR(MAX(MENU_ID), 8, 3))+ 1 )
+					FROM SYS_MENU_MNG WHERE PAR_MENU_ID LIKE SUBSTR(#{menuId}, 1, 7)|| '%' --AND MENU_LEVEL = 3
+					) , 1), 3, '0') FROM DUAL),
+				#{menuNm},
+				#{menuId},
+				#{progId},
+				3,
+				(
+				SELECT
+					NVL(MAX(ORDER_NO), 0)+ 1
+				FROM
+					SYS_MENU_MNG
+				WHERE
+					PAR_MENU_ID = #{menuId}),
+				#{useYn},
+				#{maxMenuOrderNo},
+				#{topMenuYn})
+		]]>
+	</insert>
+
+		<!-- 	관리 > 메뉴관리 > 메뉴관리 페이지 > 메뉴 수정 팝업 > 메뉴 수정 -->
+		<update id="updateMenuInfo" parameterType="map" >
+		 <![CDATA[
+		  UPDATE SYS_MENU_MNG
+						SET MENU_NM = #{menuNm}
+							,USE_YN = #{useYn}
+					  		,TOP_MENU_YN = #{topMenuYn}
+					  		,PROG_ID = #{progId}
+		 	WHERE MENU_ID = #{menuId}
+		]]>
+	</update>
+
+	<update id="deleteUdtMenu" parameterType="map" >
+	 <![CDATA[
+	  UPDATE SYS_MENU_MNG
+			SET MENU_ORDER_NO = MENU_ORDER_NO - 1
+		 WHERE MENU_ORDER_NO > (SELECT MENU_ORDER_NO FROM SYS_MENU_MNG WHERE MENU_ID = #{menuId} )
+	]]>
+	</update>
+
+	<update id="deleteUdtMenuOrder" parameterType="map" >
+	 <![CDATA[
+	  UPDATE SYS_MENU_MNG
+			SET ORDER_NO = ORDER_NO - 1
+		 WHERE ORDER_NO > (SELECT ORDER_NO FROM SYS_MENU_MNG WHERE MENU_ID = #{menuId} )
+			AND PAR_MENU_ID = #{parMenuId}
+	]]>
+	</update>
+
+	<delete id="deleteMenuInfo" parameterType="map" >
+		 <![CDATA[
+		  DELETE FROM SYS_MENU_MNG WHERE MENU_ID = #{menuId}
+		]]>
+	</delete>
+
+	<insert id="instMenu_2_4" parameterType="map" >
+		<![CDATA[
+		 INSERT INTO
+			SYS_MENU_MNG ( MENU_ID,
+			MENU_NM,
+			PROG_ID,
+			PAR_MENU_ID,
+			PROG_ID,
+			MENU_LEVEL,
+			ORDER_NO,
+			USE_YN,
+			MENU_ORDER_NO )
+		VALUES ( (
+		SELECT
+			SUBSTR( #{menuId}, 1, 7) || LPAD( NVL( ( SELECT TO_NUMBER(SUBSTR(MAX(MENU_ID), 8, 3))+ 1 FROM SYS_MENU_MNG WHERE MENU_ID LIKE SUBSTR(#{menuId}, 1, 7)|| '%' ) , 1), 3, '0')
+		FROM
+			DUAL),
+		#{leafMenuName},
+		'S0001',
+		#{leafProgid},
+		#{menuId},
+		#{progId},
+		3,
+		(
+		SELECT
+			NVL(MAX(ORDER_NO), 0)+ 1
+		FROM
+			SYS_MENU_MNG
+		WHERE
+			PAR_MENU_ID = #{menuId}),
+		#{useYn},
+		#{maxMenuOrderNo})
+		]]>
+	</insert>
+
+	<select id="menuInfoParseLvlCombo"  parameterType="map">
+		 <![CDATA[
+				SELECT
+					MENU_ID,
+		 		MENU_NM
+	  		FROM SYS_MENU_MNG
+	 		WHERE MENU_LEVEL = 1
+	 		AND MENU_ID != 'M000000000'
+	 		ORDER BY ORDER_NO
+		 ]]>
+	</select>
+
+	<select id="menuInfoLevel2Combo" parameterType="map" resultType="tgis.system.menu.service.MenuInfoComboVO">
+		 <![CDATA[
+				SELECT MENU_ID,
+				 MENU_NM,
+				 PAR_MENU_ID
+			  FROM SYS_MENU_MNG
+			 WHERE MENU_LEVEL = 2
+				AND PAR_MENU_ID =  #{rootlevel}
+			 ORDER BY ORDER_NO
+		]]>
+	</select>
+
+
+	<select id="instGetMaxOrd2_4" parameterType="map" resultType="int">
+		<![CDATA[
+				SELECT NVL ((SELECT MAX (menu_order_no) + 1 MAX
+								FROM SYS_MENU_MNG
+							  WHERE menu_id IN (SELECT menu_id
+													FROM SYS_MENU_MNG
+													WHERE par_menu_id = #{menuId} )),
+							(SELECT menu_order_no + 1
+								FROM SYS_MENU_MNG
+							  WHERE menu_id = #{menuId})
+					 ) AS MAX
+			  FROM DUAL
+		 ]]>
+	</select>
+
+	<insert id="instMenu_2_3" parameterType="map" >
+		<![CDATA[
+			INSERT INTO SYS_MENU_MNG
+						(MENU_ID,
+						 MENU_NM,
+						 PROG_ID,
+						 PAR_MENU_ID,
+						 MENU_LEVEL,
+						 ORDER_NO,
+						 USE_YN,
+						 )
+			VALUES	  ( (SELECT SUBSTR( #{menuId}, 1, 7)
+							|| LPAD(NVL((SELECT TO_NUMBER(SUBSTR(MAX(MENU_ID), 8, 3))	+ 1
+							 FROM	SYS_MENU_MNG
+							WHERE  MENU_ID LIKE SUBSTR( #{menuId}, 1, 7) || '%'), 1), 3, '0')
+							FROM	DUAL),
+						  #{midMenuName},
+						  'S0001',
+						  #{leafProgid},
+						  #{menuId},
+						  2,
+						  (SELECT NVL(MAX(ORDER_NO), 0) + 1
+							FROM	SYS_MENU_MNG
+							WHERE  PAR_MENU_ID = #{menuId}),
+						  # {midUse},
+						 	]]>
+		<choose>
+			<when test='midProgurl == ""'>
+				<![CDATA[ 'notdevelop.do', ]]>
+			</when>
+			<otherwise>
+				<![CDATA[ #{midProgurl}, ]]>
+			</otherwise>
+		</choose>
+		<![CDATA[
+						  # {maxMenuOrderNo})
+		]]>
+	</insert>
+
+	<select id="moveMenuGetParMenuId" parameterType="map" resultType="egovMap">
+		 <![CDATA[
+				SELECT A.MENU_ID,a.MENU_ORDER_NO, B.ORDER_NO ,MENU_LEVEL
+						,(SELECT T.MENU_LEVEL FROM SYS_MENU_MNG T WHERE T.MENU_ID = A.PAR_MENU_ID ) AS PAR_MENU_LEVEL
+			  FROM SYS_MENU_MNG A,
+		]]>
+			<choose>
+				<when test="upDownGb == 'up'">
+			 	 (SELECT MAX(ORDER_NO) ORDER_NO
+			 	</when>
+			 	<when test="upDownGb == 'down'">
+			 	 (SELECT MIN(ORDER_NO) ORDER_NO
+			 	</when>
+			</choose>
+		<![CDATA[
+			 		 FROM SYS_MENU_MNG
+			 		WHERE PAR_MENU_ID = #{parMenuId}
+		]]>
+			<choose>
+				<when test="upDownGb == 'up'">
+					AND ORDER_NO <![CDATA[<]]> #{orderNo}) B
+				 </when>
+				 <when test="upDownGb == 'down'">
+					AND ORDER_NO <![CDATA[>]]> #{orderNo}) B
+				 </when>
+			</choose>
+		<![CDATA[
+			 WHERE A.PAR_MENU_ID = #{parMenuId}
+				AND A.ORDER_NO = B.ORDER_NO
+		 ]]>
+	</select>
+
+	<select id="updateMenuIdList" parameterType="String" resultType="String">
+		 <![CDATA[
+				SELECT MENU_ID
+			  FROM SYS_MENU_MNG
+			 START WITH PAR_MENU_ID = #{comMenuId}
+			CONNECT BY PRIOR MENU_ID = PAR_MENU_ID
+			ORDER SIBLINGS BY ORDER_NO
+		 ]]>
+	</select>
+
+	<update id="menuMoveOrderUdt">
+		 <![CDATA[
+				UPDATE SYS_MENU_MNG
+				SET ORDER_NO = #{orderNo}
+			 WHERE MENU_ID = #{menuId}
+		 ]]>
+	</update>
+
+	<update id="menuMoveMenuOrderUdt">
+		 <![CDATA[
+				UPDATE SYS_MENU_MNG
+				SET MENU_ORDER_NO = #{orderNo}
+			 WHERE MENU_ID = #{menuId}
+		 ]]>
+	</update>
+
+
+		<!-- 사용자별 메뉴 -->
+	<select id="getUserMenuList"  parameterType="map" resultType="egovMap">
+	<![CDATA[
+				SELECT A.MENU_ID AS MENU_ID ,
+				       A.MENU_NM  AS TEXT ,
+				       A.PAR_MENU_ID  AS PARENT_ID ,
+				       B.PROG_URL AS URL,
+				       (CASE WHEN B.MENU_ID IS NULL THEN 'N' ELSE 'Y' END) AS USE_YN,
+				        B.POPUP_YN,
+				        B.PROG_DESC,
+				        A.TOP_MENU_YN
+				FROM   (SELECT *
+				        FROM   SYS_MENU_MNG
+				        WHERE  USE_YN = 'Y') A,
+				        (SELECT A.MENU_ID,
+				               A.PAR_MENU_ID,
+				               A.MENU_NM,
+				               B.PROG_URL,
+				               B.POPUP_YN,
+				               B.PROG_DESC,
+				        	   A.TOP_MENU_YN
+				        FROM   SYS_MENU_MNG A,
+				               SYS_PROG_MNG B,
+				               ( (SELECT MENU_ID
+				                        FROM   SYS_MENU_USR_MNG
+				                        WHERE  USR_ID = #{usrId}
+				                        AND    USE_YN = 'Y'
+				                        UNION
+				SELECT MENU_ID
+				                        FROM   SYS_MENU_ROLE_MNG
+				                        WHERE  ROLE_ID =
+			]]>
+			<choose>
+				<when test='roleId != "" and roleId != null'>
+					<![CDATA[
+								#{roleId} AND ROLE_KND = 'R')
+					]]>
+				</when>
+				<otherwise>
+					<![CDATA[
+						(SELECT ROLE_CDE
+							FROM   TBL_USR_MGE
+							WHERE  USR_ID = #{usrId}
+						)  AND ROLE_KND = 'R')
+					 ]]>
+				</otherwise>
+			</choose>
+			<![CDATA[
+
+				                MINUS
+				SELECT MENU_ID
+				                FROM   SYS_MENU_USR_MNG
+				                WHERE  USR_ID = #{usrId}
+				                AND    USE_YN = 'N'
+				                AND ROLE_KND = 'R' ) C
+				        WHERE  A.PROG_ID = B.PROG_ID(+)
+				        AND    A.MENU_ID = C.MENU_ID
+				        AND    A.MENU_ID <> 'M000000000'
+				        ) B
+				WHERE  A.MENU_ID = B.MENU_ID(+)
+				ORDER BY MENU_ORDER_NO
+	]]>
+	</select>
+
+</mapper>

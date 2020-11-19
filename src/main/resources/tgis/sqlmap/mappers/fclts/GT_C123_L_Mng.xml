@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper   PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="tgis.fclts.service.FcltsMngMapper">
+
+<insert id="insertFcltsInfo_GT_C123_L" parameterType="map">
+	INSERT INTO GT_C123_L
+	(
+		XGEO
+	)
+	VALUES
+	(
+	MDSYS.SDO_GEOMETRY(#{geom},
+		5181)
+	)
+
+</insert>
+
+ <!--  도로구간 삭제 -->
+<!-- <delete id="deleteFcltsInfo_GT_C123_L" parameterType="map"> -->
+<!-- DELETE FROM GT_C123_L -->
+<!-- WHERE MGRNU = #{mgrnu} -->
+<!-- </delete> -->
+
+ <!-- 도로구간 수정 -->
+<!-- <update id="updateFcltsInfo_GT_C123_L" parameterType="map"> -->
+<!-- UPDATE GT_C123_L -->
+<!-- SET XGEO = MDSYS.SDO_GEOMETRY(#{geom},5181) -->
+<!-- WHERE MGRNU = #{mgrnu} -->
+<!-- </update> -->
+</mapper>

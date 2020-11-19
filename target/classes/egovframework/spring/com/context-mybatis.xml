@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:tx="http://www.springframework.org/schema/tx" xmlns:util="http://www.springframework.org/schema/util"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+	http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx.xsd
+	http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd
+	http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop.xsd
+	http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
+
+	<!-- SqlSession setup for MyBatis Database Layer -->
+	<!--
+	<bean id="sqlSession" class="org.mybatis.spring.SqlSessionFactoryBean">
+	 -->
+	 
+	 <!-- Mybatis XML 자동 빌드 설정하는 부분 -->
+	<bean id="sqlSession" class="tgis.common.database.HotDeployableMybatisSessionFactoryBean"> <!-- 실제 프로젝트명으로 패키지명 변경 해야됨 * 체크 필요 *  -->
+		<property name="dataSource" ref="dataSource" />
+		<property name="configLocation" value="classpath:/tgis/sqlmap/config/sql-mapper-config.xml" /> <!-- 실제 프로젝트명으로 패키지명 변경 해야됨 * 체크 필요 *  -->
+		<property name="mapperLocations" value="classpath:/tgis/sqlmap/mappers/**/*.xml" /> <!-- 실제 프로젝트명으로 패키지명 변경 해야됨 * 체크 필요 *  -->
+		<property name="interval" value="500" /><!-- ms -->
+	</bean>
+
+ 	<bean class="egovframework.rte.psl.dataaccess.mapper.MapperConfigurer">
+		<property name="basePackage" value="tgis.**.**.service" /> <!-- 실제 프로젝트명으로 패키지명 변경 해야됨 * 체크 필요 *  -->
+	</bean>
+
+	<bean id="sqlSessionTemplate" class="org.mybatis.spring.SqlSessionTemplate" destroy-method="clearCache">
+		<constructor-arg index="0" ref="sqlSession" />
+	</bean>
+
+</beans>

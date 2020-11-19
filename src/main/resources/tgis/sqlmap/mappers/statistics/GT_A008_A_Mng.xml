@@ -1,0 +1,300 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper   PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="tgis.statistics.service.StatisticsMngMapper">
+
+<!-- 교차로 구별 전체 통계 -->
+	<select id="selectGuStatistics_GT_A008_A" parameterType="map" resultType="egovMap">
+		<![CDATA[
+				SELECT
+					DECODE(NAME, NULL, '합계', NAME) AS  "구분",
+					TO_CHAR(TOTAL, '999,999,999,999') AS "합계",
+					TO_CHAR(A01, '999,999,999,999') AS "단일로",
+					TO_CHAR(A02, '999,999,999,999') AS "3거리",
+					TO_CHAR(A03, '999,999,999,999') AS "4거리",
+					TO_CHAR(A04, '999,999,999,999') AS "5거리",
+					TO_CHAR(A05, '999,999,999,999') AS "6거리"
+				FROM (
+					SELECT
+						A.GU_NAM AS NAME,
+						(COUNT(DECODE(CSS_KND, '1', 1, NULL)) + COUNT(DECODE(CSS_KND, '2', 1, NULL)) + COUNT(DECODE(CSS_KND, '3', 1, NULL)) + COUNT(DECODE(CSS_KND, '4', 1, NULL)) + COUNT(DECODE(CSS_KND, '5', 1, NULL))) AS TOTAL,
+						COUNT(DECODE(CSS_KND, '1', 1, NULL)) AS A01,
+						COUNT(DECODE(CSS_KND, '2', 1, NULL)) AS A02,
+						COUNT(DECODE(CSS_KND, '3', 1, NULL)) AS A03,
+						COUNT(DECODE(CSS_KND, '4', 1, NULL)) AS A04,
+						COUNT(DECODE(CSS_KND, '5', 1, NULL)) AS A05
+					FROM SMARTTGIS.GT_A008_A A
+		]]>
+		<where>
+			<if test="guCde   != null and guCde   != ''">
+				AND A.GU_CDE  IN 	<foreach collection="guCde" item="item" open="(" close=")" separator=",">#{item}</foreach>
+			</if>
+			<if test="dongCde   != null and dongCde   != ''">
+				AND A.DONG_CDE  IN 	<foreach collection="dongCde" item="item" open="(" close=")" separator=",">#{item}</foreach>
+			</if>
+			<if test="policeCde   != null and policeCde   != ''">
+				AND A.PE_CDE  IN 	<foreach collection="policeCde" item="item" open="(" close=")" separator=",">#{item}</foreach>
+			</if>
+			<if test="statGbn   != null and statGbn   != ''">
+				AND A.CSS_KND  IN 	<foreach collection="statGbn" item="item" open="(" close=")" separator=",">#{item}</foreach>
+			</if>
+			<if test="typeCde   != null and typeCde   != ''">
+				AND A.TYPE_CDE  IN 	<foreach collection="typeCde" item="item" open="(" close=")" separator=",">#{item}</foreach>
+			</if>
+			<if test="stYmd   != null and stYmd   != ''">
+				<![CDATA[AND A.ESB_YMD >= #{stYmd}]]>
+			</if>
+			<if test="enYmd   != null and enYmd   != ''">
+				<![CDATA[AND A.ESB_YMD <= #{enYmd}]]>
+			</if>
+		</where>
+		<![CDATA[
+					GROUP BY ROLLUP(A.GU_NAM)
+					ORDER BY NAME NULLS FIRST) TEMP
+ 		]]>
+	</select>
+
+<!-- 교차로 경찰서별 전체 통계 -->
+	<select id="selectPoliceStatistics_GT_A008_A" parameterType="map" resultType="egovMap">
+		<![CDATA[
+		    	SELECT
+					DECODE(NAME, NULL, '합계', NAME) AS  "구분",
+					TO_CHAR(TOTAL, '999,999,999,999') AS "합계",
+					TO_CHAR(A01, '999,999,999,999') AS "단일로",
+					TO_CHAR(A02, '999,999,999,999') AS "3거리",
+					TO_CHAR(A03, '999,999,999,999') AS "4거리",
+					TO_CHAR(A04, '999,999,999,999') AS "5거리",
+					TO_CHAR(A05, '999,999,999,999') AS "6거리"
+				FROM  (
+				SELECT  A.PE_NAM AS NAME,
+						(COUNT(DECODE(CSS_KND, '1', 1, NULL)) + COUNT(DECODE(CSS_KND, '2', 1, NULL)) + COUNT(DECODE(CSS_KND, '3', 1, NULL)) + COUNT(DECODE(CSS_KND, '4', 1, NULL)) + COUNT(DECODE(CSS_KND, '5', 1, NULL))) AS TOTAL,
+						COUNT(DECODE(CSS_KND, '1', 1, NULL)) AS A01,
+						COUNT(DECODE(CSS_KND, '2', 1, NULL)) AS A02,
+						COUNT(DECODE(CSS_KND, '3', 1, NULL)) AS A03,
+						COUNT(DECODE(CSS_KND, '4', 1, NULL)) AS A04,
+						COUNT(DECODE(CSS_KND, '5', 1, NULL)) AS A05
+				FROM SMARTTGIS.GT_A008_A A
+		]]>
+		<where>
+			<if test="guCde   != null and guCde   != ''">
+				AND A.GU_CDE  IN 	<foreach collection="guCde" item="item" open="(" close=")" separator=",">#{item}</foreach>
+			</if>
+			<if test="dongCde   != null and dongCde   != ''">
+				AND A.DONG_CDE  IN 	<foreach collection="dongCde" item="item" open="(" close=")" separator=",">#{item}</foreach>
+			</if>
+			<if test="policeCde   != null and policeCde   != ''">
+				AND A.PE_CDE  IN 	<foreach collection="policeCde" item="item" open="(" close=")" separator=",">#{item}</foreach>
+			</if>
+			<if test="statGbn   != null and statGbn   != ''">
+				AND A.CSS_KND  IN 	<foreach collection="statGbn" item="item" open="(" close=")" separator=",">#{item}</foreach>
+			</if>
+			<if test="typeCde   != null and typeCde   != ''">
+				AND A.TYPE_CDE  IN 	<foreach collection="typeCde" item="item" open="(" close=")" separator=",">#{item}</foreach>
+			</if>
+			<if test="stYmd   != null and stYmd   != ''">
+				<![CDATA[AND A.ESB_YMD >= #{stYmd}]]>
+			</if>
+			<if test="enYmd   != null and enYmd   != ''">
+				<![CDATA[AND A.ESB_YMD <= #{enYmd}]]>
+			</if>
+		</where>
+		<![CDATA[
+				GROUP BY ROLLUP(A.PE_NAM)
+				ORDER BY NAME NULLS FIRST) TEMP
+ 		]]>
+	</select>
+
+<!-- 교차로 동별 전체 통계 -->
+	<select id="selectDongStatistics_GT_A008_A" parameterType="map" resultType="egovMap">
+		<![CDATA[
+		SELECT
+					DECODE(NAME, NULL, '합계', NAME) AS  "구분",
+					TO_CHAR(TOTAL, '999,999,999,999') AS "합계",
+					TO_CHAR(A01, '999,999,999,999') AS "단일로",
+					TO_CHAR(A02, '999,999,999,999') AS "3거리",
+					TO_CHAR(A03, '999,999,999,999') AS "4거리",
+					TO_CHAR(A04, '999,999,999,999') AS "5거리",
+					TO_CHAR(A05, '999,999,999,999') AS "6거리"
+				FROM  (
+			SELECT  G.EMD_KOR_NM AS NAME,
+					(COUNT(DECODE(CSS_KND, '1', 1, NULL)) + COUNT(DECODE(CSS_KND, '2', 1, NULL)) + COUNT(DECODE(CSS_KND, '3', 1, NULL)) + COUNT(DECODE(CSS_KND, '4', 1, NULL)) + COUNT(DECODE(CSS_KND, '5', 1, NULL))) AS TOTAL,
+					COUNT(DECODE(CSS_KND, '1', 1, NULL)) AS A01,
+					COUNT(DECODE(CSS_KND, '2', 1, NULL)) AS A02,
+					COUNT(DECODE(CSS_KND, '3', 1, NULL)) AS A03,
+					COUNT(DECODE(CSS_KND, '4', 1, NULL)) AS A04,
+					COUNT(DECODE(CSS_KND, '5', 1, NULL)) AS A05
+			FROM SMARTTGIS.GT_A008_A A, SMARTTGIS.GT_LP_AA_EMD G
+			WHERE A.DONG_NAM(+) = G.EMD_KOR_NM
+				]]>
+		<if test="guCde   != null and guCde   != ''">
+			AND A.GU_CDE  IN 	<foreach collection="guCde" item="item" open="(" close=")" separator=",">#{item}</foreach>
+		</if>
+		<if test="dongCde   != null and dongCde   != ''">
+			AND A.DONG_CDE  IN 	<foreach collection="dongCde" item="item" open="(" close=")" separator=",">#{item}</foreach>
+		</if>
+		<if test="policeCde   != null and policeCde   != ''">
+			AND A.PE_CDE  IN 	<foreach collection="policeCde" item="item" open="(" close=")" separator=",">#{item}</foreach>
+		</if>
+		<if test="statGbn   != null and statGbn   != ''">
+			AND A.CSS_KND  IN 	<foreach collection="statGbn" item="item" open="(" close=")" separator=",">#{item}</foreach>
+		</if>
+		<if test="typeCde   != null and typeCde   != ''">
+			AND A.TYPE_CDE  IN 	<foreach collection="typeCde" item="item" open="(" close=")" separator=",">#{item}</foreach>
+		</if>
+		<if test="stYmd   != null and stYmd   != ''">
+			<![CDATA[AND A.ESB_YMD >= #{stYmd}]]>
+		</if>
+		<if test="enYmd   != null and enYmd   != ''">
+			<![CDATA[AND A.ESB_YMD <= #{enYmd}]]>
+		</if>
+		<![CDATA[
+			GROUP BY ROLLUP(G.EMD_KOR_NM)
+			ORDER BY NAME NULLS FIRST) TEMP
+				]]>
+	</select>
+
+<!-- 교차로 상세내역 전체 통계 -->
+	<select id="selectDetailFcltsList_GT_A008_A" parameterType="map" resultType="egovMap">
+		<![CDATA[
+		SELECT	TEMP.*
+		FROM	(SELECT	ROWNUM  AS NUM,
+						TEMP.*,
+						COUNT(*) OVER() AS TOTALROWS
+		        FROM   (SELECT
+							MGRNU,
+							PE_NAM,
+							GU_NAM,
+							DONG_NAM,
+							JIBUN,
+							CSS_NAM,
+							TO_CODE('A008_A','CSS_KND',CSS_KND) AS CSS_KND_NAM,
+							TO_CODE('A008_A','TYPE_CDE',TYPE_CDE) AS TYPE_CDE_NAM,
+							TO_CHAR(ESB_YMD, 'YYYY-MM-DD') AS ESB_YMD
+						FROM	SMARTTGIS.GT_A008_A A
+		]]>
+		<where>
+			<if test="guCde   != null and guCde   != ''">
+				AND A.GU_CDE  IN 	<foreach collection="guCde" item="item" open="(" close=")" separator=",">#{item}</foreach>
+			</if>
+			<if test="dongCde   != null and dongCde   != ''">
+				AND A.DONG_CDE  IN 	<foreach collection="dongCde" item="item" open="(" close=")" separator=",">#{item}</foreach>
+			</if>
+			<if test="policeCde   != null and policeCde   != ''">
+				AND A.PE_CDE  IN 	<foreach collection="policeCde" item="item" open="(" close=")" separator=",">#{item}</foreach>
+			</if>
+			<if test="statGbn   != null and statGbn   != ''">
+				AND A.CSS_KND  IN 	<foreach collection="statGbn" item="item" open="(" close=")" separator=",">#{item}</foreach>
+			</if>
+			<if test="typeCde   != null and typeCde   != ''">
+				AND A.TYPE_CDE  IN 	<foreach collection="typeCde" item="item" open="(" close=")" separator=",">#{item}</foreach>
+			</if>
+			<if test="stYmd   != null and stYmd   != ''">
+				<![CDATA[AND A.ESB_YMD >= #{stYmd}]]>
+			</if>
+			<if test="enYmd   != null and enYmd   != ''">
+				<![CDATA[AND A.ESB_YMD <= #{enYmd}]]>
+			</if>
+		</where>
+		<![CDATA[
+		                ORDER BY MGRNU DESC
+		                ) TEMP)TEMP WHERE NUM BETWEEN #{rows} * ( #{page} - 1 ) + 1 AND #{rows}* #{page}
+	]]>
+	</select>
+
+	<select id="selectDetailFcltsExcelDown_GT_A008_A" parameterType="map" resultType="egovMap">
+		<![CDATA[
+			SELECT	ROWNUM  AS NUM,
+					TEMP.*
+			FROM	(SELECT
+							MGRNU,
+							PE_NAM,
+							GU_NAM,
+							DONG_NAM,
+							JIBUN,
+							CSS_NAM,
+							TO_CODE('A008_A','CSS_KND',CSS_KND) AS CSS_KND_NAM,
+							TO_CODE('A008_A','TYPE_CDE',TYPE_CDE) AS TYPE_CDE_NAM,
+							TO_CHAR(ESB_YMD, 'YYYY-MM-DD') AS ESB_YMD
+					  FROM	SMARTTGIS.GT_A008_A A
+		]]>
+		<where>
+			<if test="guCde   != null and guCde   != ''">
+				AND A.GU_CDE  IN 	<foreach collection="guCde" item="item" open="(" close=")" separator=",">#{item}</foreach>
+			</if>
+			<if test="dongCde   != null and dongCde   != ''">
+				AND A.DONG_CDE  IN 	<foreach collection="dongCde" item="item" open="(" close=")" separator=",">#{item}</foreach>
+			</if>
+			<if test="policeCde   != null and policeCde   != ''">
+				AND A.PE_CDE  IN 	<foreach collection="policeCde" item="item" open="(" close=")" separator=",">#{item}</foreach>
+			</if>
+			<if test="statGbn   != null and statGbn   != ''">
+				AND A.CSS_KND  IN 	<foreach collection="statGbn" item="item" open="(" close=")" separator=",">#{item}</foreach>
+			</if>
+			<if test="typeCde   != null and typeCde   != ''">
+				AND A.TYPE_CDE  IN 	<foreach collection="typeCde" item="item" open="(" close=")" separator=",">#{item}</foreach>
+			</if>
+			<if test="stYmd   != null and stYmd   != ''">
+				<![CDATA[AND A.ESB_YMD >= #{stYmd}]]>
+			</if>
+			<if test="enYmd   != null and enYmd   != ''">
+				<![CDATA[AND A.ESB_YMD <= #{enYmd}]]>
+			</if>
+		</where>
+		<![CDATA[
+		                ORDER BY MGRNU DESC) TEMP
+	]]>
+	</select>
+
+<!-- 교차로 교차로기준 통계 -->
+	<select id="selectCrossStatistics_GT_A008_A" parameterType="map" resultType="egovMap">
+		<![CDATA[
+		SELECT	TEMP.*
+		FROM	(SELECT	ROWNUM  AS NUM,
+						TEMP.*,
+						COUNT(*) OVER() AS TOTALROWS
+				 FROM	(SELECT
+							CSS_NAM AS "구분",
+							TO_CODE('A008_A','CSS_KND',CSS_KND) AS "형태",
+							TO_CODE('A008_A','TYPE_CDE',TYPE_CDE) AS "유형",
+							(SELECT COUNT(*) FROM   GT_A061_P WHERE  GT_A061_P.CSS_MGRNU = A.MGRNU) AS "제어기",
+							(SELECT COUNT(*) FROM   GT_A110_P WHERE  GT_A110_P.CSS_MGRNU = A.MGRNU) AS "신호등",
+							(SELECT COUNT(*) FROM   GT_A057_L WHERE  GT_A057_L.CSS_MGRNU = A.MGRNU) AS "부착대",
+							(SELECT COUNT(*) FROM   GT_A062_P WHERE  GT_A062_P.CSS_MGRNU = A.MGRNU) AS "지주",
+							(SELECT COUNT(*) FROM   GT_A090_P WHERE  GT_A090_P.CSS_MGRNU = A.MGRNU AND KND = '1') AS "음향<br>신호기",
+							(SELECT COUNT(*) FROM   GT_A090_P WHERE  GT_A090_P.CSS_MGRNU = A.MGRNU AND KND = '2') AS "보행자버튼",
+							(SELECT COUNT(*) FROM   GT_A049_P WHERE  GT_A049_P.CSS_MGRNU = A.MGRNU) AS "검지기",
+							(SELECT COUNT(*) FROM   GT_C022_P WHERE  GT_C022_P.CSS_MGRNU = A.MGRNU) AS "보행용조명",
+							(SELECT COUNT(*) FROM   GT_A004_A WHERE  GT_A004_A.CSS_MGRNU = A.MGRNU) AS "횡단<br>보도"
+						FROM SMARTTGIS.GT_A008_A A
+						WHERE A.CSS_NAM IS NOT NULL
+		]]>
+			<if test="guCde   != null and guCde   != ''">
+				AND A.GU_CDE  IN 	<foreach collection="guCde" item="item" open="(" close=")" separator=",">#{item}</foreach>
+			</if>
+			<if test="dongCde   != null and dongCde   != ''">
+				AND A.DONG_CDE  IN 	<foreach collection="dongCde" item="item" open="(" close=")" separator=",">#{item}</foreach>
+			</if>
+			<if test="policeCde   != null and policeCde   != ''">
+				AND A.PE_CDE  IN 	<foreach collection="policeCde" item="item" open="(" close=")" separator=",">#{item}</foreach>
+			</if>
+			<if test="statGbn   != null and statGbn   != ''">
+				AND A.CSS_KND  IN 	<foreach collection="statGbn" item="item" open="(" close=")" separator=",">#{item}</foreach>
+			</if>
+			<if test="typeCde   != null and typeCde   != ''">
+				AND A.TYPE_CDE  IN 	<foreach collection="typeCde" item="item" open="(" close=")" separator=",">#{item}</foreach>
+			</if>
+			<if test="stYmd   != null and stYmd   != ''">
+				<![CDATA[AND A.ESB_YMD >= #{stYmd}]]>
+			</if>
+			<if test="enYmd   != null and enYmd   != ''">
+				<![CDATA[AND A.ESB_YMD <= #{enYmd}]]>
+			</if>
+			<if test="cssNam != null and cssNam != ''">
+				<![CDATA[AND A.CSS_NAM LIKE '%' || #{cssNam} || '%']]>
+			</if>
+		<![CDATA[
+					ORDER BY CSS_NAM) TEMP)TEMP WHERE NUM BETWEEN #{rows} * ( #{page} - 1 ) + 1 AND #{rows}* #{page}
+ 		]]>
+	</select>
+
+</mapper>

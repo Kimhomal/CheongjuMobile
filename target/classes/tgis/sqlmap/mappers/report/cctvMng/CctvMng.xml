@@ -1,0 +1,262 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper   PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="tgis.report.cctvMng.service.CctvMngMapper">
+
+	<!-- [관리대장 > 교통정보수집용 CCTV 관리카드 리스트 조회] -->
+	<select id="selectInfoList" parameterType="map" resultType="egovMap">
+		<![CDATA[
+		SELECT	TEMP.*
+		FROM	(SELECT ROWNUM NUM, TCM.*, COUNT(*) OVER() AS TOTALROWS
+				 FROM  (SELECT A.ESB_HIT, A.MK_CPY, A.MK_MDL, A.ESB_YMD, A.CNN_SITE, A.CNN_MAIN, A.MGRNU, A.SGR, B.CSS_NAM, A.MGE_CHUNG
+		 				FROM GT_A069_P A
+		 				LEFT JOIN GT_A008_A B ON A.CSS_MGRNU = B.MGRNU
+		 				WHERE 1=1
+		 				AND KND ='0'
+	]]>
+	<if test="searchType != '' and searchType != null">
+		<choose>
+			<when test="searchType == 'mgrnu'">
+				<![CDATA[ AND A.MGRNU LIKE '%' || #{searchKeyword} || '%' ]]>
+			</when>
+			<otherwise>
+				<![CDATA[ AND B.CSS_NAM LIKE '%' || #{searchKeyword} || '%' ]]>
+			</otherwise>
+		</choose>
+	</if>
+	<![CDATA[
+						 ORDER BY B.CSS_NAM ASC) TCM) TEMP
+				 WHERE NUM BETWEEN #{rows} * ( #{page} - 1 ) + 1 AND #{rows}* #{page}
+	]]>
+	</select>
+
+	<!-- [관리대장 > 교통정보수집용 CCTV 관리카드 상세 조회] -->
+	<select id="selectInfo" parameterType="map" resultType="egovMap">
+	<![CDATA[
+		SELECT 	A.MGRNU,
+				A.DIRECTION,
+				TO_CODE('ALL','DIRECTION', A.DIRECTION) AS DIRECTION_NAM,
+				A.EVE,
+				TO_CODE('ALL','EVE', A.EVE) AS EVE_NAM,
+				TO_CHAR(A.ESB_YMD, 'YYYY-MM-DD') AS ESB_YMD,
+				A.ESB_CPY,
+				A.CTK_MGRNU,
+				A.SPRT_MGRNU,
+				A.ASN_MGRNU,
+				A.KND,
+				TO_CODE('A069_P', 'KND', A.KND) AS KND_NAM,
+				A.MK_MDL,
+				A.MK_CPY,
+				A.ESB_HIT,
+				A.CNN_TYPE,
+				A.CNN_SITE,
+				A.CNN_MAIN,
+				A.PE_NAM,
+				A.GU_NAM,
+				A.DONG_NAM,
+				A.JIBUN,
+				A.SCH_NAM,
+				A.SGR,
+				B.CSS_NAM,
+				(SELECT COUNT(*) FROM FACILITY_PHOTO_ALBUM WHERE MGRNU = #{mgrnu}) AS FILECNT,
+				A.XGEO.SDO_POINT.X AS XCE,
+				A.XGEO.SDO_POINT.Y AS YCE
+		FROM	GT_A069_P A
+		LEFT JOIN GT_A008_A B ON A.CSS_MGRNU=B.MGRNU
+		WHERE	A.MGRNU = #{mgrnu}
+	]]>
+	</select>
+
+	<!-- [관리대장 > 교통정보수집용 CCTV 관리카드 사진 조회] -->
+	<select id="selectFileInfo" parameterType="map" resultType="egovMap">
+	<![CDATA[
+		SELECT  *
+		FROM  ( SELECT ROWNUM RNUM, ALL_LIST.*
+				FROM  ( SELECT	SN,
+								MGRNU,
+								PHOTO_SJ,
+								ATCH_FILE_ID,
+								CREAT_DT,
+								UPDT_DT,
+								(SELECT FILE_STRE_COURS FROM COMTNFILEDETAIL WHERE ATCH_FILE_ID = A.ATCH_FILE_ID) AS FILE_PATH,
+								(SELECT STRE_FILE_NM FROM COMTNFILEDETAIL WHERE ATCH_FILE_ID = A.ATCH_FILE_ID) AS FILE_NAM,
+								(SELECT ORIGNL_FILE_NM FROM COMTNFILEDETAIL WHERE ATCH_FILE_ID = A.ATCH_FILE_ID) AS ORIGNL_FILE_NM
+						FROM	FACILITY_PHOTO_ALBUM A
+						WHERE	MGRNU = #{mgrnu}
+						ORDER BY SN DESC) ALL_LIST)
+	]]>
+	</select>
+
+	<!-- [관리대장 > 교통정보수집용 CCTV 관리카드 사진 조회(삭제된 파일)] -->
+	<select id="selectFileInfoDetail" parameterType="map" resultType="egovMap">
+	<![CDATA[
+		SELECT	SN,
+				MGRNU,
+				PHOTO_SJ,
+				ATCH_FILE_ID,
+				CREAT_DT,
+				UPDT_DT,
+				(SELECT FILE_STRE_COURS FROM COMTNFILEDETAIL WHERE ATCH_FILE_ID = A.ATCH_FILE_ID) AS FILE_PATH,
+				(SELECT STRE_FILE_NM FROM COMTNFILEDETAIL WHERE ATCH_FILE_ID = A.ATCH_FILE_ID) AS FILE_NAM,
+				(SELECT ORIGNL_FILE_NM FROM COMTNFILEDETAIL WHERE ATCH_FILE_ID = A.ATCH_FILE_ID) AS ORIGNL_FILE_NM
+		FROM	FACILITY_PHOTO_ALBUM A
+		WHERE	MGRNU = #{mgrnu}
+		AND 	SN = #{sn}
+	]]>
+	</select>
+
+	<delete id="deleteFileMaster" parameterType="map">
+		<![CDATA[
+			DELETE FROM COMTNFILE
+			WHERE ATCH_FILE_ID = #{atchFileId}
+		]]>
+	</delete>
+
+	<delete id="deleteFileDetail" parameterType="map">
+		<![CDATA[
+			DELETE FROM COMTNFILEDETAIL
+			WHERE ATCH_FILE_ID = #{atchFileId}
+		]]>
+	</delete>
+
+	<delete id="deleteFileInfo" parameterType="map">
+		<![CDATA[
+			DELETE FROM FACILITY_PHOTO_ALBUM
+			WHERE SN = #{sn}
+		]]>
+		<if test="mgrnu != '' and mgrnu != null">
+			<![CDATA[ AND MGRNU = #{mgrnu} ]]>
+		</if>
+	</delete>
+
+	<insert id="insertFile" parameterType="map">
+		<selectKey resultType="int" keyProperty="sn" order="BEFORE">
+		<![CDATA[
+			SELECT NVL(MAX (SN), 0) + 1 AS SN FROM FACILITY_PHOTO_ALBUM
+		]]>
+		</selectKey>
+		<![CDATA[
+			INSERT INTO FACILITY_PHOTO_ALBUM (
+				SN,
+				MGRNU,
+				PHOTO_SJ,
+				ATCH_FILE_ID,
+				CREAT_DT,
+				UPDT_DT
+			)
+			VALUES (
+				#{sn},
+				#{mgrnu},
+				#{photoSj},
+				#{atchFileId},
+				SYSDATE,
+				SYSDATE
+			)
+		]]>
+	</insert>
+
+	<insert id="insertFileMaster" parameterType="java.lang.String">
+		<![CDATA[
+			INSERT INTO COMTNFILE (
+				ATCH_FILE_ID,
+				CREAT_DT,
+				USE_AT
+			)
+			VALUES (
+				#{atchFileId},
+				SYSDATE,
+				'Y'
+			)
+		]]>
+	</insert>
+
+	<insert id="insertFileDetail" parameterType="map">
+		<![CDATA[
+			INSERT INTO COMTNFILEDETAIL (
+				ATCH_FILE_ID,
+				FILE_SN,
+				FILE_STRE_COURS,
+				STRE_FILE_NM,
+				ORIGNL_FILE_NM,
+				FILE_EXTSN,
+				FILE_SIZE)
+			VALUES (
+				#{atchFileId},
+				#{fileSn},
+				#{fileStreCours},
+				#{streFileNm},
+				#{orignlFileNm},
+				#{fileExtsn},
+				#{fileSize}
+			  )
+		]]>
+	</insert>
+
+	<delete id="deleteInfo" parameterType="map">
+		<![CDATA[
+			DELETE FROM GT_A069_P
+			WHERE	MGRNU = #{mgrnu}
+		]]>
+	</delete>
+
+	<update id="updateInfo" parameterType="map">
+	<![CDATA[
+		UPDATE GT_A069_P
+		SET    DIRECTION = #{direction},
+			   EVE = #{eve},
+			   ESB_YMD = #{esbYmd},
+			   ESB_CPY = #{esbCpy},
+			   CTK_MGRNU = #{ctkMgrnu},
+			   SPRT_MGRNU = #{sprtMgrnu},
+			   ASN_MGRNU = #{asnMgrnu},
+			   KND = #{knd},
+			   MK_MDL = #{mkMdl},
+			   MK_CPY = #{mkCpy},
+			   ESB_HIT = #{esbHit},
+			   CNN_TYPE = #{cnnType},
+			   CNN_SITE = #{cnnSite},
+			   CNN_MAIN = #{cnnMain},
+			   SGR = #{sgr}
+		WHERE  MGRNU =#{mgrnu}
+	]]>
+	</update>
+
+	<select id="atchFileId" resultType="java.lang.String">
+		<![CDATA[
+			SELECT	'FILE_' || LPAD(TO_CHAR(SUBSTR(MAX(ATCH_FILE_ID), 6, 100) + 1), 15, '0') AS CNT
+			FROM	COMTNFILE
+		]]>
+	</select>
+
+	<select id="selectExcelList" parameterType="map" resultType="egovMap">
+	<![CDATA[
+		SELECT	ROWNUM NUM,
+				TEMP.MGRNU,
+				TEMP.CSS_NAM,
+				TEMP.MK_MDL,
+				TEMP.CNN_SITE,
+				TEMP.CNN_MAIN,
+				TEMP.SGR
+		FROM	(SELECT A.ESB_HIT, A.MK_CPY, A.MK_MDL, A.ESB_YMD, A.CNN_SITE, A.CNN_MAIN, A.MGRNU, A.SGR, B.CSS_NAM, A.MGE_CHUNG
+				 FROM GT_A069_P A
+				 LEFT JOIN GT_A008_A B ON A.CSS_MGRNU = B.MGRNU
+				 WHERE 1=1
+				 AND KND ='0'
+	]]>
+		<if test="searchType != '' and searchType != null">
+			<choose>
+				<when test="searchType == 'mgrnu'">
+					<![CDATA[ AND A.MGRNU LIKE '%' || #{searchKeyword} || '%' ]]>
+				</when>
+				<otherwise>
+					<![CDATA[ AND B.CSS_NAM LIKE '%' || #{searchKeyword} || '%' ]]>
+				</otherwise>
+			</choose>
+		</if>
+
+		<![CDATA[
+				 ORDER BY B.CSS_NAM ASC) TEMP
+		]]>
+	</select>
+
+</mapper>

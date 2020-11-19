@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper   PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="tgis.system.menu.service.ProgMgrMapper">
+
+	<!-- 관리자 > 프로그램 리스트 > 프로그램 리스트 조회-->
+	<select id="selectProgList" parameterType="map" resultType="egovMap">
+	<![CDATA[
+		SELECT *
+		FROM	SYS_PROG_MNG
+		ORDER BY PROG_ID
+	]]>
+	</select>
+		<!-- 	 관리자 > 프로그램 리스트 > 프로그램 상세 조회 -->
+	<select id="selectProgInfo" parameterType="map" resultType="egovMap">
+	<![CDATA[
+		SELECT *
+		FROM	SYS_PROG_MNG
+		WHERE PROG_ID = #{progId}
+		ORDER BY PROG_ID
+	]]>
+	</select>
+
+	<!-- 관리자 > 프로그램 리스트 > 프로그램 추가 -->
+	<insert id="insertProgInfo" parameterType="map" >
+		<![CDATA[
+			INSERT INTO
+					SYS_PROG_MNG(PROG_ID,
+					PROG_NM,
+					PROG_DESC,
+					PROG_URL,
+					POPUP_YN)
+			VALUES (
+				 (SELECT
+					#{progGbNm} || LPAD( NVL( MAX(SUBSTR(prog_id, LENGTH( #{progGbNm} )+ 1, 2)), 0) + 1, 2, '0')
+				FROM SYS_PROG_MNG
+				WHERE PROG_ID LIKE #{progGbNm} || '%') ,
+				#{progNm} ,
+				#{progNm},
+				#{progUrl},
+				#{popupYn})
+		]]>
+	</insert>
+
+	<!-- 관리자 > 프로그램 리스트 > 프로그램 수정 -->
+	<update id="updateProgInfo" parameterType="map" >
+	<![CDATA[
+		UPDATE SYS_PROG_MNG
+		SET	PROG_NM = #{progNm},
+				PROG_URL = #{progUrl} ,
+				POPUP_YN =#{popupYn}
+		WHERE PROG_ID = #{progId}
+	]]>
+	</update>
+
+	<!-- 관리자 > 프로그램 리스트 > 프로그램 삭제 -->
+	<delete id="deleteProgInfo" parameterType="map" >
+	<![CDATA[
+		DELETE FROM SYS_PROG_MNG
+		WHERE PROG_ID = #{progId}
+		]]>
+	</delete>
+
+	<select id="progSearchList" parameterType="map" resultType="egovMap">
+	<![CDATA[
+		SELECT *
+		FROM	SYS_PROG_MNG
+		WHERE 1=1
+	]]>
+	<if test="progGb != NULL and progGb != ''">
+		AND PROG_ID LIKE #{progGb} || '%'
+	</if>
+	<if test="progGbNm != NULL and progGbNm != ''">
+		AND PROG_NM LIKE '%' || #{progGbNm} || '%'
+	</if>
+	<![CDATA[
+		 ORDER BY PROG_ID
+	]]>
+	</select>
+
+</mapper>

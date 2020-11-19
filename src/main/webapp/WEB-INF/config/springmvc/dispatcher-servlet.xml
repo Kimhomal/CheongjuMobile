@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:p="http://www.springframework.org/schema/p"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:mvc="http://www.springframework.org/schema/mvc"
+	xmlns:oxm="http://www.springframework.org/schema/oxm"
+	xmlns:ehcache="http://ehcache-spring-annotations.googlecode.com/svn/schema/ehcache-spring"
+	xsi:schemaLocation="http://www.springframework.org/schema/oxm http://www.springframework.org/schema/oxm/spring-oxm-3.0.xsd
+		http://ehcache-spring-annotations.googlecode.com/svn/schema/ehcache-spring http://ehcache-spring-annotations.googlecode.com/svn/schema/ehcache-spring/ehcache-spring-1.2.xsd
+		http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc-4.0.xsd
+		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-4.0.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.0.xsd">
+
+	<!-- 패키지 내 Controller, Service, Repository 클래스의 auto detect를 위한 mvc 설정 -->
+	<context:component-scan base-package="egovframework,tgis"> <!-- 실제 프로젝트명으로 패키지명 변경 해야됨 * 체크 필요 *  -->
+		<context:include-filter type="annotation" expression="org.springframework.stereotype.Controller"/>
+		<context:exclude-filter type="annotation" expression="org.springframework.stereotype.Service"/>
+		<context:exclude-filter type="annotation" expression="org.springframework.stereotype.Repository"/>
+	</context:component-scan>
+
+	<!-- 서블릿컨네이너상의 exception에 대한 오류 페이지를 연결하는 mvc 설정 -->
+	<bean class="org.springframework.web.servlet.handler.SimpleMappingExceptionResolver">
+		<property name="defaultErrorView" value="error/egovBizException"/>
+		<property name="exceptionMappings">
+			<props>
+				<prop key="org.springframework.dao.DataAccessException">error/dataAccessFailure</prop>
+				<prop key="org.springframework.transaction.TransactionException">error/transactionFailure</prop>
+				<prop key="egovframework.rte.fdl.cmmn.exception.EgovBizException">error/egovBizException</prop>
+			</props>
+		</property>
+	</bean>
+
+	<bean class="org.springframework.web.servlet.view.ContentNegotiatingViewResolver">
+		<property name="contentNegotiationManager">
+			<bean class="org.springframework.web.accept.ContentNegotiationManager">
+				<constructor-arg>
+					<bean
+						class="org.springframework.web.accept.PathExtensionContentNegotiationStrategy">
+						<constructor-arg>
+							<map>
+								<entry key="json" value="application/json" />
+								<entry key="xml" value="application/xml" />
+							</map>
+						</constructor-arg>
+					</bean>
+				</constructor-arg>
+			</bean>
+		</property>
+		<property name="defaultViews">
+			<list>
+				<bean class="org.springframework.web.servlet.view.json.MappingJackson2JsonView">
+					<property name="contentType" value="application/json;charset=UTF-8" />
+					<property name="prefixJson" value="false" />
+					<property name="extractValueFromSingleKeyModel" value="true" />
+					<property name="modelKeys" value="jsonView" />
+					<property name="objectMapper">
+						<bean class="tgis.common.jackson.JacksonObjectMapper" /> <!-- 실제 프로젝트명으로 패키지명 변경 해야됨 * 체크 필요 *  -->
+					</property>
+				</bean>
+				<bean class="org.springframework.web.servlet.view.xml.MarshallingView">
+					<constructor-arg>
+						<bean class="org.springframework.oxm.jaxb.Jaxb2Marshaller">
+							<property name="packagesToScan">
+								<list>
+									<value>tgis.**.service</value><!-- 실제 프로젝트명으로 패키지명 변경 해야됨 * 체크 필요 *  -->
+								</list>
+							</property>
+						</bean>
+					</constructor-arg>
+				</bean>
+			</list>
+		</property>
+	</bean>
+
+
+	<!-- 화면처리용 JSP 파일명의  prefix, suffix 처리에 대한 mvc 설정  -->
+	<bean class="org.springframework.web.servlet.view.UrlBasedViewResolver" p:order="2"
+		p:viewClass="org.springframework.web.servlet.view.JstlView"
+		p:prefix="/WEB-INF/jsp/" p:suffix=".jsp"/>
+
+	<!-- <bean class="org.springframework.web.servlet.view.BeanNameViewResolver">
+		<property name="order" value="0" />
+	</bean> -->
+
+	<!--
+	<ehcache:annotation-driven />
+
+	<ehcache:config cache-manager="cacheManager">
+		<ehcache:evict-expired-elements interval="60" />
+	</ehcache:config>
+
+	<bean id="cacheManager" class="org.springframework.cache.ehcache.EhCacheManagerFactoryBean">
+		<property name="configLocation"  value="classpath:/ehcache.xml"/>
+	</bean>
+	 -->
+
+
+	<!-- tiles3 설정 Start -->
+	<bean id="tilesViewResolver" class="org.springframework.web.servlet.view.UrlBasedViewResolver">
+		<property name="viewClass" value="org.springframework.web.servlet.view.tiles3.TilesView" />
+		<property name="order" value="1" />
+	</bean>
+
+	<bean id="tilesConfigurer" class="org.springframework.web.servlet.view.tiles3.TilesConfigurer">
+		<property name="definitions">
+			<value>/WEB-INF/tiles/tiles.xml</value>
+		</property>
+	</bean>
+	<!-- tiles3 설정 End -->
+
+
+<!-- 	로그인 체크 Interceptor -->
+<!-- 	Exclude 대상은 컨트롤러에서 @AuthExclude 어노테이션 사용 -->
+<!-- 	<mvc:interceptors> -->
+<!-- 		<mvc:interceptor> -->
+<!-- 			<mvc:mapping path="/**/*.do" /> -->
+<!-- 			<mvc:mapping path="/**/*.json" /> -->
+<!-- 			<mvc:exclude-mapping path="/map/proxy/*.do*" /> -->
+<!-- 			<mvc:exclude-mapping path="/**/*.jsp" /> -->
+<!-- 			<bean class="tgis.user.auth.interceptor.AuthInterceptor" /> -->
+<!-- 		</mvc:interceptor> -->
+<!-- 	</mvc:interceptors> -->
+<!--  실제 프로젝트명으로 패키지명 변경 해야됨 * 체크 필요 *  -->
+
+	<!-- Annotation 을 사용하지 않는 경우에 대한 MVC 처리 설정 -->
+<!-- 	<mvc:view-controller path="/cmmn/validator.do" view-name="cmmn/validator"/> -->
+
+<!-- 	<mvc:annotation-driven/> -->
+
+</beans>

@@ -1,0 +1,305 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper   PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="tgis.report.signalMng.service.SignalMngMapper">
+
+	<!-- [관리대장 > 교통신호기 관리대장 리스트 조회] -->
+	<select id="selectInfoList" parameterType="map" resultType="egovMap">
+	<![CDATA[
+		SELECT *
+		FROM   (SELECT   A.*, ROWNUM NUM, COUNT(*) OVER() AS TOTALROWS
+		        FROM     (SELECT T.*
+		                  FROM   (SELECT PE_NAM,
+		                                 PE_CDE,
+		                                 ROD_MGRNU,
+		                                 TO_CHAR(ESB_YMD,'YYYY-MM-DD') AS ESB_YMD,
+		                                 LAY_LOCA,
+		                                 MK_MDL,
+		                                 MGRNU AS CTR_MGRNU,
+		                                 CSS_MGRNU,
+		                                 ROD_NAM,
+		                                 GU_CDE,
+		                                 DONG_CDE,
+		                                 TO_CODE('A061_P','CTL_MET',CTL_MET) AS CTL_MET,
+		                                 TO_CODE('A061_P','ROD_KND',ROD_KND) AS ROD_KND,
+		                                 TO_CODE('A061_P','CON_FOR',CON_FOR) AS CON_FOR,
+		                                 TO_CODE('A061_P','LINE_MET',LINE_MET) AS LINE_MET
+		                          FROM   GT_A061_P) T ORDER BY CTR_MGRNU DESC) A
+		                 LEFT JOIN (SELECT MGRNU,CSS_NAM,GU_NAM,DONG_NAM
+		                            FROM   GT_A008_A) TEMP
+		                 ON A.CSS_MGRNU = TEMP.MGRNU
+	]]>
+	<where>
+		<if test="mgrnu != '' and mgrnu != null">
+			<![CDATA[ AND MGRNU = #{mgrnu} ]]>
+		</if>
+		<if test="sdate != '' and sdate != null">
+			<![CDATA[ AND ESB_YMD >= #{sdate} ]]>
+		</if>
+		<if test="edate != '' and edate != null">
+			<![CDATA[ AND ESB_YMD <= #{edate} ]]>
+		</if>
+		<if test="peCde != '' and peCde != null">
+			<![CDATA[ AND PE_CDE = #{peCde} ]]>
+		</if>
+		<if test="guNam != '' and guNam != null">
+			<![CDATA[ AND GU_CDE = #{guNam} ]]>
+		</if>
+		<if test="dongNam != '' and dongNam != null">
+			<![CDATA[ AND DONG_CDE = #{dongNam} ]]>
+		</if>
+		<if test="layLoca != '' and layLoca != null">
+			<![CDATA[ AND LAY_LOCA LIKE '%' || #{layLoca} || '%' ]]>
+		</if>
+	</where>
+	<![CDATA[
+						ORDER BY NUM ASC)
+		WHERE NUM BETWEEN #{rows} * ( #{page} - 1 ) + 1 AND #{rows}* #{page}
+	]]>
+	</select>
+
+	<!-- [관리대장 > 교통신호기 관리대장 상세 조회] -->
+	<select id="selectInfo" parameterType="map" resultType="egovMap">
+	<![CDATA[
+		SELECT *
+		FROM   (SELECT	ROWNUM RNUM,
+						T.*
+				FROM   (SELECT	PE_NAM,
+								PE_CDE,
+								ROD_MGRNU,
+								TO_CHAR(ESB_YMD,'YYYY-MM-DD') AS ESB_YMD,
+								LAY_LOCA,
+								MK_MDL,
+								MGRNU AS CTR_MGRNU,
+								CSS_MGRNU,
+								ROD_NAM,
+								CTL_MET,
+								(SELECT CMMT FROM M_CODE WHERE CDTP = 'A061_P' AND CDN = 'CTL_MET' AND CD = A.CTL_MET) AS CTL_MET_NAME,
+								ROD_KND,
+								(SELECT CMMT FROM M_CODE WHERE CDTP = 'A061_P' AND CDN = 'ROD_KND' AND CD = A.ROD_KND) AS ROD_KND_NAME,
+								CON_FOR,
+								(SELECT CMMT FROM M_CODE WHERE CDTP = 'A061_P' AND CDN = 'CON_FOR' AND CD = A.CON_FOR) AS CON_FOR_NAME,
+								LINE_MET,
+								(SELECT CMMT FROM M_CODE WHERE CDTP = 'A061_P' AND CDN = 'LINE_MET' AND CD = A.LINE_MET) AS LINE_MET_NAME,
+								(SELECT COUNT(*) FROM FACILITY_PHOTO_ALBUM WHERE MGRNU = #{mgrnu}) AS FILECNT,
+								A.XGEO.SDO_POINT.X AS XCE,
+								A.XGEO.SDO_POINT.Y AS YCE
+						FROM	GT_A061_P A
+						ORDER BY MGRNU ASC) T) A
+				LEFT JOIN (SELECT	MGRNU, CSS_NAM, GU_NAM, DONG_NAM
+							FROM	GT_A008_A) TEMP
+				ON A.CSS_MGRNU = TEMP.MGRNU
+				WHERE CTR_MGRNU = #{mgrnu}
+	]]>
+	</select>
+
+	<!-- [관리대장 > 교통신호기 관리대장 사진 조회] -->
+	<select id="selectFileInfo" parameterType="map" resultType="egovMap">
+	<![CDATA[
+		SELECT  *
+		FROM  ( SELECT ROWNUM RNUM, ALL_LIST.*
+				FROM  ( SELECT	SN,
+								MGRNU,
+								PHOTO_SJ,
+								ATCH_FILE_ID,
+								CREAT_DT,
+								UPDT_DT,
+								(SELECT FILE_STRE_COURS FROM COMTNFILEDETAIL WHERE ATCH_FILE_ID = A.ATCH_FILE_ID) AS FILE_PATH,
+								(SELECT STRE_FILE_NM FROM COMTNFILEDETAIL WHERE ATCH_FILE_ID = A.ATCH_FILE_ID) AS FILE_NAM,
+								(SELECT ORIGNL_FILE_NM FROM COMTNFILEDETAIL WHERE ATCH_FILE_ID = A.ATCH_FILE_ID) AS ORIGNL_FILE_NM
+						FROM	FACILITY_PHOTO_ALBUM A
+						WHERE	MGRNU = #{mgrnu}
+						ORDER BY SN DESC) ALL_LIST)
+	]]>
+	</select>
+
+	<!-- [관리대장 > 교통신호기 관리대장 사진 조회(삭제된 파일)] -->
+	<select id="selectFileInfoDetail" parameterType="map" resultType="egovMap">
+	<![CDATA[
+		SELECT	SN,
+				MGRNU,
+				PHOTO_SJ,
+				ATCH_FILE_ID,
+				CREAT_DT,
+				UPDT_DT,
+				(SELECT FILE_STRE_COURS FROM COMTNFILEDETAIL WHERE ATCH_FILE_ID = A.ATCH_FILE_ID) AS FILE_PATH,
+				(SELECT STRE_FILE_NM FROM COMTNFILEDETAIL WHERE ATCH_FILE_ID = A.ATCH_FILE_ID) AS FILE_NAM,
+				(SELECT ORIGNL_FILE_NM FROM COMTNFILEDETAIL WHERE ATCH_FILE_ID = A.ATCH_FILE_ID) AS ORIGNL_FILE_NM
+		FROM	FACILITY_PHOTO_ALBUM A
+		WHERE	MGRNU = #{mgrnu}
+		AND 	SN = #{sn}
+	]]>
+	</select>
+
+	<delete id="deleteFileMaster" parameterType="map">
+		<![CDATA[
+			DELETE FROM COMTNFILE
+			WHERE ATCH_FILE_ID = #{atchFileId}
+		]]>
+	</delete>
+
+	<delete id="deleteFileDetail" parameterType="map">
+		<![CDATA[
+			DELETE FROM COMTNFILEDETAIL
+			WHERE ATCH_FILE_ID = #{atchFileId}
+		]]>
+	</delete>
+
+	<delete id="deleteFileInfo" parameterType="map">
+		<![CDATA[
+			DELETE FROM FACILITY_PHOTO_ALBUM
+			WHERE SN = #{sn}
+		]]>
+		<if test="mgrnu != '' and mgrnu != null">
+			<![CDATA[ AND MGRNU = #{mgrnu} ]]>
+		</if>
+	</delete>
+
+	<insert id="insertFile" parameterType="map">
+		<selectKey resultType="int" keyProperty="sn" order="BEFORE">
+		<![CDATA[
+			SELECT NVL(MAX (SN), 0) + 1 AS SN FROM FACILITY_PHOTO_ALBUM
+		]]>
+		</selectKey>
+		<![CDATA[
+		INSERT INTO FACILITY_PHOTO_ALBUM (
+			SN,
+			MGRNU,
+			PHOTO_SJ,
+			ATCH_FILE_ID,
+			CREAT_DT,
+			UPDT_DT
+		)
+		VALUES (
+			#{sn},
+			#{mgrnu},
+			#{photoSj},
+			#{atchFileId},
+			SYSDATE,
+			SYSDATE
+		)
+	]]>
+	</insert>
+
+	<insert id="insertFileMaster" parameterType="java.lang.String">
+		<![CDATA[
+			INSERT INTO COMTNFILE (
+				ATCH_FILE_ID,
+				CREAT_DT,
+				USE_AT
+			)
+			VALUES (
+				#{atchFileId},
+				SYSDATE,
+				'Y'
+			)
+		]]>
+	</insert>
+
+	<insert id="insertFileDetail" parameterType="map">
+		<![CDATA[
+			INSERT INTO COMTNFILEDETAIL (
+				ATCH_FILE_ID,
+				FILE_SN,
+				FILE_STRE_COURS,
+				STRE_FILE_NM,
+				ORIGNL_FILE_NM,
+				FILE_EXTSN,
+				FILE_SIZE)
+			VALUES (
+				#{atchFileId},
+				#{fileSn},
+				#{fileStreCours},
+				#{streFileNm},
+				#{orignlFileNm},
+				#{fileExtsn},
+				#{fileSize}
+			  )
+		]]>
+	</insert>
+
+	<delete id="deleteInfo" parameterType="map">
+		<![CDATA[
+			DELETE FROM GT_A061_P
+			WHERE	MGRNU = #{mgrnu}
+		]]>
+	</delete>
+
+	<update id="updateInfo" parameterType="map">
+	<![CDATA[
+		UPDATE	GT_A061_P
+		SET		ESB_YMD = #{esbYmd},
+				LAY_LOCA = #{layLoca},
+				CTL_MET = #{ctlMet},
+				ROD_KND = #{rodKnd},
+				CON_FOR = #{conFor},
+				LINE_MET = #{lineMet},
+				MK_MDL = #{mkMdl}
+		WHERE	MGRNU = #{mgrnu}
+	]]>
+	</update>
+
+	<select id="atchFileId" resultType="java.lang.String">
+		<![CDATA[
+			SELECT	'FILE_' || LPAD(TO_CHAR(SUBSTR(MAX(ATCH_FILE_ID), 6, 100) + 1), 15, '0') AS CNT
+			FROM	COMTNFILE
+		]]>
+	</select>
+
+	<select id="selectInfoPop" parameterType="map" resultType="egovMap">
+		<![CDATA[
+			SELECT	MGRNU,
+					PE_NAM,
+					PE_CDE,
+					ROD_M,
+					TO_CHAR(ESB_YMD,'YYYY-MM-DD') AS ESB_YMD,
+					('청주시 ' || GU_NAM || ' ' || DONG_NAM || ' ' || RI_NAM || ' ' || JIBUN || ' ' || LAY_LOCA) AS ADDR,
+					LAY_LOCA,
+					CTL_MET,
+					ROD_KND,
+					CON_FOR,
+					LINE_MET,
+					CSS_MGRNU,
+					A.XGEO.SDO_POINT.X AS XCE,
+					A.XGEO.SDO_POINT.Y AS YCE
+			FROM	GT_A061_P A
+			WHERE	MGRNU = #{mgrnu}
+		]]>
+	</select>
+
+	<select id="selectInfoSinho" parameterType="map" resultType="egovMap">
+		<![CDATA[
+			SELECT	GUBUN,
+					KND,
+					MOP,
+					COUNT(*) AS CNT
+			FROM	GT_A110_P
+			WHERE	CTR_MGRNU = #{mgrnu}
+			GROUP BY GUBUN, KND, MOP
+			ORDER BY GUBUN, KND, MOP
+		]]>
+	</select>
+
+	<select id="selectInfoJiju" parameterType="map" resultType="egovMap">
+		<![CDATA[
+			SELECT	SPRT,
+					SPRT_DMR,
+					COUNT(*) AS CNT
+			FROM	GT_A062_P
+			WHERE	CTR_MGRNU = #{cssMgrnu}
+			GROUP BY SPRT, SPRT_DMR
+		]]>
+	</select>
+
+	<select id="selectInfoBu" parameterType="map" resultType="egovMap">
+		<![CDATA[
+			SELECT	ASN_LEN,
+					COUNT(*) AS CNT
+			FROM	GT_A057_L JOIN GT_A062_P ON GT_A057_L.SPRT_MGRNU = GT_A062_P.MGRNU
+			AND		GT_A062_P.CTR_MGRNU = #{mgrnu}
+			GROUP BY ASN_LEN
+			ORDER BY ASN_LEN
+		]]>
+	</select>
+
+</mapper>

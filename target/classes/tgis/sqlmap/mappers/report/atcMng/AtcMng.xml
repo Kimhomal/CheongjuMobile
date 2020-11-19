@@ -1,0 +1,322 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper   PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="tgis.report.atcMng.service.AtcMngMapper">
+
+	<!-- [관리대장 > 물품관리대장 리스트 조회] -->
+	<select id="selectInfoList" parameterType="map" resultType="egovMap">
+	<![CDATA[
+		SELECT *
+		FROM (SELECT *
+			  FROM (SELECT	ROWNUM AS NUM,
+			  				TEMP.*,
+			  				COUNT(*) OVER() AS TOTALROWS
+			  		FROM   (SELECT   *
+			  				FROM    ATC TEMP
+	]]>
+	<where>
+		<if test="std != '' and std != null">
+			<![CDATA[ AND STD LIKE '%' || #{std} || '%' ]]>
+		</if>
+		<if test="atcGroup != '' and atcGroup != null">
+			<![CDATA[ AND ATC_GROUP LIKE '%' || #{atcGroup} || '%' ]]>
+		</if>
+		<if test="atc != '' and atc != null">
+			<![CDATA[ AND ATC LIKE '%' || #{atc} || '%' ]]>
+		</if>
+		<if test="loca != '' and loca != null">
+			<![CDATA[ AND LOCA LIKE '%' || #{loca} || '%' ]]>
+		</if>
+		<if test="cfgCpy != '' and cfgCpy != null">
+			<![CDATA[ AND CFG_CPY LIKE '%' || #{cfgCpy} || '%' ]]>
+		</if>
+		<if test="uses != '' and uses != null">
+			<![CDATA[ AND USES LIKE '%' || #{uses} || '%' ]]>
+		</if>
+		<if test="sdate != '' and sdate != null">
+			<![CDATA[ AND CPT_YMD >= #{sdate} ]]>
+		</if>
+		<if test="edate != '' and edate != null">
+			<![CDATA[ AND CPT_YMD <= #{edate} ]]>
+		</if>
+		<if test="bidNm != '' and bidNm != null">
+			<![CDATA[ AND BID_NM LIKE '%' || #{bidNm} || '%' ]]>
+		</if>
+	</where>
+	<![CDATA[
+								 ORDER BY GVM_ATC_NO DESC) TEMP) TEMP
+				 ORDER BY NUM ASC) TEMP
+		WHERE NUM BETWEEN #{rows} * ( #{page} - 1 ) + 1 AND #{rows}* #{page}
+	]]>
+	</select>
+
+	<!-- [관리대장 > 물품관리대장 상세 조회] -->
+	<select id="selectInfo" parameterType="map" resultType="egovMap">
+	<![CDATA[
+		SELECT	TEMP.*,
+				(SELECT FILE_STRE_COURS FROM COMTNFILEDETAIL WHERE ATCH_FILE_ID = TEMP.ATCH_FILE_ID) AS FILE_STRE_COURS,
+				(SELECT STRE_FILE_NM FROM COMTNFILEDETAIL WHERE ATCH_FILE_ID = TEMP.ATCH_FILE_ID) AS STRE_FILE_NM,
+				(SELECT ORIGNL_FILE_NM FROM COMTNFILEDETAIL WHERE ATCH_FILE_ID = TEMP.ATCH_FILE_ID) AS ORIGNL_FILE_NM,
+				(SELECT FILE_EXTSN FROM COMTNFILEDETAIL WHERE ATCH_FILE_ID = TEMP.ATCH_FILE_ID) AS FILE_EXTSN
+		FROM	(
+					SELECT	TEMP.*,
+							(SELECT ATCH_FILE_ID FROM REPORT_TML_PHOTO_ALBUM WHERE GVM_ATC_NO = TEMP.GVM_ATC_NO) AS ATCH_FILE_ID,
+							(SELECT SN FROM REPORT_TML_PHOTO_ALBUM WHERE GVM_ATC_NO = TEMP.GVM_ATC_NO) AS SN,
+							(SELECT COUNT(*) FROM REPORT_TML_PHOTO_ALBUM WHERE GVM_ATC_NO = TEMP.GVM_ATC_NO) AS FILECNT
+					FROM	(SELECT * FROM ATC WHERE GVM_ATC_NO = #{gvmAtcNo}) TEMP
+		) TEMP
+	]]>
+	</select>
+
+	<!-- [관리대장 > 물품관리대장 사진 조회] -->
+	<select id="selectFileInfo" parameterType="map" resultType="egovMap">
+	<![CDATA[
+		SELECT  *
+		FROM  ( SELECT ROWNUM RNUM, ALL_LIST.*
+				FROM  ( SELECT	SN,
+								GVM_ATC_NO,
+								PHOTO_SJ,
+								ATCH_FILE_ID,
+								CREAT_DT,
+								UPDT_DT,
+								(SELECT FILE_STRE_COURS FROM COMTNFILEDETAIL WHERE ATCH_FILE_ID = A.ATCH_FILE_ID) AS FILE_PATH,
+								(SELECT STRE_FILE_NM FROM COMTNFILEDETAIL WHERE ATCH_FILE_ID = A.ATCH_FILE_ID) AS FILE_NAM,
+								(SELECT ORIGNL_FILE_NM FROM COMTNFILEDETAIL WHERE ATCH_FILE_ID = A.ATCH_FILE_ID) AS ORIGNL_FILE_NM
+						FROM	REPORT_TML_PHOTO_ALBUM A
+						WHERE	GVM_ATC_NO = #{gvmAtcNo}
+						ORDER BY SN DESC) ALL_LIST)
+	]]>
+	</select>
+
+	<!-- [관리대장 > 물품관리대장 사진 조회(삭제된 파일)] -->
+	<select id="selectFileInfoDetail" parameterType="map" resultType="egovMap">
+	<![CDATA[
+		SELECT	SN,
+				GVM_ATC_NO,
+				PHOTO_SJ,
+				ATCH_FILE_ID,
+				CREAT_DT,
+				UPDT_DT,
+				(SELECT FILE_STRE_COURS FROM COMTNFILEDETAIL WHERE ATCH_FILE_ID = A.ATCH_FILE_ID) AS FILE_PATH,
+				(SELECT STRE_FILE_NM FROM COMTNFILEDETAIL WHERE ATCH_FILE_ID = A.ATCH_FILE_ID) AS FILE_NAM,
+				(SELECT ORIGNL_FILE_NM FROM COMTNFILEDETAIL WHERE ATCH_FILE_ID = A.ATCH_FILE_ID) AS ORIGNL_FILE_NM
+		FROM	REPORT_TML_PHOTO_ALBUM A
+		WHERE	GVM_ATC_NO = #{gvmAtcNo}
+		AND 	SN = #{sn}
+	]]>
+	</select>
+
+	<delete id="deleteFileMaster" parameterType="map">
+		<![CDATA[
+			DELETE FROM COMTNFILE
+			WHERE ATCH_FILE_ID = #{atchFileId}
+		]]>
+	</delete>
+
+	<delete id="deleteFileDetail" parameterType="map">
+		<![CDATA[
+			DELETE FROM COMTNFILEDETAIL
+			WHERE ATCH_FILE_ID = #{atchFileId}
+		]]>
+	</delete>
+
+	<delete id="deleteFileInfo" parameterType="map">
+		<![CDATA[
+			DELETE FROM REPORT_TML_PHOTO_ALBUM
+			WHERE SN = #{sn}
+		]]>
+		<if test="gvmAtcNo != '' and gvmAtcNo != null">
+			<![CDATA[ AND GVM_ATC_NO = #{gvmAtcNo} ]]>
+		</if>
+	</delete>
+
+	<insert id="insertFile" parameterType="map">
+		<selectKey resultType="int" keyProperty="sn" order="BEFORE">
+		<![CDATA[
+			SELECT NVL(MAX (SN), 0) + 1 AS SN FROM REPORT_TML_PHOTO_ALBUM
+		]]>
+		</selectKey>
+		<![CDATA[
+		INSERT INTO REPORT_TML_PHOTO_ALBUM (
+			SN,
+			GVM_ATC_NO,
+			PHOTO_SJ,
+			ATCH_FILE_ID,
+			CREAT_DT,
+			UPDT_DT
+		)
+		VALUES (
+			#{sn},
+			#{gvmAtcNo},
+			#{photoSj},
+			#{atchFileId},
+			SYSDATE,
+			SYSDATE
+		)
+	]]>
+	</insert>
+
+	<insert id="insertFileMaster" parameterType="java.lang.String">
+		<![CDATA[
+			INSERT INTO COMTNFILE (
+				ATCH_FILE_ID,
+				CREAT_DT,
+				USE_AT
+			)
+			VALUES (
+				#{atchFileId},
+				SYSDATE,
+				'Y'
+			)
+		]]>
+	</insert>
+
+	<insert id="insertFileDetail" parameterType="map">
+		<![CDATA[
+			INSERT INTO COMTNFILEDETAIL (
+				ATCH_FILE_ID,
+				FILE_SN,
+				FILE_STRE_COURS,
+				STRE_FILE_NM,
+				ORIGNL_FILE_NM,
+				FILE_EXTSN,
+				FILE_SIZE)
+			VALUES (
+				#{atchFileId},
+				#{fileSn},
+				#{fileStreCours},
+				#{streFileNm},
+				#{orignlFileNm},
+				#{fileExtsn},
+				#{fileSize}
+			  )
+		]]>
+	</insert>
+
+	<delete id="deleteInfo" parameterType="map">
+		<![CDATA[
+			DELETE FROM ATC
+			WHERE	GVM_ATC_NO = #{gvmAtcNo}
+		]]>
+	</delete>
+
+	<insert id="insertInfo" parameterType="map">
+		<selectKey resultType="int" keyProperty="gvmAtcNo" order="BEFORE">
+		<![CDATA[
+			SELECT NVL(MAX(GVM_ATC_NO), 0) + 1 AS GVM_ATC_NO FROM ATC
+		]]>
+		</selectKey>
+
+		<![CDATA[
+		INSERT INTO ATC (
+			GVM_ATC_NO,
+			ATC_GROUP,
+			ATC,
+			STD,
+			MK_YMD,
+			MK_CPY,
+			STD_NUM,
+			CPT_YMD,
+			DEL_YMD,
+			LOCA,
+			USES,
+			CFG_CPY,
+			BID_NM,
+			MT_CODE,
+			ETC_DESC
+		)
+		VALUES (
+			#{gvmAtcNo},
+			#{atcGroup},
+			#{atc},
+			#{std},
+			#{mkYmd},
+			#{mkCpy},
+			#{stdNum},
+			#{cptYmd},
+			#{delYmd},
+			#{loca},
+			#{uses},
+			#{cfgCpy},
+			#{bidNm},
+			#{mtCode},
+			#{etcDesc}
+		)
+		]]>
+	</insert>
+
+	<update id="updateInfo" parameterType="map">
+	<![CDATA[
+		UPDATE ATC
+		SET    ATC_GROUP = #{atcGroup},
+			   ATC = #{atc},
+			   STD = #{std},
+			   MK_CPY = #{mkCpy},
+			   MK_YMD = #{mkYmd},
+			   STD_NUM = #{stdNum},
+			   CPT_YMD = #{cptYmd},
+			   DEL_YMD = #{delYmd},
+			   LOCA = #{loca},
+			   USES = #{uses},
+			   CFG_CPY = #{cfgCpy},
+			   BID_NM = #{bidNm},
+			   MT_CODE = #{mtCode},
+			   ETC_DESC = #{etcDesc}
+		WHERE  GVM_ATC_NO =#{gvmAtcNo}
+	]]>
+	</update>
+
+	<select id="atchFileId" resultType="java.lang.String">
+		<![CDATA[
+			SELECT	'FILE_' || LPAD(TO_CHAR(SUBSTR(MAX(ATCH_FILE_ID), 6, 100) + 1), 15, '0') AS CNT
+			FROM	COMTNFILE
+		]]>
+	</select>
+
+	<!-- [관리대장 > 물품관리대장 리스트 조회 (엑셀 다운로드)] -->
+	<select id="selectExcelList" parameterType="map" resultType="egovMap">
+		<![CDATA[
+		SELECT NUM, ATC_GROUP, ATC, STD, MK_CPY, MK_YMD, STD_NUM, CPT_YMD, DEL_YMD, LOCA, USES, CFG_CPY, BID_NM, MT_CODE, ETC_DESC
+		FROM (SELECT	ROWNUM AS NUM,
+						TEMP.*,
+						COUNT(*) OVER() AS TOTALROWS
+			  FROM		(SELECT *
+			  			 FROM	ATC TEMP
+	]]>
+		<where>
+			<if test="std != '' and std != null">
+				<![CDATA[ AND STD LIKE '%' || #{std} || '%' ]]>
+			</if>
+			<if test="atcGroup != '' and atcGroup != null">
+				<![CDATA[ AND ATC_GROUP LIKE '%' || #{atcGroup} || '%' ]]>
+			</if>
+			<if test="atc != '' and atc != null">
+				<![CDATA[ AND ATC LIKE '%' || #{atc} || '%' ]]>
+			</if>
+			<if test="loca != '' and loca != null">
+				<![CDATA[ AND LOCA LIKE '%' || #{loca} || '%' ]]>
+			</if>
+			<if test="cfgCpy != '' and cfgCpy != null">
+				<![CDATA[ AND CFG_CPY LIKE '%' || #{cfgCpy} || '%' ]]>
+			</if>
+			<if test="uses != '' and uses != null">
+				<![CDATA[ AND USES LIKE '%' || #{uses} || '%' ]]>
+			</if>
+			<if test="sdate != '' and sdate != null">
+				<![CDATA[ AND CPT_YMD >= #{sdate} ]]>
+			</if>
+			<if test="edate != '' and edate != null">
+				<![CDATA[ AND CPT_YMD <= #{edate} ]]>
+			</if>
+			<if test="bidNm != '' and bidNm != null">
+				<![CDATA[ AND BID_NM LIKE '%' || #{bidNm} || '%' ]]>
+			</if>
+		</where>
+
+		<![CDATA[
+			  			 ORDER BY GVM_ATC_NO DESC) TEMP) TEMP
+			  ORDER BY NUM ASC
+		]]>
+	</select>
+
+</mapper>

@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper   PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="tgis.user.info.service.UserInfoMapper">
+
+	<select id="getUsrNam" parameterType="map" resultType="java.lang.String">
+		<![CDATA[
+			SELECT USR_NAM
+			FROM TBL_USR_MGE
+			WHERE USR_ID = #{usrId}
+		]]>
+	</select>
+
+	<select id="selectPwCheck" parameterType="map" resultType="java.lang.Integer">
+	<![CDATA[
+		SELECT COUNT(USR_ID)
+		FROM TBL_USR_MGE
+		WHERE USR_ID = #{usrId}
+		AND PW = #{crntPwEnc}
+	]]>
+	</select>
+
+	<select id="updatePw" parameterType="tgis.user.auth.service.LoginVO" resultType="tgis.user.auth.service.LoginVO">
+	<![CDATA[
+		UPDATE TBL_USR_MGE
+		SET PW=#{pw},
+			PW_CHG_YMD = TO_CHAR(SYSDATE, 'YYYYMMDD')
+		WHERE USR_ID=#{usrId}
+	]]>
+	</select>
+
+	<insert id="insertBusiContents" parameterType="map" >
+        <![CDATA[
+            INSERT INTO TBL_PIPS_MGE ( ID, IP, USR_PSN, ACC_DATE, BUSI_CONTENTS )
+            VALUES (
+	            #{usrId},
+	            #{connip},
+	            #{usrpsn},
+				TO_CHAR(SYSDATE, 'yyyy-MM-dd HH24:mm:ss'),
+				#{busicontents}
+			)
+        ]]>
+    </insert>
+
+	<select id="checkUser" parameterType="tgis.user.auth.service.LoginVO" resultType="java.lang.Integer">
+	<![CDATA[
+		SELECT COUNT(USR_ID)
+		FROM TBL_USR_MGE
+		WHERE USR_ID = #{usrId} AND PW = #{pw}
+	]]>
+	</select>
+
+	<!-- 사용자 정보 조회 -->
+	<select id="selectUsrInfo" parameterType="tgis.user.auth.service.LoginVO" resultType="tgis.user.auth.service.LoginVO">
+	<![CDATA[
+		SELECT
+			USRMGEID,
+			USR_ID,
+			PW,
+			USR_NAM,
+			RMK,
+			REG_YMD,
+			ROLE_CDE,
+			USEYNO,
+			TRIM(YNO) AS YNO,
+			BUSE_NAM,
+			USR_PSTN_NAM
+		FROM
+			TBL_USR_MGE
+		WHERE
+			USR_ID=#{usrId}
+	]]>
+	</select>
+
+	<select id="updateUsrInfo" parameterType="tgis.user.auth.service.LoginVO" resultType="tgis.user.auth.service.LoginVO">
+	<![CDATA[
+		UPDATE	TBL_USR_MGE
+		SET		USR_NAM = #{usrNam},
+				USR_PSTN_NAM = #{usrPstnNam},
+				BUSE_NAM = #{buseNam},
+				RMK = #{rmk}
+		WHERE	USR_ID = #{usrId}
+	]]>
+	</select>
+
+	<update id="updateWithdraw" parameterType="tgis.user.auth.service.LoginVO" >
+	<![CDATA[
+		UPDATE TBL_USR_MGE
+		SET USEYNO = 'N'
+		WHERE USRMGEID=#{usrmgeid}
+	]]>
+	</update>
+	
+</mapper>

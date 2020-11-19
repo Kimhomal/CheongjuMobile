@@ -1,0 +1,1396 @@
+@charset "utf-8";
+
+/*------------------------------------------------------------------------------------------------------------------------------------------
+	File : layout.css 
+	Company : 벨마리에(주)
+	Author : kyung-ho-kang 2017-11
+	CSS 적용순서 : 아이디 > 태그와 클래스 > 클래스 > 태그
+	CSS 선택자 선언순서 : Type Selector, Layout Selector, Class Selector, Etc
+	CSS 속성 선언순서 : display, position, float/clear, overflow, width/height, margin/padding, border, background, color/font, align, etc 
+--------------------------------------------------------------------------------------------------------------------------------------------*/
+
+/*-----------------------------------------  #common -------------------------------------------------*/
+
+
+.h2_tp1 {
+    height: 26px;
+    padding-left: 32px;
+    background: url('../../images/common/ico_h2.png') left center no-repeat;
+    font-family: 'Noto Sans KR';
+    font-size: 18px;
+    color: #222;
+    line-height: 26px;
+    font-weight: 500;
+}
+
+.h2_tp2 {
+    margin-bottom: 8px;
+    font-size: 14px;
+    color: #222;
+    text-align: center;
+}
+
+.h2_tp3 {
+    margin-bottom: 8px;
+    font-size: 31px;
+    color: #222;
+}
+
+.h3_tp1 {
+    font-family: 'Noto Sans KR';
+    font-size: 18px;
+    color: #1e3566;
+}
+
+.h3_tp2 {
+    font-family: 'Noto Sans KR';
+    font-size: 15px;
+    color: #373737;
+}
+
+.h3_tp2.mg_tp1 {
+    margin-bottom: 8px;
+}
+
+.h3_tp3 {
+    padding-left: 25px;
+    background: url('../../images/common/ico_h3_tp3.png') left center no-repeat;
+    font-family: 'Noto Sans KR';
+    font-size: 16px;
+    color: #454545;
+    line-height: 22px;
+}
+
+.h3_tp4 {padding-left: 15px;background: url('../../images/common/ico_h3_tp4.png') left center no-repeat; font-family: 'Noto Sans KR'; font-size: 17px;font-weight: 500;color: #1f1f1f;line-height: 22px;}
+
+.h4_tp1 {
+    font-size: 12px;
+    color: #222;
+}
+
+.h4_tp2 {
+    margin-bottom: 6px;
+    font-family: 'Noto Sans KR';
+    font-size: 13px;
+    color: #3459ac;
+}
+
+.h4_tp3 {
+    margin-bottom: 10px;
+    font-family: 'Noto Sans KR';
+    font-size: 13px;
+    color: #707070;
+}
+
+.subTit {
+    margin-top: 6px;
+    font-size: 14px;
+    color: #222;
+    line-height: 23px;
+}
+
+.subTit li {
+    font-size: 14px;
+    color: #222;
+}
+
+.area_wrap {
+    *zoom: 1;
+}
+
+.area_wrap:after {
+    content: "";
+    display: block;
+    clear: both;
+}
+
+.area_l {
+    float: left;
+    padding-left: 20px;
+}
+
+.area_r {
+    float: right;
+}
+
+.txt_tp1 {
+    font-size: 13px;
+    color: #5d5d5d;
+}
+
+.txt_tp2 {
+    font-family: 'Noto Sans KR';
+    font-size: 13px;
+    line-height: 18px;
+    color: #707070;
+}
+
+.contBox_tp1 {
+    background-color: #fff;
+    border: 1px solid #dddddd;
+    border-bottom-left-radius: 2em;
+    border-top-right-radius: 2em;
+}
+
+.contBox_tp2 {
+    padding: 6px;
+    background-color: #fff;
+    border: 1px solid #dcdcdc;
+    color: #494949;
+    line-height: 18px;
+}
+
+.contBox_tp3 {
+    *zoom: 1;
+    padding: 22px 20px;
+    background-color: #f9f9f9;
+    border: 1px solid #dcdcdc;
+}
+
+.contBox_tp3:after {
+    content: "";
+    display: block;
+    clear: both;
+}
+
+.contBox_tp4 {
+    padding: 15px 12px;
+    background-color: #fff;
+    border: 1px solid #d1d1d1;
+    font-size: 12px;
+    color: #6c6c6c;
+    line-height: 17px;
+}
+
+.contBox_tp5 {
+    padding: 35px 20px;
+    background-color: #f6f6f6;
+    border: 1px solid #dcdcdc;
+    font-size: 15px;
+    color: #030303;
+}
+
+.contBox_agree {
+    overflow-y: scroll;
+    height: 118px;
+    padding: 20px 10px;
+    background-color: #fff;
+    border: 1px solid #bfbfbf;
+}
+
+.cont_wrap {
+    margin-top: 20px;
+}
+
+.exp_tp1 {
+    padding: 7px 9px;
+    font-size: 13px;
+    color: #494949;
+    line-height: 18px;
+}
+
+.exp_tp2 {
+    margin-bottom: 8px;
+    font-family: 'Noto Sans KR';
+    font-size: 13px;
+    color: #6cae0c;
+}
+
+.search_wrap {
+    *zoom: 1;
+    overflow: hidden;
+    position: absolute;
+    top: 240px;
+    width: 390px;
+    height: 48px;
+    padding-left: 18px;
+    border: 2px solid #3e3a39;
+    background-color: #fff;
+    border-top-left-radius: 0em;
+    border-top-right-radius: 1.5em;
+    border-bottom-right-radius: 0em;
+    border-bottom-left-radius: 1.5em;
+}
+
+
+.search_wrap:after {
+    content: "";
+    display: block;
+    position: absolute;
+    left: 0px;
+    top: 0px;
+    width: 0px;
+    height: 48px;
+    background-color: #fff;
+    z-index: 1;
+}
+
+.search_wrap fieldset {
+    position: absolute;
+    left: 20px;
+    z-index: 2;
+    height: 38px;
+}
+
+.search_wrap select {
+    font-size: 14px;
+    display: inline-block;
+    padding-top: 0px;
+}
+
+.search_wrap .tit {
+    font-size: 14px;
+    color: #7d7d7d;
+    line-height: 13px;
+    height: 48px;
+    display: inline-block;
+    margin-top: 15px;
+}
+
+.search_wrap .btn_search {
+    display: block;
+    position: absolute;
+    right: 15px;
+    top: 0px;
+    width: 90px;
+    height: 48px;
+    background: #3e3a39 url('../../images/common/ico_search.png') 14px 12px no-repeat;
+    color: #fff;
+}
+
+.search_wrap .btn_search .search_txt {
+    display: block;
+    position: absolute;
+    right: 20px;
+    top: 12px;
+}
+
+.search_wrap_tp1 {
+    overflow: hidden;
+    position: relative;
+    margin-top: 30px;
+    padding: 14px 0;
+    background-color: #f9f9f9;
+    border: 1px solid #dcdcdc;
+    text-align: center;
+}
+
+.search_wrap_tp1 .sel_search {
+    width: 145px;
+    height: 30px;
+}
+
+.search_wrap_tp1 .search {
+    width: 288px;
+}
+
+.search_wrap_tp1 span {
+    font-size: 13px;
+    color: #707070;
+}
+
+.search_wrap_tp2 {
+    overflow: hidden;
+    position: relative;
+    margin-top: 30px;
+    padding: 14px 0 14px 134px;
+    background-color: #f9f9f9;
+    border: 1px solid #dcdcdc;
+}
+
+.search_wrap_tp2 .sel_search {
+    width: 145px;
+}
+
+.search_wrap_tp2 .search {
+    width: 288px;
+}
+
+.search_wrap_tp3 {
+    width: 761px;
+    padding: 15px 0 15px 180px;
+    background-color: #f9f9f9;
+    border: 1px solid #dcdcdc;
+}
+
+.search_wrap_tp3 .tit {
+    width: 130px;
+    padding: 0 6px;
+    font-family: 'Noto Sans KR';
+    font-size: 13px;
+    color: #707070;
+}
+
+.search_wrap_tp3 .tit.tp1 {
+    width: 37px;
+}
+
+.search_wrap_tp3 .tit.tp2 {
+    width: 94px;
+}
+
+.search_wrap_tp3 .tit.tp3 {
+    width: 70px;
+}
+
+.search_wrap_tp3 .tit.tp4 {
+    width: 100px;
+}
+
+.search_wrap_tp3 .inp.calenderInfo,
+.search_wrap_tp3 .inp.contInfo {
+    width: 160px;
+}
+
+.search_wrap_tp3 .inp.calenderInfo input[type=text] {
+    width: 125px;
+}
+
+.search_wrap_tp3 .inp.contInfo input[type=text],
+.search_wrap_tp3 .inp.contInfo select {
+    width: 154px;
+}
+
+.search_wrap_tp3 .inp.searchInfo input[type=text],
+.search_wrap_tp3 .inp.searchInfo select {
+    width: 154px;
+}
+
+.search_wrap_tp3 .inp.selectInfo {
+    width: 120px;
+}
+
+.search_wrap_tp3 .inp.selectInfo.tp1 {
+    width: 98px;
+}
+
+.search_wrap_tp3 .inp.selectInfo.tp2 {
+    width: 88px;
+}
+
+.search_wrap_tp3 .inp.selectInfo.tp3 {
+    width: 220px;
+}
+
+.search_wrap_tp3 .inp.selectInfo.tp4 {
+    width: 147px;
+}
+
+.search_wrap_tp3 .inp.selectInfo.tp3 select {
+    width: 190px;
+}
+
+.search_wrap_tp3 .inp.selectInfo select {
+    width: 100%;
+}
+
+.search_wrap_tp3 .inp.searchInfo.tp1 input[type=text] {
+    width: 272px;
+}
+
+.search_wrap_tp3 .inp.inputInfo {
+    width: 120px;
+}
+
+.search_wrap_tp3 .inp.inputInfo.tp1 {
+    width: 267px;
+}
+
+.search_wrap_tp3 .inp.inputInfo.tp2 {
+    width: 220px;
+}
+
+.search_wrap_tp3 .inp.inputInfo.tp2 input {
+    width: 190px;
+}
+
+.search_wrap_tp3 .inp.inputInfo.tp3 {
+    width: 280px;
+}
+
+.search_wrap_tp3 .inp.inputInfo.tp3 input {
+    width: 190px;
+}
+
+.search_wrap_tp3 .inp.inputInfo input {
+    width: 100%;
+}
+
+.search_wrap_tp3.pd_tp1 {
+    padding: 15px 155px 15px 90px;
+}
+
+.search_wrap_tp3.pd_tp2 {
+    padding: 15px 50px 15px 50px;
+}
+
+.search_wrap_tp3.pd_tp3 {
+    padding: 15px 0 15px 230px;
+}
+
+.search_wrap_tp3.pd_tp4 {
+    padding: 15px 50px 15px 80px;
+}
+
+.search_wrap_tp3.pd_tp5 {
+    padding: 15px 0 15px 150px;
+}
+
+.search_wrap_tp4 {
+    padding: 5px 10px;
+}
+
+.search_wrap_tp4 .inp_wrap .inp {
+    margin-right: 20px;
+}
+
+.search_wrap_tp4 .h3_tp3 {
+    line-height: 32px;
+}
+
+.graph_wrap {}
+
+.graph_wrap .tit {
+    font-family: 'Noto Sans KR';
+    font-size: 25px;
+    color: #000;
+    text-align: center;
+}
+
+.graph_wrap .cont {}
+
+.graph_wrap .cont img {
+    width: 100%;
+}
+
+.processingStep {
+    overflow: hidden;
+}
+
+.processingStep > li {
+    float: left;
+    width: 62px;
+    height: 70px;
+    margin: 0 7px;
+    background: url('../../images/common/ico_processingStep.png') no-repeat;
+    text-indent: -9999px
+}
+
+.processingStep > li.step1 {
+    background-position: 0 0
+}
+
+.processingStep > li.step1.active {
+    background-position: 0 -90px
+}
+
+.processingStep > li.step2 {
+    background-position: -76px 0
+}
+
+.processingStep > li.step2.active {
+    background-position: -76px -90px
+}
+
+.processingStep > li.step3 {
+    background-position: -147px 0
+}
+
+.processingStep > li.step3.active {
+    background-position: -147px -90px
+}
+
+.searchCross {
+    padding: 12px;
+    background-color: #f9f9f9;
+    border: 1px solid #dcdcdc;
+}
+
+.searchCross .sel_cross {}
+
+.searchCross .sel_cross > li {
+    width: 70px;
+    height: 20px;
+    margin-top: 3px;
+    background-color: #fff;
+    border: 1px solid #dcdcdc;
+}
+
+.searchCross .sel_cross > li:first-child {
+    margin-top: 0px;
+}
+
+.searchCross .sel_cross .sel {
+    width: 70px;
+    height: 72px;
+    background-color: #fff;
+    border: 1px solid #dcdcdc;
+    font-size: 14px;
+    color: #707070;
+    text-align: center;
+}
+
+.searchCross .sel_cross .sel > a {
+    display: block;
+    padding: 28px 0;
+}
+
+.searchCross .sel_cross .btn_del {
+    display: block;
+    width: 100%;
+    padding: 3px 0px;
+    font-size: 13px;
+    color: #474747;
+    text-align: center;
+}
+
+.sign_body .signList {overflow:hidden;}
+.sign_body .signList > li {float:left; margin-bottom:5px; text-align:center;}
+.sign_body .signList > li > a {display:block; padding-top:60px; padding-bottom:20px; width:112px; height:107px; font-size:13px; color:#474747; text-align:center;}
+
+
+/* chkBox_wrap */
+.chkBox_wrap {
+    padding: 30px;
+    background-color: #f9f9f9;
+    border: 1px solid #dcdcdc;
+    text-align: center;
+}
+
+.chkBox_wrap .inp_wrap .inp {
+    margin-left: 40px;
+}
+
+.chkBox_wrap .inp_wrap .inp:first-child {
+    margin-left: 0px;
+}
+
+.chkBox_wrap.tp1 {
+    padding: 30px 70px;
+}
+
+.chkBox_wrap.tp1 .inp_wrap {
+    text-align: left;
+}
+
+.chkBox_wrap.tp1 .inp_wrap .inp {
+    position: relative;
+    width: 120px;
+    margin-left: 0px;
+    padding-left: 0px;
+    line-height: 18px;
+    text-align: left;
+}
+
+.chkBox_wrap.tp1 .inp_wrap .inp .input_checkBox.label:after {
+    top: 3px;
+}
+
+
+/*.search_wrap .btn_search {display:block; position:absolute; right:0px; top:0px; width:50px; height:32px; background-color:#1e3566;}*/
+
+
+/*-----------------------------------------  #main -------------------------------------------------*/
+.main .visual_wrap {
+    min-height: 450px;
+    padding-top: 45px;
+    padding-left: 20px;
+    background: url(../../images/main/bg_main_visual.jpg) center no-repeat;
+    -webkit-background-size: cover;
+    -moz-background-size: cover;
+    -o-background-size: cover;
+    background-size: cover;
+}
+
+.main .visual_wrap h1 {
+    padding-top: 50px;
+    font-family: 'Noto Sans KR';
+    font-size: 43px;
+    font-weight: 600;
+    letter-spacing: -3px;
+    line-height: 48px;
+}
+
+.main .visual_wrap h3 {
+    padding-top: 47px;
+    font-family: 'Noto Sans KR';
+    font-size: 20px;
+    font-weight: 500;
+    line-height: 48px;
+}
+
+.main .visual_wrap .maintxt {
+    padding-top: 50px;
+    font-family: 'Noto Sans KR';
+    font-size: 30px;
+    letter-spacing: -2px;
+    font-weight: 400;
+    color: #706f6f;
+    line-height: 31px;
+}
+
+.main .visual_wrap h2 {
+    margin-top: 18px;
+    font-family: 'Noto Sans KR';
+    font-size: 17px;
+    color: #1e3566;
+}
+
+.main .visual_wrap .area_l {
+    position: relative;
+}
+
+.main .visual_wrap .area_r {
+    width: 346px;
+}
+
+/* 맵 영역 */
+/*.mapArea_wrap {position:absolute; left:50%; top:30px; width:524px; height:524px; margin-left:-272px; background:url('../../images/main/bg_one_big.png') no-repeat;}*/
+/*.mapArea_wrap .mapArea {width:525px; height:525px; background:url('../../images/main/img_map.png') no-repeat;}*/
+/*.mapArea_wrap .mapArea.at_1 {background-position:0 -563px;}*/
+/*.mapArea_wrap .mapArea.at_2 {background-position:0 -1126px;}*/
+/*.mapArea_wrap .mapArea.at_3 {background-position:0 -1689px;}*/
+/*.mapArea_wrap .mapArea.at_4 {background-position:0 -2252px;}*/
+/*.mapArea_wrap .mapArea.at_5 {background-position:0 -2815px;}*/
+/*.mapArea_wrap .mapArea > a {display:block; position:absolute; padding:8px 12px; font-family:'NotoSansKR-Medium'; font-size:16px;}*/
+/*.mapArea_wrap .mapArea > a.on {background-color:#fff; border:1px solid #e1e1e1; border-radius:4px; color:#555;!*  box-shadow:0px 0px 5px #fff; *!}*/
+/*.mapArea_wrap .mapArea > a.on:after {*/
+    /*content:"";*/
+    /*display:block;*/
+    /*position:absolute; left:0px; top:30px;*/
+    /*width:34px; height:56px;*/
+    /*background:url('../../images/main/ico_location_white.png') no-repeat;*/
+    /*background-size:80%;*/
+/*}*/
+/*.main .visual_wrap .mapArea > a.mn_1 {left:345px; top:260px;}*/
+/*.main .visual_wrap .mapArea > a.mn_2 {left:298px; top:120px;}*/
+/*.main .visual_wrap .mapArea > a.mn_3 {left:180px; top:170px;}*/
+/*.main .visual_wrap .mapArea > a.mn_4 {left:182px; top:330px;}*/
+/*.main .visual_wrap .mapArea > a.mn_5 {left:265px; top:320px;}*/
+ /*.mapArea_wrap .mapArea > a.mn_5.on:after {left:10px;}*/
+
+.main .visual_wrap .mapArea {
+    position: absolute;
+    right: 40px;
+    top: 0px;
+    width: 345px;
+    height: 323px;
+    background:url('../../images/main/img_map.png') no-repeat;
+}
+
+.main .visual_wrap .mapArea.at_1 {
+    position: absolute;
+    right: 40px;
+    top: 0px;
+    width: 345px;
+    height: 323px;
+    background:url('../../images/main/img_map_01.png') no-repeat;
+}
+
+.main .visual_wrap .mapArea.at_2 {
+    position: absolute;
+    right: 40px;
+    top: 0px;
+    width: 345px;
+    height: 323px;
+    background:url('../../images/main/img_map_02.png') no-repeat;
+}
+
+
+.main .visual_wrap .mapArea.at_3 {
+    position: absolute;
+    right: 40px;
+    top: 0px;
+    width: 345px;
+    height: 323px;
+    background:url('../../images/main/img_map_03.png') no-repeat;
+}
+
+.main .visual_wrap .mapArea.at_4 {
+    position: absolute;
+    right: 40px;
+    top: 0px;
+    width: 345px;
+    height: 323px;
+    background:url('../../images/main/img_map_04.png') no-repeat;
+}
+
+
+.main .visual_wrap .mapArea .areaName {
+    position: relative;
+}
+
+.main .visual_wrap .mapArea .areaName > li {
+    position: absolute;
+}
+
+.main .visual_wrap .mapArea .areaName > li.am_01 {
+    left: 50px;
+    top: 100px;
+    z-index: 100;
+}
+
+.main .visual_wrap .mapArea .areaName > li.am_02 {
+    left: 135px;
+    top: 34px;
+    z-index: 100;
+}
+
+.main .visual_wrap .mapArea .areaName > li.am_03 {
+    left: 170px;
+    top: 150px;
+    z-index: 100;
+}
+
+.main .visual_wrap .mapArea .areaName > li.am_04 {
+    left: 83px;
+    top: 172px;
+    z-index: 100;
+}
+
+.main .visual_wrap .mapArea .areaName > li > a {
+    display: block;
+    font-size: 16px;
+    font-weight: 600;
+    color: #706f6f;
+    z-index: 100;
+    padding: 5px 5px;
+}
+
+.main .visual_wrap .mapArea .areaName > li > a.on {background-color:#fff; border:1px solid #e1e1e1; border-radius:4px; color:#555;/*  box-shadow:0px 0px 5px #fff; */}
+.main .visual_wrap .mapArea .areaName > li > a.on:after {
+    content:"";
+    display:block;
+    position:absolute;
+    left:5px;
+    top:23px;
+    width:34px; height:56px;
+    background:url('../../images/main/ico_location_white.png') no-repeat;
+    background-size:80%;
+}
+
+.main .trafficInfo_list {
+    *zoom: 1;
+    position: absolute;
+    left: 0;
+    top: 350px;
+    height: 85px;
+    background: #fff;
+    border-top-left-radius: 0em;
+    border-top-right-radius: 1.5em;
+    border-bottom-right-radius: 0em;
+    border-bottom-left-radius: 1.5em;
+    box-shadow: 5px 15px 10px 1px rgba(0, 0, 0, .1);
+    display: inline-block;
+}
+
+.main .trafficInfo_list:after {
+    content: "";
+    display: block;
+    clear: both;
+}
+
+.main .trafficInfo_list > li {
+    float: left;
+    width: 170px;
+    height: 91px;
+}
+
+
+.main .trafficInfo_list > li.lm_1 {
+    position: relative;
+    display: inline-block;
+    background: url('../../images/main/ico_trafficInfo_1.png') 28px 25px no-repeat;
+}
+
+.main .trafficInfo_list > li.lm_1:hover {
+    cursor: pointer;
+    display: inline-block;
+    width: 170px;
+    height: 85px;
+    border-bottom-left-radius: 1.5em;
+    box-shadow: inset 10px 10px 10px 1px rgba(0, 0, 0, .1);
+    background: #9ddd2a url('../../images/main/ico_trafficInfo_1.png') 28px 25px no-repeat;
+
+}
+
+.main .trafficInfo_list > li.lm_1 > a {
+    font-size: 16px;
+    font-weight: 400;
+    display: inline-block;
+    position: absolute;
+    left: 75px;
+    top: 32px;
+}
+
+.main .trafficInfo_list > li.lm_2 {
+    position: relative;
+    background: url('../../images/main/ico_trafficInfo_2.png') 28px 25px no-repeat;
+}
+
+.main .trafficInfo_list > li.lm_2 > a {
+    font-size: 16px;
+    line-height: 18px;
+    font-weight: 400;
+    display: inline-block;
+    position: absolute;
+    left: 80px;
+    top: 23px;
+}
+
+.main .trafficInfo_list > li.lm_2:hover {
+    cursor: pointer;
+    display: inline-block;
+    width: 170px;
+    height: 85px;
+    box-shadow: inset 10px 10px 10px 1px rgba(0, 0, 0, .1);
+    background: #9ddd2a url('../../images/main/ico_trafficInfo_2.png') 28px 25px no-repeat;
+}
+
+.main .trafficInfo_list > li.lm_3 {
+    position: relative;
+    background: url('../../images/main/ico_trafficInfo_3.png') 23px 25px no-repeat;
+}
+
+.main .trafficInfo_list > li.lm_3 > a {
+    font-size: 16px;
+    line-height: 18px;
+    font-weight: 400;
+    display: inline-block;
+    position: absolute;
+    left: 75px;
+    top: 23px;
+}
+
+.main .trafficInfo_list > li.lm_3:hover {
+    cursor: pointer;
+    display: inline-block;
+    width: 170px;
+    height: 85px;
+    box-shadow: inset 10px 10px 10px 1px rgba(0, 0, 0, .1);
+    background: #9ddd2a url('../../images/main/ico_trafficInfo_3.png') 23px 25px no-repeat;
+}
+
+.main .trafficInfo_list > li.lm_4 {
+    position: relative;
+    background: url('../../images/main/ico_trafficInfo_4.png') 25px 25px no-repeat;
+}
+
+.main .trafficInfo_list > li.lm_4 > a {
+    font-size: 16px;
+    font-weight: 400;
+    display: inline-block;
+    position: absolute;
+    left: 75px;
+    top: 32px;
+}
+
+.main .trafficInfo_list > li.lm_4:hover {
+    cursor: pointer;
+    display: inline-block;
+    width: 170px;
+    height: 85px;
+    box-shadow: inset 10px 10px 10px 1px rgba(0, 0, 0, .1);
+    background: #9ddd2a url('../../images/main/ico_trafficInfo_4.png') 25px 25px no-repeat;
+}
+
+.main .trafficInfo_list > li.lm_5 {
+    position: relative;
+    background: url('../../images/main/ico_trafficInfo_5.png') 28px 25px no-repeat;
+}
+
+.main .trafficInfo_list > li.lm_5 > a {
+    font-size: 16px;
+    font-weight: 400;
+    display: inline-block;
+    position: absolute;
+    left: 75px;
+    top: 32px;
+}
+
+.main .trafficInfo_list > li.lm_5:hover {
+    cursor: pointer;
+    display: inline-block;
+    width: 170px;
+    height: 85px;
+    box-shadow: inset 10px 10px 10px 1px rgba(0, 0, 0, .1);
+    background: #9ddd2a url('../../images/main/ico_trafficInfo_5.png') 28px 25px no-repeat;
+}
+
+.main .trafficInfo_list > li.lm_6 {
+    position: relative;
+    background: url('../../images/main/ico_trafficInfo_6.png') 28px 25px no-repeat;
+}
+
+.main .trafficInfo_list > li.lm_6 > a {
+    font-size: 16px;
+    font-weight: 400;
+    display: inline-block;
+    position: absolute;
+    left: 75px;
+    top: 32px;
+}
+
+.main .trafficInfo_list > li.lm_6:hover {
+    cursor: pointer;
+    display: inline-block;
+    width: 170px;
+    height: 85px;
+    box-shadow: inset 10px 10px 10px 1px rgba(0, 0, 0, .1);
+    border-top-right-radius: 1.5em;
+    background: #9ddd2a url('../../images/main/ico_trafficInfo_6.png') 28px 25px no-repeat;
+}
+
+.main .boardInfo {
+    width: 647px;
+}
+
+.main .boardInfo .boardList {}
+
+.main .boardInfo .boardList > li {}
+
+.main .boardInfo .boardList > li > a {
+    width: 25%;
+}
+
+.main .bannerInfo {
+    width: 345px;
+}
+
+.main .bannerInfo > .list_tp2 > li {
+    *zoom: 1;
+    position: relative;
+}
+
+.main .bannerInfo > .list_tp2 > li.lm_01:after {
+    content: "";
+    display: block;
+    position: absolute;
+    right: 11px;
+    top: 14px;
+    width: 41px;
+    height: 41px;
+    background: url('../../images/main/ico_informationUser.png') center center no-repeat;
+}
+
+.main .bannerInfo > .list_tp2 > li.lm_02:after {
+    content: "";
+    display: block;
+    position: absolute;
+    right: 11px;
+    top: 14px;
+    width: 41px;
+    height: 41px;
+    background: url('../../images/main/ico_learn.png') center center no-repeat;
+}
+
+/*-----------------------------------------  #content -------------------------------------------------*/
+#content .content_wrap {
+    margin: 30px 20px 0px 20px;
+    width: 1024px;
+    height: 300px;
+    display: inline-block;
+    position: relative;
+    padding-bottom: 30px;
+}
+
+.main #content ul {  /* 메인 공지사항용  20200910 .main 클래스명 추가 수정*/
+    margin-top: 18px;
+    display: inline-block;
+}
+
+.main #content ul li { /* 메인 공지사항용  20200910 .main 클래스명 추가 수정*/
+    position: relative;
+    display: inline-block;
+}
+
+.content_wrap .notice {
+    width: 320px;
+    height: 160px;
+    border: 1px solid #ddd;
+    border-bottom-left-radius: 1em;
+    border-top-right-radius: 1em;
+    padding: 23px;
+    float: left;
+    position: relative;
+}
+
+#content h3 {
+    font-size: 16px;
+    font-weight: 600;
+    display: inline-block;
+}
+
+.notice h3:after {
+    content: "";
+    position: absolute;
+    left: 15px;
+    top: 15px;
+    width: 6px;
+    height: 6px;
+    border-radius: 5px;
+    background-color: #85e300;
+}
+
+.notice .btn_more {
+    position: absolute;
+    right: 20px;
+    top: 20px;
+    width: 23px;
+    height: 23px;
+    background: url('../../images/common/ico_more_tp1.png') no-repeat;
+    text-indent: -9999px;
+}
+
+.statInfo {
+    position: relative;
+    float: left;
+    margin-left: 20px;
+    width: 320px;
+    height: 160px;
+    background: #f1f1f1;
+    border-bottom-left-radius: 1em;
+    border-top-right-radius: 1em;
+    padding: 23px;
+    display: inline-block;
+}
+
+.statInfo span {
+    font-size: 12px;
+    float: right;
+    position: absolute;
+    top: 26px;
+    right: 40px;
+}
+
+.statInfo h3:after {
+    content: "";
+    position: absolute;
+    left: 15px;
+    top: 15px;
+    width: 6px;
+    height: 6px;
+    border-radius: 5px;
+    background-color: #85e300;
+}
+
+.statInfo ul li {
+    width: 280px;
+    height: 25px;
+    background: #fff;
+    font-size: 14px;
+    border-radius: 30px;
+    line-height: 21px;
+    margin-bottom: 5px;
+    padding-left: 10px;
+}
+
+.statInfo ul li:after {
+    content: "";
+    position: absolute;
+    right: 15px;
+    top: 7px;
+    width: 0;
+    height: 0;
+    border-top: 5px solid transparent;
+    border-left: 7px solid #85e300;
+    border-bottom: 5px solid transparent;
+}
+
+.banner01 {
+    position: relative;
+    float: left;
+    margin-left: 20px;
+    width: 320px;
+    height: 65px;
+    background: #e9ffca;
+    border-bottom-left-radius: 1em;
+    border-top-right-radius: 1em;
+    padding: 23px;
+}
+
+.banner01 h3:after {
+    content: "";
+    position: absolute;
+    left: 15px;
+    top: 15px;
+    width: 6px;
+    height: 6px;
+    border-radius: 5px;
+    background-color: #85e300;
+}
+
+.banner01 span {
+    font-size: 12px;
+    float: right;
+    line-height: 16px;
+    position: absolute;
+    top: 17px;
+    right: 12px;
+    letter-spacing: -1px;
+}
+
+.banner02 {
+    position: absolute;
+    top: 80px;
+    right: 23px;
+    float: inherit;
+    margin-left: 20px;
+    width: 320px;
+    height: 81px;
+    background: #ededed;
+    border-bottom-left-radius: 1em;
+    border-top-right-radius: 1em;
+}
+
+.banner02 ul {
+    position: relative;
+}
+
+.banner02 ul li {
+    width: 106px;
+    float: left;
+    font-size: 14px;
+    text-align: center;
+    line-height: 16px;
+}
+
+.banner02 ul li:after {
+    content: "";
+    position: absolute;
+    top: -29px;
+    right: -2px;
+    width: 2px;
+    height: 88px;
+    background-color: #fff;
+}
+
+/*-----------------------------------------  #footer -------------------------------------------------*/
+
+/*-----------------------------------------  #member -------------------------------------------------*/
+.member {}
+
+.member .login_wrap {
+    margin-top: 20px;
+    padding: 52px 124px 52px 115px;
+    border-top: 1px solid #c0bebe;
+    border-bottom: 1px solid #c0bebe;
+}
+
+.member .login_wrap h3 {
+    font-family: 'Noto Sans KR';
+    font-size: 17px;
+    color: #454545;
+    line-height: 23px;
+}
+
+.member .login_wrap h3 span {
+    display: block;
+}
+
+.member .login_wrap h3 .txt_blue {
+    color: #6cae0c;
+}
+
+.member .login_wrap .subTit {
+    margin-top: 2px;
+}
+
+.member .login_wrap .login_form {
+    position: relative;
+    width: 525px;
+    margin-top: 10px;
+}
+
+.member .login_wrap .login_form > .input_row {
+    width: 392px;
+    height: 42px;
+}
+
+.member .login_wrap .login_form > .input_row + div {
+    margin-top: 10px;
+}
+
+.member .login_wrap .login_form .input_row input[type=text] {
+    width: 100%;
+    height: 100%;
+}
+
+.member .login_wrap .login_form .input_row input[type=password] {
+    width: 100%;
+    height: 100%;
+}
+
+.member .login_wrap .login_form .btn_login {
+    position: absolute;
+    right: 0px;
+    top: 0px;
+    width: 120px;
+    height: 94px;
+    background-color: #6cae0c;
+    font-family: 'Noto Sans KR';
+    font-size: 13px;
+    color: #fff;
+    text-align: center;
+    line-height: 94px;
+}
+
+.member .login_wrap .login_form .chk_login {
+    overflow: hidden;
+    margin-top: 12px;
+    font-size: 13px
+}
+
+.member .login_wrap .login_form .chk_login .input_wrap {
+    float: left;
+    color: #030303;
+}
+
+.member .login_wrap .login_form .chk_login .btn_area {
+    float: right;
+}
+
+.member .login_wrap .login_form .chk_login .btn_area > a {
+    *zoom: 1;
+    display: inline-block;
+    *display: inline;
+    *zoom: 1;
+    position: relative;
+    padding: 0 12px;
+}
+
+.member .login_wrap .login_form .chk_login .btn_area > a:after {
+    content: "";
+    position: absolute;
+    left: 0px;
+    top: 0px;
+    width: 2px;
+    height: 12px;
+    background-color: #c5c5c5;
+}
+
+.member .login_wrap .login_form .chk_login .btn_area > a:first-child:after {
+    display: none;
+}
+
+.member .login_wrap .login_form .chk_login .btn_area > a:last-child {
+    padding-right: 0px;
+}
+
+/*-----------------------------------------  #siteMap -------------------------------------------------*/
+.siteMap_wrap {
+    *zoom: 1;
+    margin-top: 30px;
+    padding-top: 30px;
+    border-top: 1px solid #d2d2d2;
+}
+
+.siteMap_wrap:after {
+    content: "";
+    display: block;
+    clear: both;
+}
+
+.siteMap_wrap .siteMapInfo {
+    float: left;
+    width: 245px;
+    height: 360px;
+    margin-right: 14px;
+}
+
+.siteMap_wrap .siteMapInfo.h_tp1 {
+    height: 330px;
+}
+
+.siteMap_wrap .siteMapInfo.h_tp2 {
+    height: 210px;
+}
+
+.siteMap_wrap .siteMapInfo .tit {
+    width: 100%;
+    padding: 16px 0;
+    background-color: #6cae0c;
+    font-size: 18px;
+    color: #fff;
+    text-align: center;
+}
+
+.siteMap_wrap .siteMapInfo ul {}
+
+.siteMap_wrap .siteMapInfo ul > li {
+    *zoom: 1;
+    position: relative;
+    border-bottom: 1px solid #dcdcdc;
+}
+
+.siteMap_wrap .siteMapInfo ul > li:after {
+    content: "";
+    display: block;
+    position: absolute;
+    left: 10px;
+    top: 12px;
+    width: 5px;
+    height: 5px;
+    background: url('../../images/common/ico_dot_tp2.png') no-repeat;
+}
+
+.siteMap_wrap .siteMapInfo ul > li > a {
+    display: block;
+    padding: 9px 20px;
+    font-size: 13px;
+    color: #222;
+}
+
+
+.map_wrap {
+    position: relative;
+}
+
+.map_wrap .lnb_panel {
+    position: absolute;
+    left: 0px;
+    top: 0px;
+    width: 240px;
+    height: 100%;
+    padding: 14px 20px;
+    background: rgba(255, 255, 255, 0.95);
+}
+
+.map_wrap .lnb_panel .lnb_panel_cont h3 {
+    margin-bottom: 8px;
+    font-family: 'Noto Sans KR';
+    font-size: 15px;
+    color: #2f375a;
+    text-align: center;
+}
+
+.map_wrap .lnb_panel .acc_wrap .acc_headar {
+    padding: 5px 0;
+}
+
+.map_wrap .lnb_panel .acc_wrap .acc_headar .cnt {
+    top: 6px;
+}
+
+.map_wrap .lnb_panel .list_tp4 > li {
+    padding: 5px 0;
+}
+
+.map_wrap .search_tp1 {}
+
+.map_wrap .search_tp1 > input {
+    display: block;
+    width: 100%;
+    margin-bottom: 5px;
+}
+
+.map_wrap .search_tp1 > select {
+    width: 100%;
+    height: 30px;
+    margin-bottom: 5px;
+    border: 1px solid #cecece;
+}
+
+.map_wrap .search_tp1 > button {
+    display: block;
+}

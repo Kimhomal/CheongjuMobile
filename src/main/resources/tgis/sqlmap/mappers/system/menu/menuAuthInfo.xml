@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper   PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="tgis.system.menu.service.MenuAuthMapper">
+
+	<!-- [시스템관리 -> 메뉴 권한 -> 메뉴 권한 관리 조회]  -->
+	<select id="menuAuthList" parameterType="map" resultType="egovMap">
+	<![CDATA[
+		  WITH PROG_LIST
+		AS (
+				SELECT PROG_ID,
+							PROG_NM,
+							PROG_URL
+				FROM   SYS_PROG_MNG
+		)
+		SELECT T.MENU_ID,
+					T.PAR_MENU_ID,
+					T.ORDER_NO,
+					T.T_LVL as TREE_LEVEL,
+					M.MENU_NM,
+					M.PROG_ID,
+					M.PROG_NM,
+					DECODE( M.PROG_NM, '','', '[' || M.PROG_ID || ']' || M.PROG_NM ) AS PROG_NAME,
+					M.PROG_URL,
+					M.USE_YN,
+					M.MENU_LEVEL,
+					't' AS EX,
+					DECODE( M.MENU_LEVEL, 3, DECODE(M.USE_YN, 'Y', '사용', 'N', '미사용'), '' ) AS USE_YN_YN,
+					(SELECT T.PAR_MENU_ID FROM SYS_MENU_MNG T WHERE T.MENU_ID = M.PAR_MENU_ID ) AS TOP_MENU_ID,
+					(SELECT COUNT(MENU_ID) FROM SYS_MENU_MNG T WHERE T.PAR_MENU_ID = M.MENU_ID ) AS CHILD_COUNT,
+					(SELECT T.MENU_LEVEL FROM SYS_MENU_MNG T WHERE T.MENU_ID = M.PAR_MENU_ID ) AS PAR_MENU_LEVEL,
+					(SELECT T.MENU_NM FROM SYS_MENU_MNG T WHERE T.MENU_ID = M.PAR_MENU_ID ) AS PAR_MENU_NM,
+					T.IS_LEAF,
+					M.MENU_ORDER_NO,
+					DECODE( R.MENU_ID, NULL,'FALSE', 'TRUE' ) AS R_MENU_ID,
+					DECODE( C.MENU_ID, NULL,'FALSE', 'TRUE' ) AS CU_MENU_ID,
+					DECODE( D.MENU_ID, NULL,'FALSE', 'TRUE' ) AS D_MENU_ID
+		FROM
+		(
+			SELECT MENU_ID,
+						MENU_NM,
+						NVL((SELECT P.PROG_ID FROM PROG_LIST P WHERE P.PROG_ID = I.PROG_ID), '') AS PROG_ID,
+						NVL((SELECT P.PROG_NM FROM PROG_LIST P WHERE P.PROG_ID = I.PROG_ID), '') AS PROG_NM,
+						NVL((SELECT P.PROG_URL FROM PROG_LIST P WHERE P.PROG_ID = I.PROG_ID), '') AS PROG_URL,
+						USE_YN,
+						MENU_LEVEL,
+						PAR_MENU_ID,
+						MENU_ORDER_NO
+			FROM	SYS_MENU_MNG I
+		) M,
+		(
+			SELECT ROWNUM TR,
+						A.*
+			FROM (
+						SELECT MENU_ID,
+									LEVEL AS T_LVL,
+									PAR_MENU_ID,
+									ORDER_NO,
+									DECODE((SELECT DISTINCT '1' FROM SYS_MENU_MNG START WITH PAR_MENU_ID = MT.MENU_ID CONNECT BY PRIOR MENU_ID = PAR_MENU_ID),NULL,'true','false') AS IS_LEAF
+						FROM	SYS_MENU_MNG MT
+						START WITH PAR_MENU_ID = '0'
+						CONNECT BY PRIOR MENU_ID = PAR_MENU_ID
+						ORDER SIBLINGS BY ORDER_NO
+					) A
+		) T,
+		(
+			SELECT *
+			FROM	SYS_MENU_ROLE_MNG
+			WHERE ROLE_ID = #{roleId} AND ROLE_KND = 'R'
+		) R,
+		(
+			SELECT *
+			FROM	SYS_MENU_ROLE_MNG
+			WHERE ROLE_ID = #{roleId} AND ROLE_KND = 'CU'
+		) C,
+		(
+			SELECT *
+			FROM	SYS_MENU_ROLE_MNG
+			WHERE ROLE_ID = #{roleId} AND ROLE_KND = 'D'
+		) D
+		WHERE M.MENU_ID = T.MENU_ID
+		AND T.MENU_ID = R.MENU_ID(+)
+		AND T.MENU_ID = C.MENU_ID(+)
+		AND T.MENU_ID = D.MENU_ID(+)
+		ORDER BY MENU_ORDER_NO
+	]]>
+	</select>
+
+	<!-- [시스템관리 -> 메뉴 권한 -> 메뉴 권한 삭제]  -->
+	<delete id="roleMenuAuthDelete" parameterType="java.lang.String" >
+	<![CDATA[
+		DELETE FROM SYS_MENU_ROLE_MNG
+		WHERE ROLE_ID = #{authVal}
+	]]>
+	</delete>
+
+	<!-- [시스템관리 -> 메뉴 권한 -> 조회 권한 등록]  -->
+	<insert id="roleMenuAuthInsert" >
+	<![CDATA[
+		INSERT INTO SYS_MENU_ROLE_MNG (ROLE_ID, MENU_ID,ROLE_KND)
+		VALUES (#{roleId}, #{menuId},#{roleKnd})
+	]]>
+	</insert>
+
+</mapper>

@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper   PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="tgis.system.menu.service.AuthInfoMapper">
+
+	<!-- [메뉴관리 -> 권한관리 -> 목록] -->
+	<select id="selectInfoList" parameterType="map" resultType="egovMap">
+	<![CDATA[
+		SELECT	ROLE_ID,
+				ROLE_NM,
+				ROLE_DESC,
+				DECODE(USE_YN, 'Y', '사용', 'N', '미사용') AS USE_DESC,
+				USE_YN
+		FROM	SYS_ROLE_MNG
+		WHERE	ROLE_ID LIKE 'R%'
+		ORDER BY ROLE_ID
+	]]>
+	</select>
+
+	<!-- [메뉴관리 -> 권한관리 -> 상세조회] -->
+	<select id="selectInfo" parameterType="map" resultType="egovMap">
+	<![CDATA[
+		SELECT	ROLE_ID,
+				ROLE_NM,
+				ROLE_DESC,
+				DECODE(USE_YN, 'Y', '사용', 'N', '미사용') AS USE_DESC,
+				USE_YN
+		FROM	SYS_ROLE_MNG
+		WHERE 	ROLE_ID LIKE 'R%'
+		AND		ROLE_ID = #{roleId}
+	]]>
+	</select>
+
+	<!-- [메뉴관리 -> 권한관리 -> 추가] -->
+	<insert id="insertInfo" parameterType="map">
+	<![CDATA[
+		INSERT INTO SYS_ROLE_MNG( ROLE_ID, ROLE_NM, ROLE_DESC, USE_YN )
+		VALUES( (SELECT 'R' || LPAD((SELECT MAX(SUBSTR(ROLE_ID,2,4)) + 1 FROM SYS_ROLE_MNG WHERE ROLE_ID LIKE 'R%'), 4,'0' ) FROM DUAL), #{roleNm}, #{roleDesc}, #{useYn} )
+	]]>
+	</insert>
+
+	<!-- [메뉴관리 -> 권한관리 -> 수정] -->
+	<update id="updateInfo" parameterType="map">
+	<![CDATA[
+		UPDATE	SYS_ROLE_MNG
+		SET		ROLE_NM = #{roleNm},
+				ROLE_DESC = #{roleDesc},
+				USE_YN = #{useYn}
+		WHERE	ROLE_ID = #{roleId}
+	]]>
+	</update>
+
+	<!-- [메뉴관리 -> 권한관리 -> 삭제] -->
+	<delete id="deleteInfo" parameterType="map">
+	<![CDATA[
+		DELETE
+		FROM	SYS_ROLE_MNG
+		WHERE	ROLE_ID = #{roleId}
+	]]>
+	</delete>
+
+</mapper>

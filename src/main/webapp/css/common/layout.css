@@ -1,0 +1,404 @@
+@charset "utf-8";
+
+/*------------------------------------------------------------------------------------------------------------------------------------------
+	File : layout.css 
+	Company : 벨마리에(주)
+	Author : kyung-ho-kang 2017-11
+	CSS 적용순서 : 아이디 > 태그와 클래스 > 클래스 > 태그
+	CSS 선택자 선언순서 : Type Selector, Layout Selector, Class Selector, Etc
+	CSS 속성 선언순서 : display, position, float/clear, overflow, width/height, margin/padding, border, background, color/font, align, etc 
+--------------------------------------------------------------------------------------------------------------------------------------------*/
+
+#wrap {
+    position: relative;
+    width: 100%;
+    min-height: 100%;
+    ;
+}
+
+.main #wrap {
+    background-color: #fff;
+}
+
+.main #container {
+    padding: 115px 0 0px 0;
+}
+
+.innerArea {
+    position: relative;
+    width: 1024px;
+    margin: 0 auto;
+}
+
+.innerArea:after {
+    content: "";
+    display: block;
+    clear: both;
+}
+
+/*------------------------------------------------------------------------------------------
+                                         * header *
+-----------------------f--------------------------------------------------------------------*/
+#header {
+    position: absolute;
+    left: 0px;
+    top: 0px;
+    width: 100%;
+    background-color: #fff;
+    border-top: 1px solid #e7e6e6;
+    border-bottom: 1px solid #e7e6e6;
+    z-index: 200;
+}
+
+#header .innerArea .logo {
+    padding: 20px 0;
+}
+
+#header .gnb_wrap {
+    overflow: hidden;
+    position: absolute;
+    right: 0px;
+    top: 24px;
+}
+
+#header .gnb_wrap .gnb {
+    float: left;
+    overflow: hidden;
+}
+
+#header .gnb_wrap .gnb > li {
+    float: left;
+    padding: 5px 10px;
+}
+
+#header .gnb_wrap .gnb > li:first-child {
+    padding-left: 0px;
+    border-left: 0px;
+}
+
+#header .gnb_wrap .gnb > li > a {
+    font-size: 13px;
+    color: #6e6e6d;
+}
+
+#header .gnb_wrap .gnb > li > p.tit {font-size:13px; color:#6e6e6d;margin-top: 5px;} /*한봄 추가 000님이 접속중입니다. 메시지 출력 부분*/
+
+#header .gnb_wrap .gnb_link {
+    overflow: hidden;
+    float: right;
+    height: 30px;
+    line-height: 20px;
+}
+
+#header .gnb_wrap .gnb_link .tit {
+    float: left;
+    font-family: 'Noto Sans KR';
+    font-size: 13px;
+    color: #1e3566;
+}
+
+#header .lnb_wrap {
+    overflow: hidden;
+    height: 49px;
+    background: url(../../images/common/bg_lnb.png) left top repeat-x;
+}
+
+#header .lnb_wrap.active {
+    height: 284px;
+    border-bottom: 0px;
+}
+
+#header .lnb_wrap .lnb {
+    *zoom: 1;
+    width: 1024px;
+    margin: 0 auto;
+}
+
+#header .lnb_wrap .lnb:after {
+    content: "";
+    display: block;
+    clear: both;
+}
+
+#header .lnb_wrap .lnb > li {
+    float: left;
+    position: relative;
+    width: 128px;
+    text-align: center;
+}
+
+#header .lnb_wrap .lnb > li > a {
+    display: block;
+    padding: 17px 0;
+    border-right: 1px solid #4b4b4b;
+    font-family: 'Noto Sans KR';
+    font-size: 15px;
+    color: #fff;
+
+}
+
+#header .lnb_wrap .lnb > li.active > a {
+    color: #8cd510;
+}
+
+#header .lnb_wrap .lnb > li:first-child > a {
+    border-left: 1px solid #4b4b4b;
+}
+
+#header .lnb_wrap .lnb .subMenu {
+    /* display:none; */
+    /* position:absolute; left:0px; top:48px; */
+    width: 128px;
+    height: 236px;
+    padding: 13px 0px 20px;
+    border-right: 1px solid #4b4b4b;
+    background: #1b1b1b;
+
+}
+
+#header .lnb_wrap .lnb .subMenu > li {}
+
+#header .lnb_wrap .lnb .subMenu > li > a {
+    display: block;
+    width: 100%;
+    font-family: 'Noto Sans KR';
+    font-size: 12px;
+    color: #fff;
+    line-height: 23px;
+    letter-spacing: -0.8px;
+    text-align: center;
+}
+
+#header .lnb_wrap .lnb .subMenu > li > a:hover,
+#header .lnb_wrap .lnb .subMenu > li > a:focus,
+#header .lnb_wrap .lnb .subMenu > li > a.active {
+    color: #8cd510;
+}
+
+/*#header .lnb_wrap.active .subMenu {display:block;}*/
+#header .lnb_wrap.active .lnb > li:first-child .subMenu {
+    border-left: 1px solid #4b4b4b;
+}
+
+
+/*.main #container {padding:115px 0 0px 0;}*/
+#container {padding:115px 0 0 0;}
+
+#content {
+    *zoom: 1;
+    width: 804px;
+    margin-left: 220px;
+    padding-top: 40px;
+    padding-left: 40px;
+    padding-bottom: 80px;
+}
+
+#content:after {
+    content: "";
+    display: block;
+    clear: both;
+}
+
+#content.tp1 {
+    width: 1024px;
+    margin-left: 0px;
+    padding-left: 0px;
+}
+
+#content.siteMap {
+    background: url('../../images/contents/bg_siteMap_01.png') right 40px no-repeat;
+}
+
+.main #content {
+    width: 1024px;
+    min-height: 80px;
+    ;
+    margin: 0 auto;
+    padding: 45px 0;
+}
+
+
+.partnerSite {
+    width: 100%;
+    height: 80px;
+    background-color: #f5f5f5;
+    line-height: 72px;
+}
+
+.partnerSite h3 {
+    position: absolute;
+    left: 0px;
+    top: 0px;
+}
+
+.partnerSite .partnerSite_list {
+    margin-left: 114px;
+}
+
+.snbNavi_wrap {
+    padding-top: 5px;
+    height: 50px;
+    border-bottom: 1px #ddd solid;
+}
+
+.depthNavi {
+    overflow: hidden;
+    padding-top: 17px;
+}
+
+.depthNavi > li {
+    float: left;
+    padding: 0 10px;
+    background: url('../../images/common/arrow_tp1.png') left center no-repeat;
+}
+
+.depthNavi > li:first-child {
+    padding-left: 0px;
+    background: none;
+}
+
+.depthNavi > li > a {
+    display: block;
+    font-size: 13px;
+    color: #222222;
+}
+
+.depthNavi > li > a.home {
+    width: 14px;
+    height: 12px;
+    background: url('../../images/common/ico_home.png') 1px center no-repeat;
+    text-indent: -9999px
+}
+
+#snb {
+    position: absolute;
+    left: 0px;
+    top: 0px;
+    width: 204px;
+}
+
+#snb h1 {
+    padding: 60px 24px;
+    font-size: 25px;
+    font-weight: 500;
+    height: 140px;
+    background: #77ca00 url('../../images/common/bg_snb_h1.png') 10px 3px no-repeat;
+    color: #fff;
+    text-align: left;
+}
+
+#snb h1 em {
+    display: block;
+    margin-top: 8px;
+    font-size: 11px;
+}
+
+.snb_list {}
+
+.snb_list > li {
+    position: relative;
+    background-color: #f6f6f6;
+}
+
+.snb_list > li.active:after {
+    content: "";
+    display: block;
+    position: absolute;
+    left: 0px;
+    top: 0px;
+    width: 3px;
+    height: 51px;
+    background-color: #77ca00;
+}
+
+.snb_list > li > a {
+    display: block;
+    padding: 18px 20px;
+    font-size: 14px;
+    color: #222;
+    border: 1px solid #e8e8e8;
+    border-top: none;
+    text-align: left;
+}
+
+/*.snb_list > li.active {border-left:3px solid #004ea8;}*/
+.snb_list > li.active > a {
+    background-color: #fff;
+}
+
+.snb_list > li .subMenu {
+    display: none;
+    padding: 15px 20px;
+    background-color: #ebfbeb
+}
+
+.snb_list > li.active .subMenu {
+    display: block;
+}
+
+.snb_list > li .subMenu > ul > li {
+    line-height: 28px;
+}
+
+.snb_list > li .subMenu > ul > li > a {
+    display: block;
+    padding-left: 16px;
+    background: url('../../images/common/ico_snb_dot.png') left 8px no-repeat;
+    font-size: 13px;
+    color: #000000;
+}
+
+.snb_list > li .subMenu > ul > li.active > a {
+    font-family: 'Noto Sans KR';
+    color: #106810;
+}
+
+#snb .boardInfo {
+    margin-top: 60px;
+}
+
+#footer {
+    position: absolute;
+    left: 0px;
+    bottom: 0px;
+    width: 100%;
+    background: #3e3e3e;
+    border-top: 1px solid #dcdcdc;
+}
+
+
+#footer .f_info {
+    padding: 16px 0;
+    font-family: 'Noto Sans KR';
+    font-size: 13px;
+    color: #e5e5e5;
+    line-height: 17px;
+}
+
+#footer .cntInfo {
+    *zoom: 1;
+    position: absolute;
+    right: 0px;
+    top: 12px;
+    width: 140px;
+    font-family: 'Noto Sans KR';
+    font-size: 11px;
+    color: #e5e5e5;
+    line-height: 17px;
+}
+
+#footer .cntInfo:after {
+    content: "";
+    display: block;
+    clear: both;
+}
+
+#footer .cntInfo .tit {
+    float: left;
+    padding-right: 3px;
+    font-family: 'Noto Sans KR';
+}
+
+#footer .cntInfo .cont {
+    float: left;
+}

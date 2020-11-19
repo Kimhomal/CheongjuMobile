@@ -1,0 +1,181 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper   PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="tgis.fclts.service.FcltsMngMapper">
+
+	<!-- [물품관리대장 이미지 파일 view 조회] -->
+	<select id="selectReportFileInf" parameterType="map" resultType="egovMap">
+ 		<![CDATA[
+			SELECT	ATCH_FILE_ID,
+					GVM_ATC_NO,
+					(SELECT FILE_STRE_COURS FROM COMTNFILEDETAIL WHERE ATCH_FILE_ID = A.ATCH_FILE_ID) AS FILE_PATH,
+					(SELECT STRE_FILE_NM FROM COMTNFILEDETAIL WHERE ATCH_FILE_ID = A.ATCH_FILE_ID) AS FILE_NAM,
+					(SELECT ORIGNL_FILE_NM FROM COMTNFILEDETAIL WHERE ATCH_FILE_ID = A.ATCH_FILE_ID) AS OGL_NAM
+			FROM	REPORT_TML_PHOTO_ALBUM A
+			WHERE 	GVM_ATC_NO = #{gvmAtcNo}
+			AND 	SN = #{sn}
+ 		]]>
+ 	</select>
+
+	<!-- [시설물 이미지 파일 view 조회] -->
+	<select id="selectFacFileInf" parameterType="map" resultType="egovMap">
+ 		<![CDATA[
+			SELECT	ATCH_FILE_ID,
+					MGRNU,
+					(SELECT FILE_STRE_COURS FROM COMTNFILEDETAIL WHERE ATCH_FILE_ID = A.ATCH_FILE_ID) AS FILE_PATH,
+					(SELECT STRE_FILE_NM FROM COMTNFILEDETAIL WHERE ATCH_FILE_ID = A.ATCH_FILE_ID) AS FILE_NAM,
+					(SELECT ORIGNL_FILE_NM FROM COMTNFILEDETAIL WHERE ATCH_FILE_ID = A.ATCH_FILE_ID) AS OGL_NAM
+			FROM	FACILITY_PHOTO_ALBUM A
+			WHERE 	MGRNU = #{mgrnu}
+			AND 	SN = #{sn}
+ 		]]>
+ 	</select>
+
+ 	<!-- 사진첨부 -->
+	<insert id="insertFile" parameterType="map">
+		<selectKey resultType="int" keyProperty="sn" order="BEFORE">
+		<![CDATA[
+			SELECT NVL(MAX (SN), 0) + 1 AS SN FROM FACILITY_PHOTO_ALBUM
+		]]>
+		</selectKey>
+		<![CDATA[
+		INSERT INTO FACILITY_PHOTO_ALBUM (
+			SN,
+			MGRNU,
+			PHOTO_SJ,
+			ATCH_FILE_ID,
+			CREAT_DT,
+			UPDT_DT
+		)
+		VALUES (
+			#{sn},
+			]]>
+			<choose>
+			<when test='mgrnu != "" and mgrnu != null'>
+				<![CDATA[ #{mgrnu},  ]]>
+			</when>
+			<otherwise>
+				<![CDATA[GET_MGRNU(#{facilityId}), ]]>
+			</otherwise>
+			</choose>
+			<![CDATA[
+			#{photoSj},
+			#{atchFileId},
+			SYSDATE,
+			SYSDATE
+		)
+	]]>
+	</insert>
+
+	<insert id="insertFileDetail" parameterType="map">
+		<![CDATA[
+			INSERT INTO COMTNFILEDETAIL (
+				ATCH_FILE_ID,
+				FILE_SN,
+				FILE_STRE_COURS,
+				STRE_FILE_NM,
+				ORIGNL_FILE_NM,
+				FILE_EXTSN,
+				FILE_SIZE)
+			VALUES (
+				#{atchFileId},
+				#{fileSn},
+				#{fileStreCours},
+				#{streFileNm},
+				#{orignlFileNm},
+				#{fileExtsn},
+				#{fileSize}
+			  )
+		]]>
+	</insert>
+
+	<insert id="insertFileMaster" parameterType="java.lang.String">
+		<![CDATA[
+			INSERT INTO COMTNFILE (
+				ATCH_FILE_ID,
+				CREAT_DT,
+				USE_AT
+			)
+			VALUES (
+				#{atchFileId},
+				SYSDATE,
+				'Y'
+			)
+		]]>
+	</insert>
+
+	<select id="atchFileId" resultType="java.lang.String">
+		<![CDATA[
+			SELECT	'FILE_' || LPAD(TO_CHAR(SUBSTR(MAX(ATCH_FILE_ID), 6, 100) + 1), 15, '0') AS CNT
+			FROM	COMTNFILE
+		]]>
+	</select>
+
+	<select id="selectFileInfo" parameterType="map" resultType="egovMap">
+	<![CDATA[
+		SELECT  *
+		FROM  ( SELECT ROWNUM RNUM, ALL_LIST.*
+				FROM  ( SELECT	SN,
+								MGRNU,
+								PHOTO_SJ,
+								ATCH_FILE_ID,
+								CREAT_DT,
+								UPDT_DT,
+								(SELECT FILE_STRE_COURS FROM COMTNFILEDETAIL WHERE ATCH_FILE_ID = A.ATCH_FILE_ID) AS FILE_PATH,
+								(SELECT STRE_FILE_NM FROM COMTNFILEDETAIL WHERE ATCH_FILE_ID = A.ATCH_FILE_ID) AS FILE_NAM,
+								(SELECT ORIGNL_FILE_NM FROM COMTNFILEDETAIL WHERE ATCH_FILE_ID = A.ATCH_FILE_ID) AS ORIGNL_FILE_NM
+						FROM	FACILITY_PHOTO_ALBUM A
+						WHERE	MGRNU = #{mgrnu}
+						ORDER BY SN DESC) ALL_LIST)
+	]]>
+	</select>
+
+	<delete id="deleteFileMaster" parameterType="map">
+		<![CDATA[
+			DELETE FROM COMTNFILE
+			WHERE ATCH_FILE_ID = #{atchFileId}
+		]]>
+	</delete>
+
+	<delete id="deleteFileDetail" parameterType="map">
+		<![CDATA[
+			DELETE FROM COMTNFILEDETAIL
+			WHERE ATCH_FILE_ID = #{atchFileId}
+		]]>
+	</delete>
+
+	<delete id="deleteFileInfo" parameterType="map">
+		<![CDATA[
+			DELETE FROM FACILITY_PHOTO_ALBUM
+			WHERE SN = #{sn}
+		]]>
+		<if test="mgrnu != '' and mgrnu != null">
+			<![CDATA[ AND MGRNU = #{mgrnu} ]]>
+		</if>
+	</delete>
+
+	<select id="selectFileInfoDetail" parameterType="map" resultType="egovMap">
+	<![CDATA[
+		SELECT	SN,
+				MGRNU,
+				PHOTO_SJ,
+				ATCH_FILE_ID,
+				CREAT_DT,
+				UPDT_DT,
+				(SELECT FILE_STRE_COURS FROM COMTNFILEDETAIL WHERE ATCH_FILE_ID = A.ATCH_FILE_ID) AS FILE_PATH,
+				(SELECT STRE_FILE_NM FROM COMTNFILEDETAIL WHERE ATCH_FILE_ID = A.ATCH_FILE_ID) AS FILE_NAM,
+				(SELECT ORIGNL_FILE_NM FROM COMTNFILEDETAIL WHERE ATCH_FILE_ID = A.ATCH_FILE_ID) AS ORIGNL_FILE_NM
+		FROM	FACILITY_PHOTO_ALBUM A
+		WHERE	MGRNU = #{mgrnu}
+		AND 	SN = #{sn}
+	]]>
+	</select>
+
+	<select id="chekPhoto" parameterType="map" resultType="Integer">
+		SELECT COUNT(*)
+		FROM FACILITY_PHOTO_ALBUM
+		WHERE MGRNU = #{mgrnu}
+
+	</select>
+
+</mapper>

@@ -1,0 +1,291 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper   PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="tgis.report.signMng.service.SignMngMapper">
+
+	<!-- [관리대장 > 표지관리대장 리스트 조회] -->
+	<select id="selectInfoList" parameterType="map" resultType="egovMap">
+	<![CDATA[
+		SELECT  NUM,
+				MGRNU,
+				PE_NAM,
+				GU_NAM,
+				DONG_NAM,
+				TO_CHAR(ESB_YMD, 'YYYY-MM-DD') AS ESB_YMD,
+				ROD_NAM,
+				TOTALROWS,
+				(SELECT CMMT FROM M_CODE WHERE CDTP = 'A064_P' AND CDN = 'MRK_KND' AND CD = MRK_KND) AS CMMT,
+				(SELECT CMMT FROM M_CODE WHERE CDTP = 'A064_P' AND CDN = 'STD' AND CD = STD) AS STD_NAME
+		FROM    (SELECT *
+         		 FROM   (SELECT ROWNUM AS NUM, TEMP.*, COUNT(*) OVER() AS TOTALROWS
+                 		 FROM   (SELECT *
+                         		 FROM   GT_A064_P TEMP
+	]]>
+	<where>
+		<if test="mgrnu != '' and mgrnu != null">
+			<![CDATA[ AND mgrnu = #{mgrnu} ]]>
+		</if>
+		<if test="sdate != '' and sdate != null">
+			<![CDATA[ AND ESB_YMD >= #{sdate} ]]>
+		</if>
+		<if test="edate != '' and edate != null">
+			<![CDATA[ AND ESB_YMD <= #{edate} ]]>
+		</if>
+		<if test="peCde != '' and peCde != null">
+			<![CDATA[ AND PE_CDE LIKE '%' || #{peCde} || '%' ]]>
+		</if>
+		<if test="guNam != '' and guNam != null">
+			<![CDATA[ AND GU_CDE LIKE '%' || #{guNam} || '%' ]]>
+		</if>
+		<if test="dongNam != '' and dongNam != null">
+			<![CDATA[ AND DONG_CDE LIKE '%' || #{dongNam} || '%' ]]>
+		</if>
+		<if test="searchWrd != '' and searchWrd != null">
+			<![CDATA[ AND MGRNU LIKE '%' || #{searchWrd} || '%' ]]>
+		</if>
+	</where>
+	<![CDATA[
+								 ORDER BY MGRNU DESC) TEMP) TEMP
+				 ORDER BY NUM ASC) TEMP
+		WHERE NUM BETWEEN #{rows} * ( #{page} - 1 ) + 1 AND #{rows}* #{page}
+	]]>
+	</select>
+
+	<!-- [관리대장 > 표지관리대장 상세 조회] -->
+	<select id="selectInfo" parameterType="map" resultType="egovMap">
+	<![CDATA[
+		SELECT
+				GEOMSEQ,
+				GEOM,
+				MAPCODE,
+				MOR,
+				MOP,
+				MRK_CDE,
+				STD,
+				EVE,
+				MGRNU,
+				GU_NAM,
+				DRN,
+				PE_CDE,
+				MRK_KND,
+				ROD_MGRNU,
+				ROD_KND,
+				ROD_FRM,
+				ESB_CPY,
+				ESB_NAM,
+				ESB_COS,
+				SPRT_MOP,
+				LGR_TYPE,
+				LGR_GBN,
+				SPT_MRK,
+				SPRT_KND,
+				CTK_MGRNU,
+				DONG_NAM,
+				SCH_MGRNU,
+				CSS_MGRNU,
+				ASN_MGRNU,
+				SPRT_MGRNU,
+				JIBUN,
+				SPT_MRK_ET,
+				NTC,
+				MRK_CDE_WE,
+				MRK_DESC,
+				MINX,
+				MINY,
+				MAXX,
+				MAXY,
+				CSS_NAM,
+				PE_NAM,
+				GU_CDE,
+				DONG_CDE,
+				RI_NAM,
+				RI_CDE,
+				PNU,
+				DIRECTION,
+				SCH_NAM,
+				ROD_NAM,
+				DRN_NUM,
+				TO_CHAR(A.ESB_YMD,'YYYY-MM-DD') AS ESB_YMD,
+				TO_CHAR(A.CAE_YMD,'YYYY-MM-DD') AS CAE_YMD,
+				(SELECT COUNT(*) FROM FACILITY_PHOTO_ALBUM WHERE MGRNU = #{mgrnu}) AS FILECNT,
+				A.XGEO.SDO_POINT.X AS XCE,
+				A.XGEO.SDO_POINT.Y AS YCE,
+				(SELECT CMMT FROM M_CODE WHERE CDTP = 'ALL' AND CDN = 'EVE' AND CD = A.EVE) AS EVE_NAME,
+				(SELECT CMMT FROM M_CODE WHERE CDTP = 'A064_P' AND CDN = 'MRK_KND' AND CD = A.MRK_KND) AS MRK_KND_NAME,
+				(SELECT CMMT FROM M_CODE WHERE CDTP = 'A064_P' AND CDN = 'STD' AND CD = A.STD) AS STD_NAME,
+                (SELECT CMMT FROM M_CODE WHERE CDTP = 'ALL' AND CDN = 'DIRECTION' AND CD = A.DIRECTION) AS DIRECTION_NAME,
+                (SELECT CMMT FROM M_CODE WHERE CDTP = 'A064_P' AND CDN = 'MOR' AND CD = A.MOR) AS MOR_NAME,
+                (SELECT CMMT FROM M_CODE WHERE CDTP = 'A064_P' AND CDN = 'MOP' AND CD = A.MOP) AS MOP_NAME,
+                (SELECT CMMT FROM M_CODE WHERE CDTP = 'A064_P' AND CDN = 'SPT_MRK' AND CD = A.SPT_MRK) AS SPT_MRK_NAME,
+                (SELECT CMMT FROM M_CODE WHERE CDTP = 'A064_P' AND CDN = 'SPRT_MOP' AND CD = A.SPRT_MOP) AS SPRT_MOP_NAME,
+                (SELECT CMMT FROM M_CODE WHERE CDTP = 'A064_P' AND CDN = 'SPRT_KND' AND CD = A.SPRT_KND) AS SPRT_KND_NAME,
+                (SELECT CMMT FROM M_CODE WHERE CDTP = 'A064_P' AND CDN = 'ROD_KND' AND CD = A.ROD_KND) AS ROD_KND_NAME,
+                (SELECT CMMT FROM M_CODE WHERE CDTP = 'A064_P' AND CDN = 'ROD_FRM' AND CD = A.ROD_FRM) AS ROD_FRM_NAME
+		FROM	GT_A064_P A
+		WHERE	MGRNU = #{mgrnu}
+	]]>
+	</select>
+
+	<!-- [관리대장 > 표지관리대장 사진 조회] -->
+	<select id="selectFileInfo" parameterType="map" resultType="egovMap">
+	<![CDATA[
+		SELECT  *
+		FROM  ( SELECT ROWNUM RNUM, ALL_LIST.*
+				FROM  ( SELECT	SN,
+								MGRNU,
+								PHOTO_SJ,
+								ATCH_FILE_ID,
+								CREAT_DT,
+								UPDT_DT,
+								(SELECT FILE_STRE_COURS FROM COMTNFILEDETAIL WHERE ATCH_FILE_ID = A.ATCH_FILE_ID) AS FILE_PATH,
+								(SELECT STRE_FILE_NM FROM COMTNFILEDETAIL WHERE ATCH_FILE_ID = A.ATCH_FILE_ID) AS FILE_NAM,
+								(SELECT ORIGNL_FILE_NM FROM COMTNFILEDETAIL WHERE ATCH_FILE_ID = A.ATCH_FILE_ID) AS ORIGNL_FILE_NM
+						FROM	FACILITY_PHOTO_ALBUM A
+						WHERE	MGRNU = #{mgrnu}
+						ORDER BY SN DESC) ALL_LIST)
+	]]>
+	</select>
+
+	<!-- [관리대장 > 표지관리대장 사진 조회(삭제된 파일)] -->
+	<select id="selectFileInfoDetail" parameterType="map" resultType="egovMap">
+	<![CDATA[
+		SELECT	SN,
+				MGRNU,
+				PHOTO_SJ,
+				ATCH_FILE_ID,
+				CREAT_DT,
+				UPDT_DT,
+				(SELECT FILE_STRE_COURS FROM COMTNFILEDETAIL WHERE ATCH_FILE_ID = A.ATCH_FILE_ID) AS FILE_PATH,
+				(SELECT STRE_FILE_NM FROM COMTNFILEDETAIL WHERE ATCH_FILE_ID = A.ATCH_FILE_ID) AS FILE_NAM,
+				(SELECT ORIGNL_FILE_NM FROM COMTNFILEDETAIL WHERE ATCH_FILE_ID = A.ATCH_FILE_ID) AS ORIGNL_FILE_NM
+		FROM	FACILITY_PHOTO_ALBUM A
+		WHERE	MGRNU = #{mgrnu}
+		AND 	SN = #{sn}
+	]]>
+	</select>
+
+	<delete id="deleteFileMaster" parameterType="map">
+		<![CDATA[
+			DELETE FROM COMTNFILE
+			WHERE ATCH_FILE_ID = #{atchFileId}
+		]]>
+	</delete>
+
+	<delete id="deleteFileDetail" parameterType="map">
+		<![CDATA[
+			DELETE FROM COMTNFILEDETAIL
+			WHERE ATCH_FILE_ID = #{atchFileId}
+		]]>
+	</delete>
+
+	<delete id="deleteFileInfo" parameterType="map">
+		<![CDATA[
+			DELETE FROM FACILITY_PHOTO_ALBUM
+			WHERE SN = #{sn}
+		]]>
+		<if test="mgrnu != '' and mgrnu != null">
+			<![CDATA[ AND MGRNU = #{mgrnu} ]]>
+		</if>
+	</delete>
+
+	<insert id="insertFile" parameterType="map">
+		<selectKey resultType="int" keyProperty="sn" order="BEFORE">
+		<![CDATA[
+			SELECT NVL(MAX (SN), 0) + 1 AS SN FROM FACILITY_PHOTO_ALBUM
+		]]>
+		</selectKey>
+		<![CDATA[
+		INSERT INTO FACILITY_PHOTO_ALBUM (
+			SN,
+			MGRNU,
+			PHOTO_SJ,
+			ATCH_FILE_ID,
+			CREAT_DT,
+			UPDT_DT
+		)
+		VALUES (
+			#{sn},
+			#{mgrnu},
+			#{photoSj},
+			#{atchFileId},
+			SYSDATE,
+			SYSDATE
+		)
+	]]>
+	</insert>
+
+	<insert id="insertFileMaster" parameterType="java.lang.String">
+		<![CDATA[
+			INSERT INTO COMTNFILE (
+				ATCH_FILE_ID,
+				CREAT_DT,
+				USE_AT
+			)
+			VALUES (
+				#{atchFileId},
+				SYSDATE,
+				'Y'
+			)
+		]]>
+	</insert>
+
+	<insert id="insertFileDetail" parameterType="map">
+		<![CDATA[
+			INSERT INTO COMTNFILEDETAIL (
+				ATCH_FILE_ID,
+				FILE_SN,
+				FILE_STRE_COURS,
+				STRE_FILE_NM,
+				ORIGNL_FILE_NM,
+				FILE_EXTSN,
+				FILE_SIZE)
+			VALUES (
+				#{atchFileId},
+				#{fileSn},
+				#{fileStreCours},
+				#{streFileNm},
+				#{orignlFileNm},
+				#{fileExtsn},
+				#{fileSize}
+			  )
+		]]>
+	</insert>
+
+	<delete id="deleteInfo" parameterType="map">
+		<![CDATA[
+			DELETE FROM GT_A064_P
+			WHERE	MGRNU = #{mgrnu}
+		]]>
+	</delete>
+
+	<update id="updateInfo" parameterType="map">
+	<![CDATA[
+		UPDATE	GT_A064_P
+		SET		DIRECTION = #{direction},
+				EVE = #{eve},
+				ESB_YMD = #{esbYmd},
+				ESB_CPY = #{esbCpy},
+				CTK_MGRNU = #{ctkMgrnu},
+				MRK_CDE = #{mrkCde},
+				NTC = #{ntc},
+				MRK_KND = #{mrkKnd},
+				STD = #{std},
+				MOR = #{mor},
+				MOP = #{mop},
+				SPT_MRK = #{sptMrk},
+				SPRT_MOP = #{sprtMop},
+				SPRT_KND = #{sprtKnd},
+				ROD_KND = #{rodKnd},
+				ROD_FRM = #{rodFrm}
+		WHERE	MGRNU = #{mgrnu}
+	]]>
+	</update>
+
+	<select id="atchFileId" resultType="java.lang.String">
+		<![CDATA[
+			SELECT	'FILE_' || LPAD(TO_CHAR(SUBSTR(MAX(ATCH_FILE_ID), 6, 100) + 1), 15, '0') AS CNT
+			FROM	COMTNFILE
+		]]>
+	</select>
+
+</mapper>

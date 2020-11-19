@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper   PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="tgis.main.service.MainPageMapper"> <!-- 실제 프로젝트명으로 패키지명 변경 해야됨 * 체크 필요 *  -->
+<!-- 메인 공지사항 리스트 -->
+	<select id="mainNoticeList" parameterType="map" resultType="egovMap">
+	<![CDATA[
+		
+	SELECT  ROWNUM  AS NUM,
+		               TEMP.*,
+		                COUNT(*) OVER() AS TOTALROWS
+		        FROM   (SELECT
+								SEQ,
+								SUBJECT,
+								INDATE
+							FROM NOTICE
+	]]>
+	<![CDATA[
+					WHERE SEQ < 5
+					ORDER BY INDATE DESC
+					) TEMP
+	]]>
+	</select>
+
+</mapper>

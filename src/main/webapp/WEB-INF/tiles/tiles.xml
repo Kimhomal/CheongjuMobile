@@ -1,0 +1,134 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE tiles-definitions PUBLIC "-//Apache Software Foundation//DTD Tiles Configuration 3.0//EN"
+	"http://tiles.apache.org/dtds/tiles-config_3_0.dtd">
+
+<tiles-definitions>
+	<!-- tiles3 템플릿 적용 X -->
+	<definition name="notTemplate" template="/WEB-INF/jsp/tiles/notTplt/layout.jsp">
+		<put-attribute name="content" value="" />
+	</definition>
+	<definition name="main/*" extends="notTemplate">
+		<put-attribute name="content" value="/WEB-INF/jsp/main/{1}.jsp" />
+	</definition>
+	<definition name="error/*" extends="notTemplate">
+		<put-attribute name="content" value="/WEB-INF/jsp/error/{1}.jsp" />
+	</definition>
+	<definition name="statistics/**/statistics*" extends="notTemplate">
+		<put-attribute name="content" value="/WEB-INF/jsp/statistics/{1}/statistics{2}.jsp" />
+	</definition>
+	<!-- // tiles3 템플릿 적용 X -->
+
+		<!-- 기본템플릿 -->
+	<definition name="defaultTemplate" template="/WEB-INF/jsp/tiles/default/layout.jsp">
+		<put-attribute name="header" value="/WEB-INF/jsp/tiles/default/header.jsp" />
+		<put-attribute name="topMenu" value="/WEB-INF/jsp/tiles/default/topMenu.jsp" />
+		<put-attribute name="left" value="/WEB-INF/jsp/tiles/default/left.jsp" />
+		<put-attribute name="side" value="/WEB-INF/jsp/tiles/default/side.jsp" />
+		<put-attribute name="content" value="" />
+		<put-attribute name="footer" value="/WEB-INF/jsp/tiles/default/footer.jsp" />
+	</definition>
+
+	<!-- 메인 -->
+	<definition name="index" template="/WEB-INF/jsp/tiles/main/layout.jsp">
+		<put-attribute name="header" value="/WEB-INF/jsp/tiles/default/header.jsp" />
+		<put-attribute name="topMenu" value="/WEB-INF/jsp/tiles/default/topMenu.jsp" />
+		<put-attribute name="side" value="/WEB-INF/jsp/tiles/default/side.jsp" />
+		<put-attribute name="content" value="/WEB-INF/jsp/index.jsp" />
+		<put-attribute name="footer" value="/WEB-INF/jsp/tiles/main/footer.jsp" />
+	</definition>
+
+	<!-- 개인정보 -->
+	<definition name="user/*/*"  extends="defaultTemplate">
+		<put-attribute name="header" value="/WEB-INF/jsp/tiles/default/header.jsp" />
+		<put-attribute name="topMenu" value="/WEB-INF/jsp/tiles/default/topMenu.jsp" />
+		<put-attribute name="side" value="/WEB-INF/jsp/tiles/default/side.jsp" />
+		<put-attribute name="content" value="/WEB-INF/jsp/user/{1}/{2}.jsp" />
+	</definition>
+
+	<!-- 공통 윈도우 팝업 템플릿(1단계) -->
+	<definition name="**/*PopW" template="/WEB-INF/jsp/tiles/popW/layout.jsp">
+		<put-attribute name="header" value="/WEB-INF/jsp/tiles/popW/header.jsp" />
+		<put-attribute name="content" value="/WEB-INF/jsp/{1}/{2}PopW.jsp" />
+	</definition>
+
+	<!-- 지도 있는 팝업 창 -->
+	<definition name="**/*PopM" template="/WEB-INF/jsp/tiles/popM/layout.jsp">
+		<put-attribute name="header" value="/WEB-INF/jsp/tiles/popM/header.jsp" />
+		<put-attribute name="content" value="/WEB-INF/jsp/{1}/{2}PopM.jsp" />
+	</definition>
+
+	<!-- 공통 빈 팝업 템플릿(컨텐츠) 2단계 -->
+	<definition name="**/*PopE" template="/WEB-INF/jsp/tiles/notTplt/layout.jsp">
+		<put-attribute name="content" value="/WEB-INF/jsp/{1}/{2}PopE.jsp" />
+	</definition>
+
+	<!-- 지도 있는 상세 조회 창 -->
+	<definition name="**/*Map" template="/WEB-INF/jsp/tiles/mapContent/layout.jsp">
+		<put-attribute name="header" value="/WEB-INF/jsp/tiles/mapContent/header.jsp" />
+		<put-attribute name="topMenu" value="/WEB-INF/jsp/tiles/mapContent/topMenu.jsp" />
+		<put-attribute name="left" value="/WEB-INF/jsp/tiles/mapContent/left.jsp" />
+		<put-attribute name="content" value="/WEB-INF/jsp/{1}/{2}Map.jsp" />
+		<put-attribute name="footer" value="/WEB-INF/jsp/tiles/mapContent/footer.jsp" />
+	</definition>
+
+	<!-- 공통 윈도우 팝업 템플릿(2단계) -->
+	<!--<definition name="*/*/*PopW" template="/WEB-INF/jsp/tiles/popW/layout.jsp">-->
+		<!--<put-attribute name="header" value="/WEB-INF/jsp/tiles/popW/header.jsp" />-->
+		<!--<put-attribute name="content" value="/WEB-INF/jsp/{1}/{2}/{3}PopW.jsp" />-->
+	<!--</definition>-->
+
+	<!-- 공통 빈 팝업 템플릿(컨텐츠) 2단계 -->
+<!-- 	<definition name="*/*/*PopE" template="/WEB-INF/jsp/tiles/notTplt/layout.jsp"> -->
+<!-- 		<put-attribute name="content" value="/WEB-INF/jsp/{1}/{2}/{3}PopE.jsp" /> -->
+<!-- 	</definition> -->
+
+	<!-- 시스템관리 -->
+	<definition name="system/*/*" extends="defaultTemplate">
+		<put-attribute name="header" value="/WEB-INF/jsp/tiles/system/header.jsp" />
+		<put-attribute name="content" value="/WEB-INF/jsp/system/{1}/{2}.jsp" />
+		<!-- 나중에 지워야함 -->
+		<!--<put-attribute name="left" value="/WEB-INF/jsp/tiles/system/left.jsp" />-->
+		<!-- 나중에 지워야함 -->
+	</definition>
+
+
+
+	<!-- 지도 모달 팝업 템플릿 -->
+	<definition name="fclts/**/*Pop" template="/WEB-INF/jsp/tiles/map/layoutPop.jsp">
+		<put-attribute name="content" value="/WEB-INF/jsp/fclts/{1}/{2}Pop.jsp" />
+	</definition>
+
+	<!-- 지도 사용 팝업 템플릿 -->
+	<definition name="map/*MapPop" template="/WEB-INF/jsp/tiles/mapPop/layout.jsp">
+		<put-attribute name="header" value="/WEB-INF/jsp/tiles/mapPop/header.jsp" />
+		<put-attribute name="content" value="/WEB-INF/jsp/map/{1}MapPop.jsp" />
+	</definition>
+
+	<definition name="map/*Pop" template="/WEB-INF/jsp/tiles/map/layoutPop.jsp">
+		<put-attribute name="content" value="/WEB-INF/jsp/map/{1}Pop.jsp" />
+	</definition>
+
+	<!-- 지도 템플릿 -->
+	<definition name="map/*" template="/WEB-INF/jsp/tiles/map/layout.jsp">
+		<put-attribute name="header" value="/WEB-INF/jsp/tiles/map/header.jsp" />
+		<put-attribute name="side" value="/WEB-INF/jsp/tiles/default/side.jsp" />
+		<put-attribute name="topMenu" value="/WEB-INF/jsp/tiles/default/topMenu.jsp" />
+		<put-attribute name="content" value="/WEB-INF/jsp/map/{1}.jsp" />
+	</definition>
+
+
+	<!-- 지도검색 -->
+	<definition name="search/*" template="/WEB-INF/jsp/tiles/notTplt/layout.jsp">
+		<put-attribute name="content" value="/WEB-INF/jsp/search/{1}.jsp" />
+	</definition>
+
+	<!-- 서브 -->
+	<definition name="*/*" extends="defaultTemplate">
+		<put-attribute name="content" value="/WEB-INF/jsp/{1}/{2}.jsp" />
+	</definition>
+
+	<definition name="*/*/*" extends="defaultTemplate">
+		<put-attribute name="content" value="/WEB-INF/jsp/{1}/{2}/{3}.jsp" />
+	</definition>
+
+</tiles-definitions>

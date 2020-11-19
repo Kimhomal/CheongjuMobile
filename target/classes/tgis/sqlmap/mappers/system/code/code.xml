@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper   PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="tgis.system.code.service.CodeMapper">
+
+	<!-- [메뉴관리 -> 코드관리 -> 목록] -->
+	<select id="selectInfoList" parameterType="map" resultType="egovMap">
+	<![CDATA[
+		SELECT *
+			 FROM ( SELECT ROWNUM AS NUM, TEMP.*,
+			     COUNT(*) OVER() AS TOTALROWS
+		        FROM   (SELECT *
+		                FROM   M_CODE
+	]]>
+	<where>
+		<if test='cdnm != null and cdnm != ""'>
+			<![CDATA[ AND CDNM LIKE '%' || #{cdnm}|| '%' ]]>
+		</if>
+		<if test='refcd != null and refcd != ""'>
+			<![CDATA[ AND REFCD LIKE '%' || #{refcd}|| '%' ]]>
+		</if>
+		<if test='cmmt != null and cmmt != ""'>
+			<![CDATA[ AND CMMT LIKE '%' || #{cmmt}|| '%' ]]>
+		</if>
+	</where>
+	<![CDATA[
+			ORDER BY REFCD ASC
+			)TEMP)TEMP WHERE NUM BETWEEN #{rows} * ( #{page} - 1 ) + 1 AND #{rows}* #{page}
+	]]>
+	</select>
+
+	<!-- [메뉴관리 -> 코드관리 -> 상세조회] -->
+	<select id="selectInfo" parameterType="map" resultType="egovMap">
+	<![CDATA[
+		SELECT *
+		FROM   M_CODE
+		WHERE  M_ID = #{mId}
+	]]>
+	</select>
+
+	<!-- [메뉴관리 -> 코드관리 -> 추가] -->
+	<insert id="insertInfo" parameterType="map">
+	<selectKey resultType="string" keyProperty="mId" order="BEFORE">
+		<![CDATA[
+		SELECT NVL(MAX(M_ID)+1, 1) AS M_ID FROM M_CODE
+		]]>
+	</selectKey>
+	<![CDATA[
+		INSERT INTO M_CODE
+						(  CDTP,
+						CD,
+						CDN,
+						CDNM,
+						REFCDTP,
+						REFCD,
+						CMMT,
+						REG_YMD,
+						M_ID)
+		VALUES		( #{cdtp},
+						#{cd},
+						#{cdn},
+						#{cdnm},
+						#{refcdtp},
+						#{refcd},
+						#{cmmt},
+						TO_CHAR(SYSDATE, 'YYYY-MM-DD'),
+						#{mId} )
+	]]>
+	</insert>
+
+	<!-- [메뉴관리 -> 코드관리 -> 수정] -->
+	<update id="updateInfo" parameterType="map">
+	<![CDATA[
+		UPDATE M_CODE
+		SET    CDTP = #{cdtp},
+		       CD = #{cd},
+		       CDN = #{cdn},
+		       CDNM = #{cdnm},
+		       REFCDTP = #{refcdtp},
+		       REFCD = #{refcd},
+		       CMMT = #{cmmt}
+		WHERE  M_ID = #{mId}
+	]]>
+	</update>
+
+	<!-- [메뉴관리 -> 코드관리 -> 삭제] -->
+	<delete id="deleteInfo" parameterType="map">
+	<![CDATA[
+		DELETE FROM M_CODE
+		WHERE  M_ID = #{mId}
+	]]>
+	</delete>
+
+</mapper>
