@@ -83,7 +83,94 @@
 
 		}
 	}
+	
+	/*
+	 * DatePicker 기본옵션
+	 */
+	G.datepickerOptions = {
+//		dateFormat: 'yy-mm-dd',
+//		prevText: '전월',
+//		nextText: '차월',
+//		monthNames : ['1월','2월','3월','4월','5월','6월','7월','8월','9월','10월','11월','12월'],
+//		monthNamesShort : ['1월','2월','3월','4월','5월','6월','7월','8월','9월','10월','11월','12월'],
+//		dayNames : ['일','월','화','수','목','금','토'],
+//		dayNamesShort : ['일','월','화','수','목','금','토'],
+//		dayNamesMin : ['일','월','화','수','목','금','토'],
+//		showMonthAfterYear : true,
+//		yearSuffix : '년',
+//		changeMonth: true,
+//		changeYear: true,
+//		 showOtherMonths: true, // 나머지 날짜도 화면에 표시, 선택은 불가
+//		selectOtherMonths: false, // 나머지 날짜에도 선택을 하려면 true
+	};
 
+	var setDatePicker = function ($parent) {
+		$.datepicker.regional['ko'] = { // Default regional settings
+			dateFormat : 'yy-mm-dd', // [mm/dd/yy], [yy-mm-dd], [d M, y], [DD, d MM]
+			prevText : '',
+			nextText : '',
+			monthNames : ['1월','2월','3월','4월','5월','6월','7월','8월','9월','10월','11월','12월'],
+			monthNamesShort : ['1월','2월','3월','4월','5월','6월','7월','8월','9월','10월','11월','12월'],
+			dayNames : ['일','월','화','수','목','금','토'],
+			dayNamesShort : ['일','월','화','수','목','금','토'],
+			dayNamesMin : ['일','월','화','수','목','금','토'],
+//				weekHeader: 'Wk',
+//				firstDay: 0,
+//				isRTL: false,
+			showMonthAfterYear : true,
+			yearSuffix : '',
+			changeMonth: true,
+			changeYear: true,
+		};
+
+		$.datepicker.setDefaults($.datepicker.regional['ko']);
+
+		var $datapicker_open;
+//		var $ico_calendar;
+
+		var $datapicker_open_std;
+		var $datapicker_open_end;
+
+		if ($parent) {
+			$datapicker_open = $parent.find(".datapicker_open");
+			$ico_calendar = $parent.find(".ico_calendar");
+			$datapicker_open_std = $parent.find(".datapicker_open_std");
+			$datapicker_open_end = $parent.find(".datapicker_open_end");
+		} else {
+			$datapicker_open = $(".datapicker_open");
+			$ico_calendar = $(".ico_calendar");
+			$datapicker_open_std = $(".datapicker_open_std");
+			$datapicker_open_end = $(".datapicker_open_end");
+		}
+
+		/* datapicker */
+		$datapicker_open.datepicker();
+		$ico_calendar.datepicker();
+
+//		$("#dedate").val($.datepicker.formatDate('yy-mm-dd', new Date()));
+
+		/* datapicker period*/
+		$datapicker_open_std.datepicker();
+
+		if ($datapicker_open_end.val() != "") {
+			$datapicker_open_std.datepicker("option", "maxDate", $datapicker_open_end.val());
+		}
+
+		$datapicker_open_std.datepicker("option", "onClose", function(selectedDate) {
+			$datapicker_open_end.datepicker("option", "minDate", selectedDate);
+		});
+
+		$datapicker_open_end.datepicker();
+
+		if ($datapicker_open_std.val() != "") {
+			$datapicker_open_end.datepicker("option", "minDate", $datapicker_open_std.val());
+		}
+
+		$datapicker_open_end.datepicker("option", "onClose", function(selectedDate) {
+			$datapicker_open_std.datepicker("option", "maxDate", selectedDate);
+		});
+	}
+//	setDatePicker();
 })(window, jQuery);
 
 /**
@@ -322,3 +409,37 @@
 		},
 	});
 })(jQuery);
+
+String.prototype.lpad = function(padString, length) {
+	var str = this;
+	while (str.length < length) str = padString + str;
+	return str;
+}
+
+String.prototype.rpad = function(padString, length) {
+	var str = this;
+	while (str.length < length) str = str + padString;
+	return str;
+}
+
+String.prototype.trim = function() {
+	return  this.replace(/(^\s*)|(\s*$)/gi, "");
+};
+
+String.prototype.ltrim = function() {
+	return  this.replace(/^\s+/, "");
+};
+
+String.prototype.rtrim = function() {
+	return  this.replace(/\s+$/, "");
+};
+
+String.prototype.startsWith = function(str) {
+	if(this.length<str.length){return false;}
+	return this.indexOf(str)==0;
+}
+
+String.prototype.endsWith = function(str) {
+	if(this.length<str.length){return false;}
+	return this.lastIndexOf(str)+str.length==this.length;
+}

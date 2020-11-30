@@ -3,10 +3,87 @@
 
 <mapper namespace="tgis.fclts.service.FcltsMngMapper">
 
-<insert id="insertFcltsInfo_GT_C088_P" parameterType="map">
-	INSERT INTO GT_C088_P
-		(
-			MGRNU,
+	<insert id="insertFcltsInfo_GT_C088_P" parameterType="map">
+	<selectKey resultType="string" keyProperty="mgrnu" order="BEFORE">
+		<![CDATA[
+		SELECT GET_MGRNU('GT_C088_P') FROM DUAL
+		]]>
+	</selectKey>
+		INSERT INTO GT_C088_P
+			(
+				MGRNU,
+				CTK_MGRNU,
+				CSS_NAM,
+				PE_NAM,
+				GU_NAM,
+				DONG_NAM,
+				SCH_NAM,
+				MINX,
+				MINY,
+				MAXX,
+				MAXY,
+				XCE,
+				YCE,
+				PE_CDE,
+				GU_CDE,
+				DONG_CDE,
+				CSS_MGRNU,
+				SCH_MGRNU,
+				RI_NAM,
+				RI_CDE,
+				JIBUN,
+				PNU,
+				XGEO,
+				ROD_NAM,
+				ROD_MGRNU,
+				EVE,
+				STD,
+				ESB_FRM,
+				KND,
+				REG_YMD
+			)
+		VALUES
+			(
+				#{mgrnu},
+				NULL,
+				#{cssNam},
+				#{peNam},
+				#{guNam},
+				#{dongNam},
+				#{schNam},
+				#{minX},
+				#{minY},
+				#{maxX},
+				#{maxY},
+				#{xce},
+				#{yce},
+				#{peCde},
+				#{guCde},
+				#{dongCde},
+				#{cssMgrnu},
+				#{schMgrnu},
+				#{liNam},
+				#{liCde},
+				#{jibun},
+				#{pnu},
+				MDSYS.SDO_GEOMETRY(#{geom},
+				5181),
+				#{rodNam},
+				#{rodMgrnu},
+				#{eve},
+				#{std},
+				#{esbFrm},
+				#{knd},
+				SYSDATE
+
+			)
+
+	</insert>
+
+	<!-- 갈매기표지 상세조회 -->
+	<select id="selectFcltsInfo_GT_C088_P" parameterType="map" resultType="egovMap">
+	SELECT MGRNU,
+		'청주시'	||' '|| GU_NAM || ' ' || DONG_NAM || ' ' || RI_NAM || JIBUN AS ADDR,
 			CTK_MGRNU,
 			CSS_NAM,
 			PE_NAM,
@@ -32,283 +109,211 @@
 			ROD_NAM,
 			ROD_MGRNU,
 			EVE,
+			TO_CODE('ALL','EVE',EVE) AS EVE_NAM,
 			STD,
+			TO_CODE('C088_P','STD',STD) AS STD_NAM,
 			ESB_FRM,
+			TO_CODE('C088_P','ESB_FRM',ESB_FRM) AS ESB_FRM_NAM,
 			KND,
-			REG_YMD
-		)
-	VALUES
-		(
-			GET_MGRNU('GT_C088_P'),
-			NULL,
-			#{cssNam},
-			#{peNam},
-			#{guNam},
-			#{dongNam},
-			#{schNam},
-			#{minX},
-			#{minY},
-			#{maxX},
-			#{maxY},
-			#{xce},
-			#{yce},
-			#{peCde},
-			#{guCde},
-			#{dongCde},
-			#{cssMgrnu},
-			#{schMgrnu},
-			#{liNam},
-			#{liCde},
-			#{jibun},
-			#{pnu},
-			MDSYS.SDO_GEOMETRY(#{geom},
-			5181),
-			#{rodNam},
-			#{rodMgrnu},
-			#{eve},
-			#{std},
-			#{esbFrm},
-			#{knd},
-			SYSDATE
-
-		)
-
-</insert>
-
-<!-- 갈매기표지 상세조회 -->
-<select id="selectFcltsInfo_GT_C088_P" parameterType="map" resultType="egovMap">
-SELECT MGRNU,
-	'청주시'	||' '|| GU_NAM || ' ' || DONG_NAM || ' ' || RI_NAM || JIBUN AS ADDR,
-		CTK_MGRNU,
-		CSS_NAM,
-		PE_NAM,
-		GU_NAM,
-		DONG_NAM,
-		SCH_NAM,
-		MINX,
-		MINY,
-		MAXX,
-		MAXY,
-		XCE,
-		YCE,
-		PE_CDE,
-		GU_CDE,
-		DONG_CDE,
-		CSS_MGRNU,
-		SCH_MGRNU,
-		RI_NAM,
-		RI_CDE,
-		JIBUN,
-		PNU,
-		XGEO,
-		ROD_NAM,
-		ROD_MGRNU,
-		EVE,
-		TO_CODE('ALL','EVE',EVE) AS EVE_NAM,
-		STD,
-		TO_CODE('C088_P','STD',STD) AS STD_NAM,
-		ESB_FRM,
-		TO_CODE('C088_P','ESB_FRM',ESB_FRM) AS ESB_FRM_NAM,
-		KND,
-		TO_CODE('C088_P','KND',KND) AS KND_NAM,
-		REG_YMD,
-		UPT_YMD
-FROM GT_C088_P
-WHERE MGRNU = #{mgrnu}
-
-</select>
-
-<!--  갈매기표지 삭제 -->
-<delete id="deleteFcltsInfo_GT_C088_P" parameterType="map">
-DELETE FROM GT_C088_P
-WHERE MGRNU = #{mgrnu}
-</delete>
-
-<!-- 갈매기표지 수정 -->
-<update id="updateFcltsInfo_GT_C088_P" parameterType="map">
-UPDATE GT_C088_P
-SET EVE = #{eve},
-	KND = #{knd},
-	STD = #{std},
-	ESB_FRM = #{esbFrm},
-	UPT_YMD = SYSDATE,
-	CTK_MGRNU = null,
-	CSS_NAM = #{cssNam},
-	PE_NAM = #{peNam},
-	GU_NAM = #{guNam},
-	DONG_NAM = #{dongNam},
-	SCH_NAM = #{schNam},
-	PE_CDE = #{peCde},
-	GU_CDE = #{guCde},
-	DONG_CDE = #{dongCde},
-	CSS_MGRNU = #{cssMgrnu},
-	SCH_MGRNU = #{schMgrnu},
-	RI_NAM = #{liNam},
-	RI_CDE = #{liCde},
-	JIBUN = #{jibun},
-	PNU = #{pnu},
-	ROD_NAM = #{rodNam},
-	ROD_MGRNU = #{rodMgrnu},
-	XCE = #{pointXce},
-	YCE = #{pointYce},
-	MAXX = #{maxX},
-	MAXY = #{maxY},
-	MINX = #{minX},
-	MINY = #{minY},
-	XGEO = MDSYS.SDO_GEOMETRY(#{geom},5181)
-WHERE MGRNU = #{mgrnu}
-</update>
-
-<!-- 이력조회리스트 -->
-<select id="selectWorkList_GT_C088_P" parameterType="map" resultType="egovMap">
-	SELECT *
-	FROM(SELECT ROWNUM AS NUM,
-		TEMP.*,
-		COUNT(*) OVER() AS TOTALROWS
-		FROM ( SELECT MGRNU,
-					MGRNU_IDX,
-					WORK_CDE,
-					TO_CODE('CHG_HISTORY','WORK_CDE',WORK_CDE) AS WORK_CDE_NAM,
-					WORKTM,
-					WORKUSER,
-					WORK_BG
-			FROM GT_C088_P_WORK
-			WHERE MGRNU = #{mgrnu} AND WORK_ACTIVE = 1
-			ORDER BY MGRNU_IDX DESC ) TEMP
-		ORDER BY MGRNU_IDX DESC,
-				MGRNU ASC) TEMP WHERE NUM BETWEEN #{rows} * ( #{page} - 1 ) + 1 AND #{rows}* #{page}
-
-</select>
-
-<!-- 이력등록 -->
-<insert id="insertWorkList_GT_C088_P" parameterType="map">
-<selectKey resultType="int" keyProperty="mgrnuIdx" order="BEFORE">
-	SELECT NVL(MAX(MGRNU_IDX), 0) +1 AS mgrnuIdx
-	FROM GT_C088_P_WORK
+			TO_CODE('C088_P','KND',KND) AS KND_NAM,
+			REG_YMD,
+			UPT_YMD
+	FROM GT_C088_P
 	WHERE MGRNU = #{mgrnu}
-</selectKey>
 
-INSERT INTO GT_C088_P_WORK
-		( GEOMSEQ,
-			MGRNU,
-			CTK_MGRNU,
-		   CSS_NAM,
-		   DONG_NAM,
-		   GU_NAM,
-		   PE_CDE,
-		   ROD_MGRNU,
-		   SCH_MGRNU,
-		   XCE,
-		   YCE,
-		   MINX,
-		   MINY,
-		   MAXX,
-		   MAXY,
-		   PE_NAM,
-		   GU_CDE,
-		   DONG_CDE,
-		   RI_NAM,
-		   RI_CDE,
-		   JIBUN,
-		   PNU,
-		   SCH_NAM,
-		   ROD_NAM,
-		   ESB_YMD,
-		   EVE,
-		   KND,
-		   STD,
-		   ESB_FRM,
-		   REG_YMD,
-			UPT_YMD,
-	XGEO,
-             MGRNU_IDX,
-             WORKUSER,
-             WORKTM,
-             WORK_CDE,
-             WORK_BG,
-             WORK_REG_YMD,
-             WORK_OP,
-             WORK_ACTIVE,
-             CHK_CITY)
-SELECT  GEOMSEQ,
-	MGRNU,
-	CTK_MGRNU,
-   CSS_NAM,
-   DONG_NAM,
-   GU_NAM,
-   PE_CDE,
-   ROD_MGRNU,
-   SCH_MGRNU,
-   XCE,
-   YCE,
-   MINX,
-   MINY,
-   MAXX,
-   MAXY,
-   PE_NAM,
-   GU_CDE,
-   DONG_CDE,
-   RI_NAM,
-   RI_CDE,
-   JIBUN,
-   PNU,
-   SCH_NAM,
-   ROD_NAM,
-   ESB_YMD,
-   EVE,
-   KND,
-   STD,
-   ESB_FRM,
-   REG_YMD,
-	UPT_YMD,
-	XGEO,
-   #{mgrnuIdx},
-   #{workuser},
-   #{worktm},
-   #{workCde},
-   #{workBg},
-   #{workRegYmd},
-   #{workRegOp},
-   1,
-   #{chkCity}
-FROM GT_C088_P
-WHERE MGRNU = #{mgrnu}
+	</select>
 
-</insert>
+	<!--  갈매기표지 삭제 -->
+	<delete id="deleteFcltsInfo_GT_C088_P" parameterType="map">
+	DELETE FROM GT_C088_P
+	WHERE MGRNU = #{mgrnu}
+	</delete>
 
-<!-- 이력조회 -->
-<select id="selectInfo_GT_C088_P" parameterType="map" resultType="egovMap">
-SELECT MGRNU,
-		MGRNU_IDX,
-		WORKUSER,
-		WORKTM,
-		WORK_CDE,
-		TO_CODE('CHG_HISTORY','WORK_CDE',WORK_CDE) AS WORK_CDE_NAM,
-		WORK_BG,
-		WORK_REG_YMD,
-		WORK_OP,
-		WORK_ACTIVE,
-		CHK_CITY
-FROM GT_C088_P_WORK
-WHERE MGRNU = #{mgrnu} AND WORK_ACTIVE = 1 AND MGRNU_IDX = #{mgrnuIdx}
-</select>
+	<!-- 갈매기표지 수정 -->
+	<update id="updateFcltsInfo_GT_C088_P" parameterType="map">
+	UPDATE GT_C088_P
+	SET EVE = #{eve},
+		KND = #{knd},
+		STD = #{std},
+		ESB_FRM = #{esbFrm},
+		UPT_YMD = SYSDATE,
+		CTK_MGRNU = null,
+		CSS_NAM = #{cssNam},
+		PE_NAM = #{peNam},
+		GU_NAM = #{guNam},
+		DONG_NAM = #{dongNam},
+		SCH_NAM = #{schNam},
+		PE_CDE = #{peCde},
+		GU_CDE = #{guCde},
+		DONG_CDE = #{dongCde},
+		CSS_MGRNU = #{cssMgrnu},
+		SCH_MGRNU = #{schMgrnu},
+		RI_NAM = #{liNam},
+		RI_CDE = #{liCde},
+		JIBUN = #{jibun},
+		PNU = #{pnu},
+		ROD_NAM = #{rodNam},
+		ROD_MGRNU = #{rodMgrnu},
+		XCE = #{pointXce},
+		YCE = #{pointYce},
+		MAXX = #{maxX},
+		MAXY = #{maxY},
+		MINX = #{minX},
+		MINY = #{minY},
+		XGEO = MDSYS.SDO_GEOMETRY(#{geom},5181)
+	WHERE MGRNU = #{mgrnu}
+	</update>
 
-<!-- 이력수정 -->
-<update id="updateWorkList_GT_C088_P" parameterType="map">
-UPDATE GT_C088_P_WORK
-SET WORKTM = #{worktm},
-	WORKUSER = #{workuser},
-	WORK_CDE = #{workCde},
-	WORK_BG = #{workBg}
-WHERE MGRNU = #{mgrnu} AND WORK_ACTIVE = 1 AND MGRNU_IDX = #{mgrnuIdx}
+	<!-- 이력조회리스트 -->
+	<select id="selectWorkList_GT_C088_P" parameterType="map" resultType="egovMap">
+		SELECT *
+		FROM(SELECT ROWNUM AS NUM,
+			TEMP.*,
+			COUNT(*) OVER() AS TOTALROWS
+			FROM ( SELECT MGRNU,
+						MGRNU_IDX,
+						WORK_CDE,
+						TO_CODE('CHG_HISTORY','WORK_CDE',WORK_CDE) AS WORK_CDE_NAM,
+						WORKTM,
+						WORKUSER,
+						WORK_BG
+				FROM GT_C088_P_WORK
+				WHERE MGRNU = #{mgrnu} AND WORK_ACTIVE = 1
+				ORDER BY MGRNU_IDX DESC ) TEMP
+			ORDER BY MGRNU_IDX DESC,
+					MGRNU ASC) TEMP WHERE NUM BETWEEN #{rows} * ( #{page} - 1 ) + 1 AND #{rows}* #{page}
 
-</update>
+	</select>
 
-<!-- 이력삭제 -->
-<update id="deleteWorkList_GT_C088_P" parameterType="map">
-UPDATE GT_C088_P_WORK
-SET WORK_ACTIVE = 0
-WHERE MGRNU = #{mgrnu} AND MGRNU_IDX = #{mgrnuIdx}
-</update>
+	<!-- 이력등록 -->
+	<insert id="insertWorkList_GT_C088_P" parameterType="map">
+	<selectKey resultType="int" keyProperty="mgrnuIdx" order="BEFORE">
+		SELECT NVL(MAX(MGRNU_IDX), 0) +1 AS mgrnuIdx
+		FROM GT_C088_P_WORK
+		WHERE MGRNU = #{mgrnu}
+	</selectKey>
+
+	INSERT INTO GT_C088_P_WORK
+			( GEOMSEQ,
+				MGRNU,
+				CTK_MGRNU,
+			   CSS_NAM,
+			   DONG_NAM,
+			   GU_NAM,
+			   PE_CDE,
+			   ROD_MGRNU,
+			   SCH_MGRNU,
+			   XCE,
+			   YCE,
+			   MINX,
+			   MINY,
+			   MAXX,
+			   MAXY,
+			   PE_NAM,
+			   GU_CDE,
+			   DONG_CDE,
+			   RI_NAM,
+			   RI_CDE,
+			   JIBUN,
+			   PNU,
+			   SCH_NAM,
+			   ROD_NAM,
+			   ESB_YMD,
+			   EVE,
+			   KND,
+			   STD,
+			   ESB_FRM,
+			   REG_YMD,
+				UPT_YMD,
+		XGEO,
+				 MGRNU_IDX,
+				 WORKUSER,
+				 WORKTM,
+				 WORK_CDE,
+				 WORK_BG,
+				 WORK_REG_YMD,
+				 WORK_OP,
+				 WORK_ACTIVE,
+				 CHK_CITY)
+	SELECT  GEOMSEQ,
+		MGRNU,
+		CTK_MGRNU,
+	   CSS_NAM,
+	   DONG_NAM,
+	   GU_NAM,
+	   PE_CDE,
+	   ROD_MGRNU,
+	   SCH_MGRNU,
+	   XCE,
+	   YCE,
+	   MINX,
+	   MINY,
+	   MAXX,
+	   MAXY,
+	   PE_NAM,
+	   GU_CDE,
+	   DONG_CDE,
+	   RI_NAM,
+	   RI_CDE,
+	   JIBUN,
+	   PNU,
+	   SCH_NAM,
+	   ROD_NAM,
+	   ESB_YMD,
+	   EVE,
+	   KND,
+	   STD,
+	   ESB_FRM,
+	   REG_YMD,
+		UPT_YMD,
+		XGEO,
+	   #{mgrnuIdx},
+	   #{workuser},
+	   #{worktm},
+	   #{workCde},
+	   #{workBg},
+	   #{workRegYmd},
+	   #{workRegOp},
+	   1,
+	   #{chkCity}
+	FROM GT_C088_P
+	WHERE MGRNU = #{mgrnu}
+
+	</insert>
+
+	<!-- 이력조회 -->
+	<select id="selectInfo_GT_C088_P" parameterType="map" resultType="egovMap">
+	SELECT MGRNU,
+			MGRNU_IDX,
+			WORKUSER,
+			WORKTM,
+			WORK_CDE,
+			TO_CODE('CHG_HISTORY','WORK_CDE',WORK_CDE) AS WORK_CDE_NAM,
+			WORK_BG,
+			WORK_REG_YMD,
+			WORK_OP,
+			WORK_ACTIVE,
+			CHK_CITY
+	FROM GT_C088_P_WORK
+	WHERE MGRNU = #{mgrnu} AND WORK_ACTIVE = 1 AND MGRNU_IDX = #{mgrnuIdx}
+	</select>
+
+	<!-- 이력수정 -->
+	<update id="updateWorkList_GT_C088_P" parameterType="map">
+	UPDATE GT_C088_P_WORK
+	SET WORKTM = #{worktm},
+		WORKUSER = #{workuser},
+		WORK_CDE = #{workCde},
+		WORK_BG = #{workBg}
+	WHERE MGRNU = #{mgrnu} AND WORK_ACTIVE = 1 AND MGRNU_IDX = #{mgrnuIdx}
+
+	</update>
+
+	<!-- 이력삭제 -->
+	<update id="deleteWorkList_GT_C088_P" parameterType="map">
+	UPDATE GT_C088_P_WORK
+	SET WORK_ACTIVE = 0
+	WHERE MGRNU = #{mgrnu} AND MGRNU_IDX = #{mgrnuIdx}
+	</update>
 
 </mapper>

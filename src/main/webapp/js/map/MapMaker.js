@@ -111,7 +111,7 @@
 			noProxyWfs : "http://1.234.21.200:8888/geoserver/tgis_loc/wfs",
 //			proxyBackground : G.baseUrl + "proxy/proxy.jsp?url=",
 			proxyBackground : "",
-			workspace : "tgis_loc",
+			workspace : "tgis",
 			facilityCrsCode : "EPSG:5181",
 			initBaseMap : "Daum",
 			arrOlDefaultCtrl : [ new ol.control.ScaleLine(), new ol.control.ZoomSlider() ],
@@ -134,7 +134,7 @@
 			_self.crsCode = _self.baseMap.crsCode;
 
 			_self.center = _self.baseMap.center;
-			_self.zoomLvl = 0;
+			_self.zoomLvl = 7;
 
 			_self.map = new ol.Map({
 				renderer : 'canvas',

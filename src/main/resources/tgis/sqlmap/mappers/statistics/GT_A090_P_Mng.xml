@@ -3,7 +3,7 @@
 
 <mapper namespace="tgis.statistics.service.StatisticsMngMapper">
 
-<!-- 음향신호기 구별 전체 통계 -->
+<!-- 보행자버튼 구별 전체 통계 -->
 	<select id="selectGuStatistics_GT_A090_P" parameterType="map" resultType="egovMap">
 		<![CDATA[
 				SELECT
@@ -14,7 +14,7 @@
 					SELECT
 						A.GU_NAM AS NAME,
 						COUNT(*) AS TOTAL
-					FROM SMARTTGIS.GT_A090_P A
+					FROM GT_A090_P A
 		]]>
 		<where>
 			<if test="guCde   != null and guCde   != ''">
@@ -25,6 +25,9 @@
 			</if>
 			<if test="policeCde   != null and policeCde   != ''">
 				AND A.PE_CDE  IN 	<foreach collection="policeCde" item="item" open="(" close=")" separator=",">#{item}</foreach>
+			</if>
+			<if test="statGbn   != null and statGbn   != ''">
+				AND A.FORM  IN 	<foreach collection="statGbn" item="item" open="(" close=")" separator=",">#{item}</foreach>
 			</if>
 			<if test="stYmd   != null and stYmd   != ''">
 				<![CDATA[AND A.ESB_YMD >= #{stYmd}]]>
@@ -39,7 +42,7 @@
  		]]>
 	</select>
 
-<!-- 음향신호기 경찰서별 전체 통계 -->
+<!-- 보행자버튼 경찰서별 전체 통계 -->
 	<select id="selectPoliceStatistics_GT_A090_P" parameterType="map" resultType="egovMap">
 		<![CDATA[
 		    	SELECT
@@ -49,7 +52,7 @@
 				FROM  (
 				SELECT  A.PE_NAM AS NAME,
 						COUNT(*) AS TOTAL
-				FROM SMARTTGIS.GT_A090_P A
+				FROM GT_A090_P A
 		]]>
 		<where>
 			<if test="guCde   != null and guCde   != ''">
@@ -60,6 +63,9 @@
 			</if>
 			<if test="policeCde   != null and policeCde   != ''">
 				AND A.PE_CDE  IN 	<foreach collection="policeCde" item="item" open="(" close=")" separator=",">#{item}</foreach>
+			</if>
+			<if test="statGbn   != null and statGbn   != ''">
+				AND A.FORM  IN 	<foreach collection="statGbn" item="item" open="(" close=")" separator=",">#{item}</foreach>
 			</if>
 			<if test="stYmd   != null and stYmd   != ''">
 				<![CDATA[AND A.ESB_YMD >= #{stYmd}]]>
@@ -74,7 +80,7 @@
  		]]>
 	</select>
 
-<!-- 음향신호기 동별 전체 통계 -->
+<!-- 보행자버튼 동별 전체 통계 -->
 	<select id="selectDongStatistics_GT_A090_P" parameterType="map" resultType="egovMap">
 		<![CDATA[
 		SELECT
@@ -84,7 +90,7 @@
 				FROM  (
 			SELECT  G.EMD_KOR_NM AS NAME,
 					COUNT(*) AS TOTAL
-			FROM SMARTTGIS.GT_A090_P A, SMARTTGIS.GT_LP_AA_EMD G
+			FROM GT_A090_P A, GT_LP_AA_EMD G
 			WHERE A.DONG_NAM(+) = G.EMD_KOR_NM
 				]]>
 		<if test="guCde   != null and guCde   != ''">
@@ -95,6 +101,9 @@
 		</if>
 		<if test="policeCde   != null and policeCde   != ''">
 			AND A.PE_CDE  IN 	<foreach collection="policeCde" item="item" open="(" close=")" separator=",">#{item}</foreach>
+		</if>
+		<if test="statGbn   != null and statGbn   != ''">
+			AND A.FORM  IN 	<foreach collection="statGbn" item="item" open="(" close=")" separator=",">#{item}</foreach>
 		</if>
 		<if test="stYmd   != null and stYmd   != ''">
 			<![CDATA[AND A.ESB_YMD >= #{stYmd}]]>
@@ -108,7 +117,7 @@
 				]]>
 	</select>
 
-<!-- 음향신호기 상세내역 전체 통계 -->
+<!-- 보행자버튼 상세내역 전체 통계 -->
 	<select id="selectDetailFcltsList_GT_A090_P" parameterType="map" resultType="egovMap">
 		<![CDATA[
 		SELECT  TEMP.*
@@ -122,11 +131,13 @@
                                          DONG_NAM,
                                          JIBUN,
                                          CSS_NAM,
-		                                TO_CHAR(ESB_YMD ,'YYYY-MM-DD') AS ESB_YMD,
 		                                TO_CODE('A090_P','FORM',FORM) AS FORM_NAM,
+		                                TO_CHAR(ESB_YMD ,'YYYY-MM-DD') AS ESB_YMD,
+		                                ESB_CPY,
+		                   			 	MK_CPY,
 		                                XCE,
 		                                YCE
-						FROM	SMARTTGIS.GT_A090_P A
+						FROM	GT_A090_P A
 		]]>
 		<where>
 			<if test="guCde   != null and guCde   != ''">
@@ -137,6 +148,9 @@
 			</if>
 			<if test="policeCde   != null and policeCde   != ''">
 				AND A.PE_CDE  IN 	<foreach collection="policeCde" item="item" open="(" close=")" separator=",">#{item}</foreach>
+			</if>
+			<if test="statGbn   != null and statGbn   != ''">
+				AND A.FORM  IN 	<foreach collection="statGbn" item="item" open="(" close=")" separator=",">#{item}</foreach>
 			</if>
 			<if test="stYmd   != null and stYmd   != ''">
 				<![CDATA[AND A.ESB_YMD >= #{stYmd}]]>
@@ -162,11 +176,13 @@
                             DONG_NAM,
                             JIBUN,
                             CSS_NAM,
-		                    TO_CHAR(ESB_YMD ,'YYYY-MM-DD') AS ESB_YMD,
 		                    TO_CODE('A090_P','FORM',FORM) AS FORM_NAM,
+		                    TO_CHAR(ESB_YMD ,'YYYY-MM-DD') AS ESB_YMD,
+		                    ESB_CPY,
+		                    MK_CPY,
 		                    XCE,
 		                    YCE
-						FROM	SMARTTGIS.GT_A090_P A
+						FROM	GT_A090_P A
 		]]>
 		<where>
 			<if test="guCde   != null and guCde   != ''">
@@ -177,6 +193,9 @@
 			</if>
 			<if test="policeCde   != null and policeCde   != ''">
 				AND A.PE_CDE  IN 	<foreach collection="policeCde" item="item" open="(" close=")" separator=",">#{item}</foreach>
+			</if>
+			<if test="statGbn   != null and statGbn   != ''">
+				AND A.FORM  IN 	<foreach collection="statGbn" item="item" open="(" close=")" separator=",">#{item}</foreach>
 			</if>
 			<if test="stYmd   != null and stYmd   != ''">
 				<![CDATA[AND A.ESB_YMD >= #{stYmd}]]>
@@ -190,7 +209,7 @@
 	]]>
 	</select>
 
-<!-- 음향신호기 교차로기준 통계 -->
+<!-- 보행자버튼 교차로기준 통계 -->
 	<select id="selectCrossStatistics_GT_A090_P" parameterType="map" resultType="egovMap">
 		<![CDATA[
 		SELECT  TEMP.*
@@ -206,7 +225,7 @@
 					SELECT
 						A.CSS_NAM AS NAME,
 						COUNT(*) AS TOTAL
-					FROM SMARTTGIS.GT_A090_P A
+					FROM GT_A090_P A
 					WHERE A.CSS_NAM IS NOT NULL
 		]]>
 			<if test="guCde   != null and guCde   != ''">
@@ -217,6 +236,9 @@
 			</if>
 			<if test="policeCde   != null and policeCde   != ''">
 				AND A.PE_CDE  IN 	<foreach collection="policeCde" item="item" open="(" close=")" separator=",">#{item}</foreach>
+			</if>
+			<if test="statGbn   != null and statGbn   != ''">
+				AND A.FORM  IN 	<foreach collection="statGbn" item="item" open="(" close=")" separator=",">#{item}</foreach>
 			</if>
 			<if test="stYmd   != null and stYmd   != ''">
 				<![CDATA[AND A.ESB_YMD >= #{stYmd}]]>
@@ -230,6 +252,47 @@
 		<![CDATA[
 				GROUP BY ROLLUP(A.CSS_NAM)
 					ORDER BY NAME NULLS FIRST  ) TEMP)TEMP)TEMP WHERE NUM BETWEEN #{rows} * ( #{page} - 1 ) + 1 AND #{rows}* #{page}
+ 		]]>
+	</select>
+
+<!-- 보행자버튼 교차로기준 통계 엑셀-->
+	<select id="selectCrossFcltsExcelDown_GT_A090_P" parameterType="map" resultType="egovMap">
+		<![CDATA[
+				SELECT
+					DECODE(NAME, NULL, '합계', NAME) AS  "구분",
+					TO_CHAR(TOTAL, '999,999,999,999') AS "합계",
+					TO_CHAR(TOTAL, '999,999,999,999') AS "계"
+				FROM (
+					SELECT
+						A.CSS_NAM AS NAME,
+						COUNT(*) AS TOTAL
+					FROM GT_A090_P A
+					WHERE A.CSS_NAM IS NOT NULL
+		]]>
+			<if test="guCde   != null and guCde   != ''">
+				AND A.GU_CDE  IN 	<foreach collection="guCde" item="item" open="(" close=")" separator=",">#{item}</foreach>
+			</if>
+			<if test="dongCde   != null and dongCde   != ''">
+				AND A.DONG_CDE  IN 	<foreach collection="dongCde" item="item" open="(" close=")" separator=",">#{item}</foreach>
+			</if>
+			<if test="policeCde   != null and policeCde   != ''">
+				AND A.PE_CDE  IN 	<foreach collection="policeCde" item="item" open="(" close=")" separator=",">#{item}</foreach>
+			</if>
+			<if test="statGbn   != null and statGbn   != ''">
+				AND A.FORM  IN 	<foreach collection="statGbn" item="item" open="(" close=")" separator=",">#{item}</foreach>
+			</if>
+			<if test="stYmd   != null and stYmd   != ''">
+				<![CDATA[AND A.ESB_YMD >= #{stYmd}]]>
+			</if>
+			<if test="enYmd   != null and enYmd   != ''">
+				<![CDATA[AND A.ESB_YMD <= #{enYmd}]]>
+			</if>
+			<if test="cssNam   != null and cssNam   != ''">
+		      <![CDATA[AND A.CSS_NAM LIKE '%' || #{cssNam} || '%']]>
+		    </if>
+		<![CDATA[
+					GROUP BY ROLLUP(A.CSS_NAM)
+					ORDER BY NAME NULLS FIRST) TEMP
  		]]>
 	</select>
 

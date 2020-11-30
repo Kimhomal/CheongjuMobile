@@ -19,7 +19,7 @@
 						COUNT(DECODE(CTL_MET, '1', 1, NULL)) AS A01,
 						COUNT(DECODE(CTL_MET, '2', 1, NULL)) AS A02,
 						COUNT(DECODE(CTL_MET, '3', 1, NULL)) AS A03
-					FROM SMARTTGIS.GT_A061_P A
+					FROM GT_A061_P A
 		]]>
 		<where>
 			<if test="guCde   != null and guCde   != ''">
@@ -71,7 +71,7 @@
 						COUNT(DECODE(CTL_MET, '1', 1, NULL)) AS A01,
 						COUNT(DECODE(CTL_MET, '2', 1, NULL)) AS A02,
 						COUNT(DECODE(CTL_MET, '3', 1, NULL)) AS A03
-				FROM SMARTTGIS.GT_A061_P A
+				FROM GT_A061_P A
 		]]>
 		<where>
 			<if test="guCde   != null and guCde   != ''">
@@ -123,7 +123,7 @@
 					COUNT(DECODE(CTL_MET, '1', 1, NULL)) AS A01,
 					COUNT(DECODE(CTL_MET, '2', 1, NULL)) AS A02,
 					COUNT(DECODE(CTL_MET, '3', 1, NULL)) AS A03
-			FROM SMARTTGIS.GT_A061_P A, SMARTTGIS.GT_LP_AA_EMD G
+			FROM GT_A061_P A, GT_LP_AA_EMD G
 			WHERE A.DONG_NAM(+) = G.EMD_KOR_NM
 				]]>
 		<if test="guCde   != null and guCde   != ''">
@@ -184,7 +184,7 @@
 		                                 TO_CODE('A061_P', 'ROD_KND',ROD_KND) AS ROD_KND_NAM,
 										XCE,
 										YCE
-						FROM	SMARTTGIS.GT_A061_P A
+						FROM	GT_A061_P A
 		]]>
 		<where>
 			<if test="guCde   != null and guCde   != ''">
@@ -244,7 +244,7 @@
 		                                 TO_CODE('A061_P', 'ROD_KND',ROD_KND) AS ROD_KND_NAM,
 		                                 XCE,
 		                                 YCE
-						FROM	SMARTTGIS.GT_A061_P A
+						FROM	GT_A061_P A
 		]]>
 		<where>
 			<if test="guCde   != null and guCde   != ''">
@@ -301,7 +301,7 @@ SELECT  TEMP.*
 						COUNT(DECODE(CTL_MET, '1', 1, NULL)) AS A01,
 						COUNT(DECODE(CTL_MET, '2', 1, NULL)) AS A02,
 						COUNT(DECODE(CTL_MET, '3', 1, NULL)) AS A03
-					FROM SMARTTGIS.GT_A061_P A
+					FROM GT_A061_P A
 					WHERE A.CSS_NAM IS NOT NULL
 		]]>
 			<if test="guCde   != null and guCde   != ''">
@@ -337,6 +337,62 @@ SELECT  TEMP.*
 		<![CDATA[
 					GROUP BY ROLLUP(A.CSS_NAM)
 					ORDER BY NAME NULLS FIRST  ) TEMP)TEMP)TEMP WHERE NUM BETWEEN #{rows} * ( #{page} - 1 ) + 1 AND #{rows}* #{page}
+ 		]]>
+	</select>
+
+<!-- 제어기 교차로기준 전체 통계 -->
+	<select id="selectCrossFcltsExcelDown_GT_A061_P" parameterType="map" resultType="egovMap">
+		<![CDATA[
+				SELECT
+					DECODE(NAME, NULL, '합계', NAME) AS  "구분",
+					TO_CHAR(TOTAL, '999,999,999,999') AS "합계",
+					TO_CHAR(A01, '999,999,999,999') AS "전자",
+					TO_CHAR(A02, '999,999,999,999') AS "일반",
+					TO_CHAR(A03, '999,999,999,999') AS "신신호"
+				FROM (
+					SELECT
+						A.CSS_NAM AS NAME,
+						(COUNT(DECODE(CTL_MET, '1', 1, NULL)) + COUNT(DECODE(CTL_MET, '2', 1, NULL)) + COUNT(DECODE(CTL_MET, '3', 1, NULL))) AS TOTAL,
+						COUNT(DECODE(CTL_MET, '1', 1, NULL)) AS A01,
+						COUNT(DECODE(CTL_MET, '2', 1, NULL)) AS A02,
+						COUNT(DECODE(CTL_MET, '3', 1, NULL)) AS A03
+					FROM GT_A061_P A
+					WHERE A.CSS_NAM IS NOT NULL
+		]]>
+			<if test="guCde   != null and guCde   != ''">
+				AND A.GU_CDE  IN 	<foreach collection="guCde" item="item" open="(" close=")" separator=",">#{item}</foreach>
+			</if>
+			<if test="dongCde   != null and dongCde   != ''">
+				AND A.DONG_CDE  IN 	<foreach collection="dongCde" item="item" open="(" close=")" separator=",">#{item}</foreach>
+			</if>
+			<if test="policeCde   != null and policeCde   != ''">
+				AND A.PE_CDE  IN 	<foreach collection="policeCde" item="item" open="(" close=")" separator=",">#{item}</foreach>
+			</if>
+			<if test="statGbn   != null and statGbn   != ''">
+				AND A.CTL_MET  IN 	<foreach collection="statGbn" item="item" open="(" close=")" separator=",">#{item}</foreach>
+			</if>
+			<if test="conForCde   != null and conForCde   != ''">
+				AND A.CON_FOR  IN 	<foreach collection="conForCde" item="item" open="(" close=")" separator=",">#{item}</foreach>
+			</if>
+			<if test="lineMetCde   != null and lineMetCde   != ''">
+				AND A.LINE_MET  IN 	<foreach collection="lineMetCde" item="item" open="(" close=")" separator=",">#{item}</foreach>
+			</if>
+			<if test="rodKndCde   != null and rodKndCde   != ''">
+				AND A.ROD_KND  IN 	<foreach collection="rodKndCde" item="item" open="(" close=")" separator=",">#{item}</foreach>
+			</if>
+			<if test="stYmd   != null and stYmd   != ''">
+				<![CDATA[AND A.ESB_YMD >= #{stYmd}]]>
+			</if>
+			<if test="enYmd   != null and enYmd   != ''">
+				<![CDATA[AND A.ESB_YMD <= #{enYmd}]]>
+			</if>
+			<if test="cssNam   != null and cssNam   != ''">
+		      <![CDATA[AND A.CSS_NAM LIKE '%' || #{cssNam} || '%']]>
+		    </if>
+
+		<![CDATA[
+					GROUP BY ROLLUP(A.CSS_NAM)
+					ORDER BY NAME NULLS FIRST) TEMP
  		]]>
 	</select>
 </mapper>

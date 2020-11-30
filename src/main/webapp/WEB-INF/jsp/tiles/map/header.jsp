@@ -29,7 +29,7 @@
 
 <script type="text/javascript" src="<c:url value='/js/plugins/jquery/jquery.form.min.js'/>"></script>
 <script type="text/javascript" src="<c:url value='/js/plugins/jquery/jquery.cookie.js'/>"></script>
-<script type="text/javascript" src="/js/plugins/jqueryui/jquery-ui.js"></script>
+<script type="text/javascript" src="<c:url value='/js/plugins/jqueryui/jquery-ui.js'/>"></script>
 <script type="text/javascript" src="<c:url value='/js/plugins/jquery/jquery.bxslider.min.js'/>"></script>
 
 <script src="<c:url value='/js/plugins/onsenui/js/onsenui.min.js'/>"></script>
@@ -39,6 +39,7 @@
 <script src="<c:url value='/js/common/common.js'/>"></script>
 <script src="<c:url value='/js/custom/combobox.js'/>"></script>
 <script src="<c:url value='/js/custom/search.js'/>"></script>
+<script src="<c:url value='/js/custom/board.js'/>"></script>
 
 <!-- map 관련 js -->
 <script type="text/javascript" src="<c:url value='/js/common/mapService.js'/>"></script>

@@ -21,7 +21,7 @@
 						COUNT(DECODE(SCH_KND, '2', 1, NULL)) AS A02,
 						COUNT(DECODE(SCH_KND, '3', 1, NULL)) AS A03,
 						COUNT(DECODE(SCH_KND, '4', 1, NULL)) AS A04
-					FROM SMARTTGIS.GT_C101_A A
+					FROM GT_C101_A A
 		]]>
 		<where>
 			<if test="guCde   != null and guCde   != ''">
@@ -66,7 +66,7 @@
 						COUNT(DECODE(SCH_KND, '2', 1, NULL)) AS A02,
 						COUNT(DECODE(SCH_KND, '3', 1, NULL)) AS A03,
 						COUNT(DECODE(SCH_KND, '4', 1, NULL)) AS A04
-				FROM SMARTTGIS.GT_C101_A A
+				FROM GT_C101_A A
 		]]>
 		<where>
 			<if test="guCde   != null and guCde   != ''">
@@ -110,7 +110,7 @@
 						COUNT(DECODE(SCH_KND, '2', 1, NULL)) AS A02,
 						COUNT(DECODE(SCH_KND, '3', 1, NULL)) AS A03,
 						COUNT(DECODE(SCH_KND, '4', 1, NULL)) AS A04
-			FROM SMARTTGIS.GT_C101_A A, SMARTTGIS.GT_LP_AA_EMD G
+			FROM GT_C101_A A, GT_LP_AA_EMD G
 			WHERE A.DONG_NAM(+) = G.EMD_KOR_NM
 				]]>
 		<if test="guCde   != null and guCde   != ''">
@@ -162,7 +162,7 @@
 		                                DIE,
 		                                INJ,
 		                                MEMO
-						FROM	SMARTTGIS.GT_C101_A A
+						FROM	GT_C101_A A
 		]]>
 		<where>
 			<if test="guCde   != null and guCde   != ''">
@@ -212,7 +212,7 @@
 		                    DIE,
 		                    INJ,
 		                    MEMO
-						FROM	SMARTTGIS.GT_C101_A A
+						FROM	GT_C101_A A
 		]]>
 		<where>
 			<if test="guCde   != null and guCde   != ''">
@@ -239,7 +239,7 @@
 	]]>
 	</select>
 
-<!-- 어린이보호구역 교차로기준 통계 -->
+<!-- 어린이보호구역 시설물별현황 통계 -->
 	<select id="selectCrossStatistics_GT_C101_A" parameterType="map" resultType="egovMap">
 		<![CDATA[
 		SELECT  TEMP.*
@@ -248,22 +248,31 @@
 		                COUNT(*) OVER() AS TOTALROWS
 		        FROM   (
 				SELECT
-					DECODE(NAME, NULL, '합계', NAME) AS  "구분",
-					TO_CHAR(TOTAL, '999,999,999,999') AS "합계",
-					TO_CHAR(A01, '999,999,999,999') AS "유치원",
-					TO_CHAR(A02, '999,999,999,999') AS "초등학교",
-					TO_CHAR(A03, '999,999,999,999') AS "특수학교",
-					TO_CHAR(A04, '999,999,999,999') AS "보육시설"
-				FROM (
-					SELECT
-						A.CSS_NAM AS NAME,
-						(COUNT(DECODE(SCH_KND, '1', 1, NULL)) + COUNT(DECODE(SCH_KND, '2', 1, NULL)) + COUNT(DECODE(SCH_KND, '3', 1, NULL)) + COUNT(DECODE(SCH_KND, '4', 1, NULL))) AS TOTAL,
-						COUNT(DECODE(SCH_KND, '1', 1, NULL)) AS A01,
-						COUNT(DECODE(SCH_KND, '2', 1, NULL)) AS A02,
-						COUNT(DECODE(SCH_KND, '3', 1, NULL)) AS A03,
-						COUNT(DECODE(SCH_KND, '4', 1, NULL)) AS A04
-					FROM SMARTTGIS.GT_C101_A A
-					WHERE A.CSS_NAM IS NOT NULL
+					SCH_NAM AS "학교명",
+					PE_NAM AS "행정구역(경찰서)",
+					GU_NAM AS "구",
+					DONG_NAM AS "동",
+					JIBUN AS "지번",
+					CSS_NAM AS "교차로",
+					DIE AS "교통사고(사망자수)",
+					INJ AS "교통사고(부상자수)",
+					(SELECT COUNT(*) FROM   GT_A061_P WHERE  GT_A061_P.SCH_MGRNU = A.MGRNU) AS "제어기",
+					(SELECT COUNT(*) FROM   GT_A110_P WHERE  GT_A110_P.SCH_MGRNU = A.MGRNU) AS "신호등",
+					(SELECT COUNT(*) FROM   GT_A057_L WHERE  GT_A057_L.SCH_MGRNU = A.MGRNU) AS "부착대",
+					(SELECT COUNT(*) FROM   GT_A062_P WHERE  GT_A062_P.SCH_MGRNU = A.MGRNU) AS "지주",
+					(SELECT COUNT(*) FROM   GT_A119_P WHERE  GT_A119_P.SCH_MGRNU = A.MGRNU) AS "음향<br>신호기",
+					(SELECT COUNT(*) FROM   GT_A090_P WHERE  GT_A090_P.SCH_MGRNU = A.MGRNU) AS "보행자버튼",
+					(SELECT COUNT(*) FROM   GT_A049_P WHERE  GT_A049_P.SCH_MGRNU = A.MGRNU) AS "검지기",
+					(SELECT COUNT(*) FROM   GT_C022_P WHERE  GT_C022_P.SCH_MGRNU = A.MGRNU) AS "횡단<br>보도<br>조명",
+					(SELECT COUNT(*) FROM   GT_A004_A WHERE  GT_A004_A.SCH_MGRNU = A.MGRNU) AS "횡단<br>보도",
+					(SELECT COUNT(*) FROM   GT_C104_A WHERE  GT_C104_A.SCH_MGRNU = A.MGRNU) AS "고원식<br>교차로",
+					(SELECT COUNT(*) FROM   GT_A004_A WHERE  GT_A004_A.SCH_MGRNU = A.MGRNU) AS "과속방지턱",
+					(SELECT COUNT(*) FROM   GT_C059_A WHERE  GT_C059_A.SCH_MGRNU = A.MGRNU) AS "방호울타리",
+					(SELECT COUNT(*) FROM   GT_C092_P WHERE  GT_C092_P.SCH_MGRNU = A.MGRNU) AS "시선유도봉",
+					(SELECT COUNT(*) FROM   GT_C051_P WHERE  GT_C051_P.SCH_MGRNU = A.MGRNU) AS "도로반사경"
+
+					FROM GT_C101_A A
+					WHERE A.SCH_NAM IS NOT NULL
 		]]>
 			<if test="guCde   != null and guCde   != ''">
 				AND A.GU_CDE  IN 	<foreach collection="guCde" item="item" open="(" close=")" separator=",">#{item}</foreach>
@@ -283,12 +292,67 @@
 			<if test="enYmd   != null and enYmd   != ''">
 				<![CDATA[AND A.ESB_YMD <= #{enYmd}]]>
 			</if>
-			<if test="cssNam != null and cssNam != ''">
-				<![CDATA[AND A.CSS_NAM LIKE '%' || #{cssNam} || '%']]>
+			<if test="schNam != null and schNam != ''">
+				<![CDATA[AND A.SCH_NAM LIKE '%' || #{schNam} || '%']]>
 			</if>
 		<![CDATA[
-				GROUP BY ROLLUP(A.CSS_NAM)
-					ORDER BY NAME NULLS FIRST  ) TEMP)TEMP)TEMP WHERE NUM BETWEEN #{rows} * ( #{page} - 1 ) + 1 AND #{rows}* #{page}
+				ORDER BY SCH_NAM) TEMP)TEMP WHERE NUM BETWEEN #{rows} * ( #{page} - 1 ) + 1 AND #{rows}* #{page}
+ 		]]>
+	</select>
+
+<!-- 어린이보호구역 시설물별현황 통계 엑셀-->
+	<select id="selectGbnFcltsExcelDown_GT_C101_A" parameterType="map" resultType="egovMap">
+		<![CDATA[
+				SELECT
+					SCH_NAM AS "학교명",
+					PE_NAM AS "행정구역(경찰서)",
+					GU_NAM AS "구",
+					DONG_NAM AS "동",
+					JIBUN AS "지번",
+					CSS_NAM AS "교차로",
+					DIE AS "교통사고(사망자수)",
+					INJ AS "교통사고(부상자수)",
+					(SELECT COUNT(*) FROM   GT_A061_P WHERE  GT_A061_P.SCH_MGRNU = A.MGRNU) AS "제어기",
+					(SELECT COUNT(*) FROM   GT_A110_P WHERE  GT_A110_P.SCH_MGRNU = A.MGRNU) AS "신호등",
+					(SELECT COUNT(*) FROM   GT_A057_L WHERE  GT_A057_L.SCH_MGRNU = A.MGRNU) AS "부착대",
+					(SELECT COUNT(*) FROM   GT_A062_P WHERE  GT_A062_P.SCH_MGRNU = A.MGRNU) AS "지주",
+					(SELECT COUNT(*) FROM   GT_A119_P WHERE  GT_A119_P.SCH_MGRNU = A.MGRNU) AS "음향<br>신호기",
+					(SELECT COUNT(*) FROM   GT_A090_P WHERE  GT_A090_P.SCH_MGRNU = A.MGRNU) AS "보행자버튼",
+					(SELECT COUNT(*) FROM   GT_A049_P WHERE  GT_A049_P.SCH_MGRNU = A.MGRNU) AS "검지기",
+					(SELECT COUNT(*) FROM   GT_C022_P WHERE  GT_C022_P.SCH_MGRNU = A.MGRNU) AS "횡단<br>보도<br>조명",
+					(SELECT COUNT(*) FROM   GT_A004_A WHERE  GT_A004_A.SCH_MGRNU = A.MGRNU) AS "횡단<br>보도",
+					(SELECT COUNT(*) FROM   GT_C104_A WHERE  GT_C104_A.SCH_MGRNU = A.MGRNU) AS "고원식<br>교차로",
+					(SELECT COUNT(*) FROM   GT_A004_A WHERE  GT_A004_A.SCH_MGRNU = A.MGRNU) AS "과속방지턱",
+					(SELECT COUNT(*) FROM   GT_C059_A WHERE  GT_C059_A.SCH_MGRNU = A.MGRNU) AS "방호울타리",
+					(SELECT COUNT(*) FROM   GT_C092_P WHERE  GT_C092_P.SCH_MGRNU = A.MGRNU) AS "시선유도봉",
+					(SELECT COUNT(*) FROM   GT_C051_P WHERE  GT_C051_P.SCH_MGRNU = A.MGRNU) AS "도로반사경"
+
+					FROM GT_C101_A A
+					WHERE A.SCH_NAM IS NOT NULL
+		]]>
+			<if test="guCde   != null and guCde   != ''">
+				AND A.GU_CDE  IN 	<foreach collection="guCde" item="item" open="(" close=")" separator=",">#{item}</foreach>
+			</if>
+			<if test="dongCde   != null and dongCde   != ''">
+				AND A.DONG_CDE  IN 	<foreach collection="dongCde" item="item" open="(" close=")" separator=",">#{item}</foreach>
+			</if>
+			<if test="policeCde   != null and policeCde   != ''">
+				AND A.PE_CDE  IN 	<foreach collection="policeCde" item="item" open="(" close=")" separator=",">#{item}</foreach>
+			</if>
+			<if test="statGbn   != null and statGbn   != ''">
+				AND A.SCH_KND  IN 	<foreach collection="statGbn" item="item" open="(" close=")" separator=",">#{item}</foreach>
+			</if>
+			<if test="stYmd   != null and stYmd   != ''">
+				<![CDATA[AND A.ESB_YMD >= #{stYmd}]]>
+			</if>
+			<if test="enYmd   != null and enYmd   != ''">
+				<![CDATA[AND A.ESB_YMD <= #{enYmd}]]>
+			</if>
+			<if test="schNam   != null and schNam   != ''">
+		      <![CDATA[AND A.SCH_NAM LIKE '%' || #{schNam} || '%']]>
+		    </if>
+		<![CDATA[
+					ORDER BY SCH_NAM
  		]]>
 	</select>
 

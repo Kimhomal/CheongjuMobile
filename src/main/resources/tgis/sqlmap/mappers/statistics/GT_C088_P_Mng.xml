@@ -17,7 +17,7 @@
 						(COUNT(DECODE(KND, '1', 1, NULL)) + COUNT(DECODE(KND, '2', 1, NULL))) AS TOTAL,
 						COUNT(DECODE(KND, '1', 1, NULL)) AS A01,
 						COUNT(DECODE(KND, '2', 1, NULL)) AS A02
-					FROM SMARTTGIS.GT_C088_P A
+					FROM GT_C088_P A
 		]]>
 		<where>
 			<if test="guCde   != null and guCde   != ''">
@@ -64,7 +64,7 @@
 						(COUNT(DECODE(KND, '1', 1, NULL)) + COUNT(DECODE(KND, '2', 1, NULL))) AS TOTAL,
 						COUNT(DECODE(KND, '1', 1, NULL)) AS A01,
 						COUNT(DECODE(KND, '2', 1, NULL)) AS A02
-				FROM SMARTTGIS.GT_C088_P A
+				FROM GT_C088_P A
 		]]>
 		<where>
 			<if test="guCde   != null and guCde   != ''">
@@ -111,7 +111,7 @@
 					(COUNT(DECODE(KND, '1', 1, NULL)) + COUNT(DECODE(KND, '2', 1, NULL))) AS TOTAL,
 					COUNT(DECODE(KND, '1', 1, NULL)) AS A01,
 					COUNT(DECODE(KND, '2', 1, NULL)) AS A02
-			FROM SMARTTGIS.GT_C088_P A, SMARTTGIS.GT_LP_AA_EMD G
+			FROM GT_C088_P A, GT_LP_AA_EMD G
 			WHERE A.DONG_NAM(+) = G.EMD_KOR_NM
 				]]>
 		<if test="guCde   != null and guCde   != ''">
@@ -164,7 +164,7 @@
 							TO_CHAR(ESB_YMD, 'YYYY-MM-DD') AS ESB_YMD,
 							XCE,
 							YCE
-						FROM	SMARTTGIS.GT_C088_P A
+						FROM	GT_C088_P A
 		]]>
 		<where>
 			<if test="guCde   != null and guCde   != ''">
@@ -215,7 +215,7 @@
 							TO_CHAR(ESB_YMD, 'YYYY-MM-DD') AS ESB_YMD,
 							XCE,
 							YCE
-					  FROM	SMARTTGIS.GT_C088_P A
+					  FROM	GT_C088_P A
 		]]>
 		<where>
 			<if test="guCde   != null and guCde   != ''">
@@ -265,7 +265,7 @@
 									(COUNT(DECODE(KND, '1', 1, NULL)) + COUNT(DECODE(KND, '2', 1, NULL))) AS TOTAL,
 									COUNT(DECODE(KND, '1', 1, NULL)) AS A01,
 									COUNT(DECODE(KND, '2', 1, NULL)) AS A02
-							   FROM SMARTTGIS.GT_C088_P A
+							   FROM GT_C088_P A
 							   WHERE A.CSS_NAM IS NOT NULL
 		]]>
 			<if test="guCde   != null and guCde   != ''">
@@ -298,6 +298,56 @@
 		<![CDATA[
 				GROUP BY ROLLUP(A.CSS_NAM)
 					ORDER BY NAME NULLS FIRST  ) TEMP)TEMP)TEMP WHERE NUM BETWEEN #{rows} * ( #{page} - 1 ) + 1 AND #{rows}* #{page}
+ 		]]>
+	</select>
+
+<!-- 갈매기표지 교차로기준 통계 엑셀-->
+	<select id="selectCrossFcltsExcelDown_GT_C088_P" parameterType="map" resultType="egovMap">
+		<![CDATA[
+				SELECT
+					DECODE(NAME, NULL, '합계', NAME) AS  "구분",
+					TO_CHAR(TOTAL, '999,999,999,999') AS "합계",
+					TO_CHAR(A01, '999,999,999,999') AS "바탕=노랑,꺾임=검정",
+					TO_CHAR(A02, '999,999,999,999') AS "바탕=흰색,꺾임=빨강"
+				FROM (
+					SELECT
+						A.CSS_NAM AS NAME,
+						(COUNT(DECODE(KND, '1', 1, NULL)) + COUNT(DECODE(KND, '2', 1, NULL))) AS TOTAL,
+						COUNT(DECODE(KND, '1', 1, NULL)) AS A01,
+						COUNT(DECODE(KND, '2', 1, NULL)) AS A02
+					FROM GT_C088_P A
+					WHERE A.CSS_NAM IS NOT NULL
+		]]>
+			<if test="guCde   != null and guCde   != ''">
+				AND A.GU_CDE  IN 	<foreach collection="guCde" item="item" open="(" close=")" separator=",">#{item}</foreach>
+			</if>
+			<if test="dongCde   != null and dongCde   != ''">
+				AND A.DONG_CDE  IN 	<foreach collection="dongCde" item="item" open="(" close=")" separator=",">#{item}</foreach>
+			</if>
+			<if test="policeCde   != null and policeCde   != ''">
+				AND A.PE_CDE  IN 	<foreach collection="policeCde" item="item" open="(" close=")" separator=",">#{item}</foreach>
+			</if>
+			<if test="statGbn   != null and statGbn   != ''">
+				AND A.KND  IN 	<foreach collection="statGbn" item="item" open="(" close=")" separator=",">#{item}</foreach>
+			</if>
+			<if test="stdCde   != null and stdCde   != ''">
+				AND A.STD  IN 	<foreach collection="stdCde" item="item" open="(" close=")" separator=",">#{item}</foreach>
+			</if>
+			<if test="esbFrmCde   != null and esbFrmCde   != ''">
+				AND A.ESB_FRM  IN 	<foreach collection="esbFrmCde" item="item" open="(" close=")" separator=",">#{item}</foreach>
+			</if>
+			<if test="stYmd   != null and stYmd   != ''">
+				<![CDATA[AND A.ESB_YMD >= #{stYmd}]]>
+			</if>
+			<if test="enYmd   != null and enYmd   != ''">
+				<![CDATA[AND A.ESB_YMD <= #{enYmd}]]>
+			</if>
+			<if test="cssNam   != null and cssNam   != ''">
+		      <![CDATA[AND A.CSS_NAM LIKE '%' || #{cssNam} || '%']]>
+		    </if>
+		<![CDATA[
+					GROUP BY ROLLUP(A.CSS_NAM)
+					ORDER BY NAME NULLS FIRST) TEMP
  		]]>
 	</select>
 

@@ -20,6 +20,14 @@
 
 
 /* map popup style start */
+.area_l {
+    margin-right: auto;
+}
+
+.area_r {
+    margin-left: auto;
+}
+
 .lp_inner .lp_header {
     padding: .5em .5em;
     background-color: #599700;
@@ -123,7 +131,7 @@
     width: 100%;
 }
 
-.list_tp8 > li .cont input[type=text] {
+.list_tp8 > li .cont input[type=text], .list_tp8 > li .cont input[type=date] {
     width: 100%;
 }
 
@@ -231,6 +239,13 @@
     line-height: 30px;
 }
 
+.btn.sml {
+    margin: 2px;
+    padding: 0 18px;
+    height: 30px;
+    line-height: 30px;
+}
+
 .tabCont.active {
     display: block;
 }
@@ -241,7 +256,8 @@
 
 ons-modal input[type=text],
 ons-modal input[type=password],
-ons-modal input[type=number] {
+ons-modal input[type=number],
+ons-modal input[type=date] {
     padding: .5em 1em;
     border: 1px solid #dcdcdc;
     font-family: inherit;
@@ -483,4 +499,39 @@ ons-modal select {
 .paging > a.btn_last {
     width: 15px;
     background: url('../../images/mapService/paging_last.png') no-repeat;
+}
+
+.ol-popup {
+  position: absolute;
+  background-color: white;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.2);
+  padding: 1em;
+  border-radius: .5em;
+  border: 1px solid #cccccc;
+  bottom: 1em;
+  left: -4.7em;
+}
+
+.ol-popup:after, .ol-popup:before {
+  top: 100%;
+  border: solid transparent;
+  content: " ";
+  height: 0;
+  width: 0;
+  position: absolute;
+  pointer-events: none;
+}
+
+.ol-popup:after {
+  border-top-color: white;
+  border-width: .7em;
+  margin-left: -.7em;
+  left: 50%;
+}
+
+.ol-popup:before {
+  border-top-color: #cccccc;
+  border-width: .8em;
+  margin-left: -.8em;
+  left: 51%;
 }

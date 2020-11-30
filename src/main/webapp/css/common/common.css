@@ -7,6 +7,10 @@ ol, ul {
     list-style: none;
 }
 
+hr, caption {
+    display: none;
+}
+
 .page__content {
     display: flex;
     flex-direction: column;
@@ -16,6 +20,10 @@ ol, ul {
 	background-image: url(../../images/main/bg_main_visual.jpg);
 	background-repeat: no-repeat;
 	background-size: 100% 40%;
+}
+
+.image.main {
+	height: 3em;
 }
 
 .mtb-auto {
@@ -146,6 +154,308 @@ ol, ul {
 }
 /*-------------------------- <- introduce --------------------------*/
 
+/*  ---------------------------------- #tbl ----------------------------------*/
+.tbl_col_tp1 {
+    width: 100%;
+    table-layout: fixed
+}
+
+.tbl_col_tp1 thead th {
+    padding: 12px 10px;
+    border-top: 1px solid #dcdcdc;
+    border-bottom: 2px solid #6cae0c;
+    font-size: 13px;
+    color: #707070;
+    line-height: 16px;
+}
+
+.tbl_col_tp1 tbody td {
+    padding: 12px 10px;
+    border-bottom: 1px solid #d2d2d2;
+    font-size: 13px;
+    color: #707070;
+    text-align: center;
+    line-height: 16px;
+}
+
+.tbl_col_tp1 tbody td.subject {
+    text-align: left;
+}
+
+.tbl_col_tp1 tbody td.subject:hover {
+    text-decoration: underline
+}
+
+.tbl_col_tp1 .notice td {
+    background-color: #f9f9f9;
+    font-family: 'Noto Sans KR';
+}
+
+.tbl_col_tp1 .ico_answer {
+    padding-left: 24px;
+}
+
+.tbl_row_tp1 {
+    width: 100%;
+    border-top: 2px solid #6cae0c;
+    table-layout: fixed
+}
+
+.tbl_row_tp1.bor_none {
+    border: none;
+}
+
+.tbl_row_tp1.bor_t_gray {
+    border-top: 1px solid #d2d2d2;
+}
+
+.tbl_row_tp1.bor_t2_gray {
+    border-top: 2px solid #808080
+}
+
+.tbl_row_tp1.th_fs12 th {
+    font-size: 12px;
+}
+
+.tbl_row_tp1 th {
+    padding: 12px 10px;
+    background-color: #f9f9f9;
+    border-bottom: 1px solid #dcdcdc;
+    font-family: 'Noto Sans KR';
+    font-size: 13px;
+    color: #494949;
+    text-align: left;
+    line-height: 15px;
+}
+
+.tbl_row_tp1 .bor_l {
+    border-left: 1px solid #dcdcdc;
+}
+
+.tbl_row_tp1 .bor_r {
+    border-right: 1px solid #dcdcdc;
+}
+
+.tbl_row_tp1 td {
+    padding: 7px 11px;
+    border-bottom: 1px solid #dcdcdc;
+    font-size: 13px;
+    color: #494949;
+    line-height: 15px;
+}
+
+.tbl_row_tp1 td.subject {
+    font-family: 'Noto Sans KR';
+}
+
+.tbl_row_tp1 .cont {
+    height: 225px;
+    font-size: 13px;
+    color: #494949;
+    line-height: 21px;
+}
+
+.tbl_row_tp1 .cont.tp1 {
+    height: 125px;
+}
+
+.tbl_row_tp1 .cont.noData {
+    font-size: 16px;
+    color: #aaaaaa;
+    text-align: center;
+}
+
+.tbl_row_tp1 .mapInfo {
+    padding: 0;
+}
+
+.tbl_row_tp1 .mapInfo .map_header {
+    padding: 13px 0;
+    background-color: #f5fafe;
+    font-family: 'Noto Sans KR';
+    font-size: 13px;
+    color: #6cae0c;
+    text-align: center;
+}
+
+.tbl_row_tp1 .mapInfo .map_content {}
+
+.tbl_row_tp1 .mapInfo .map_footer {
+    padding: 13px 0;
+    background-color: #f5fafe;
+    font-size: 13px;
+    color: #6cae0c;
+    text-align: center;
+}
+
+.tbl_row_tp1.th_c th {
+    text-align: center;
+}
+
+.tbl_row_tp1.td_c td {
+    text-align: center;
+}
+
+.tbl_row_tp1.bor_tp1 th,
+.tbl_row_tp1.bor_tp1 td {
+    border-left: 1px solid #dcdcdc;
+}
+
+.tbl_row_tp1.bor_tp1 th:first-child {
+    border-left: 0px;
+}
+
+.tbl_row_tp1.bor_tp1 td:first-child {
+    border-left: 0px;
+}
+
+.tbl_row_tp1.fs12 th,
+.tbl_row_tp1.fs12 td {
+    font-size: 12px;
+}
+
+.tbl_row_tp1 .infoArea_wrap {
+    width: 50%;
+    height: 196px;
+    padding: 0px;
+    border-right: 1px solid #d2d2d2;
+    border-left: 1px solid #d2d2d2;
+    text-align: center;
+}
+
+/*  ---------------------------------- #board ----------------------------------*/
+.board_tp1 {
+    position: relative;
+}
+
+.board_tp1 .cnt {
+    padding-bottom: 6px;
+    font-size: 12px;
+    color: #707070;
+    text-align: right;
+}
+
+
+/*  ---------------------------------- #Board Pager ----------------------------------*/
+.board_pager_wrap {
+    overflow: hidden;
+    position: relative;
+    width: auto;
+    padding: 18px 0;
+    text-align: center;
+}
+
+.board_pager {
+    display: inline-block;
+    overflow: hidden;
+}
+
+.board_pager .boardNav {
+    display: inline-block;
+    float: left;
+    margin: 0px;
+    padding: 0px;
+}
+
+.board_pager .boardNav li {
+    float: left;
+    height: 15px;
+    margin: 0 3px;
+    line-height: 15px;
+}
+
+.board_pager .boardNav li.on a {color:#6cae0c;font-weight: bold;text-decoration: underline;font-size: 14px;} /* 한봄 추가 현제 페이지 번호 활성화*/
+
+.board_pager .boardNav a {
+    display: block;
+    min-width: 15px;
+    height: 15px;
+    font-size: 13px;
+    color: #707070;
+    line-height: 15px;
+}
+
+.board_pager .boardNav a.btn_first {
+    background: url('../../images/common/paging_first.png') center center no-repeat;
+    text-indent: -9999px
+}
+
+.board_pager .boardNav a.btn_last {
+    background: url('../../images/common/paging_last.png') center center no-repeat;
+    text-indent: -9999px
+}
+
+.board_pager .boardNav a.btn_prev {
+    margin-right: 10px;
+    background: url('../../images/common/paging_prev.png') center center no-repeat;
+    text-indent: -9999px
+}
+
+.board_pager .boardNav a.btn_next {
+    margin-left: 10px;
+    background: url('../../images/common/paging_next.png') center center no-repeat;
+    text-indent: -9999px
+}
+
+.board_pager .boardPage {
+    float: left;
+    overflow: hidden;
+    margin: 0 8px;
+}
+
+.board_pager .boardPage li {
+    float: left;
+    height: 25px;
+    margin: 0 2px;
+    background-color: #fff;
+    border: 1px solid #d1d1d1;
+}
+
+.board_pager .boardPage li:first-child {
+    border-left: 1px solid #e6e6e6;
+}
+
+.board_pager .boardPage li a {
+    display: block;
+    height: 25px;
+    padding: 0 10px;
+    font-weight: bold;
+    font-size: 12px;
+    line-height: 25px;
+    color: #888888;
+    text-align: center;
+}
+
+.board_pager .boardPage li.on {
+    border: 0px
+}
+
+.board_pager .boardPage li.on a {
+    font-weight: bold;
+    color: #fff;
+    background-color: #875514;
+}
+
+.board_pager .boardPage li:hover a {
+    font-weight: bold;
+    color: #fff;
+    background-color: #875514;
+}
+
+.board_pager_wrap .btn_wrap.ab_l {
+    position: absolute;
+    left: 0px;
+    top: 10px;
+    margin: 0;
+}
+
+.board_pager_wrap .btn_wrap.ab_r {
+    position: absolute;
+    right: 0px;
+    top: 10px;
+    margin: 0;
+}
+
 /*-------------------------- map -> --------------------------*/
 #map {
 	position: absolute;
@@ -157,3 +467,19 @@ ol, ul {
 	width: 80% !important;
 }
 /*-------------------------- <- map --------------------------*/
+
+/* Ripple effect */
+.ui.segment.ripple-effect, .ui.table tr {
+  background-position: center;
+  transition: background 0.8s;
+}
+
+.ui.segment.ripple-effect:active, .ui.table tr:active {
+  background-color: #6eb9f7;
+  background-size: 100%;
+  transition: background 0s;
+}
+
+ons-fab.fab.active, ons-speed-dial-item.fab.active, button.fab.active {
+	background-color: #00ff1f;
+}

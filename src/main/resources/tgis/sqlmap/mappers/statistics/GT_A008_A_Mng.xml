@@ -23,7 +23,7 @@
 						COUNT(DECODE(CSS_KND, '3', 1, NULL)) AS A03,
 						COUNT(DECODE(CSS_KND, '4', 1, NULL)) AS A04,
 						COUNT(DECODE(CSS_KND, '5', 1, NULL)) AS A05
-					FROM SMARTTGIS.GT_A008_A A
+					FROM GT_A008_A A
 		]]>
 		<where>
 			<if test="guCde   != null and guCde   != ''">
@@ -73,7 +73,7 @@
 						COUNT(DECODE(CSS_KND, '3', 1, NULL)) AS A03,
 						COUNT(DECODE(CSS_KND, '4', 1, NULL)) AS A04,
 						COUNT(DECODE(CSS_KND, '5', 1, NULL)) AS A05
-				FROM SMARTTGIS.GT_A008_A A
+				FROM GT_A008_A A
 		]]>
 		<where>
 			<if test="guCde   != null and guCde   != ''">
@@ -123,7 +123,7 @@
 					COUNT(DECODE(CSS_KND, '3', 1, NULL)) AS A03,
 					COUNT(DECODE(CSS_KND, '4', 1, NULL)) AS A04,
 					COUNT(DECODE(CSS_KND, '5', 1, NULL)) AS A05
-			FROM SMARTTGIS.GT_A008_A A, SMARTTGIS.GT_LP_AA_EMD G
+			FROM GT_A008_A A, GT_LP_AA_EMD G
 			WHERE A.DONG_NAM(+) = G.EMD_KOR_NM
 				]]>
 		<if test="guCde   != null and guCde   != ''">
@@ -170,7 +170,7 @@
 							TO_CODE('A008_A','CSS_KND',CSS_KND) AS CSS_KND_NAM,
 							TO_CODE('A008_A','TYPE_CDE',TYPE_CDE) AS TYPE_CDE_NAM,
 							TO_CHAR(ESB_YMD, 'YYYY-MM-DD') AS ESB_YMD
-						FROM	SMARTTGIS.GT_A008_A A
+						FROM	GT_A008_A A
 		]]>
 		<where>
 			<if test="guCde   != null and guCde   != ''">
@@ -215,7 +215,7 @@
 							TO_CODE('A008_A','CSS_KND',CSS_KND) AS CSS_KND_NAM,
 							TO_CODE('A008_A','TYPE_CDE',TYPE_CDE) AS TYPE_CDE_NAM,
 							TO_CHAR(ESB_YMD, 'YYYY-MM-DD') AS ESB_YMD
-					  FROM	SMARTTGIS.GT_A008_A A
+					  FROM	GT_A008_A A
 		]]>
 		<where>
 			<if test="guCde   != null and guCde   != ''">
@@ -245,7 +245,7 @@
 	]]>
 	</select>
 
-<!-- 교차로 교차로기준 통계 -->
+<!-- 교차로 시설물별현황 통계 -->
 	<select id="selectCrossStatistics_GT_A008_A" parameterType="map" resultType="egovMap">
 		<![CDATA[
 		SELECT	TEMP.*
@@ -260,12 +260,12 @@
 							(SELECT COUNT(*) FROM   GT_A110_P WHERE  GT_A110_P.CSS_MGRNU = A.MGRNU) AS "신호등",
 							(SELECT COUNT(*) FROM   GT_A057_L WHERE  GT_A057_L.CSS_MGRNU = A.MGRNU) AS "부착대",
 							(SELECT COUNT(*) FROM   GT_A062_P WHERE  GT_A062_P.CSS_MGRNU = A.MGRNU) AS "지주",
-							(SELECT COUNT(*) FROM   GT_A090_P WHERE  GT_A090_P.CSS_MGRNU = A.MGRNU AND KND = '1') AS "음향<br>신호기",
-							(SELECT COUNT(*) FROM   GT_A090_P WHERE  GT_A090_P.CSS_MGRNU = A.MGRNU AND KND = '2') AS "보행자버튼",
+							(SELECT COUNT(*) FROM   GT_A119_P WHERE  GT_A119_P.CSS_MGRNU = A.MGRNU) AS "음향<br>신호기",
+							(SELECT COUNT(*) FROM   GT_A090_P WHERE  GT_A090_P.CSS_MGRNU = A.MGRNU) AS "보행자버튼",
 							(SELECT COUNT(*) FROM   GT_A049_P WHERE  GT_A049_P.CSS_MGRNU = A.MGRNU) AS "검지기",
-							(SELECT COUNT(*) FROM   GT_C022_P WHERE  GT_C022_P.CSS_MGRNU = A.MGRNU) AS "보행용조명",
+							(SELECT COUNT(*) FROM   GT_C022_P WHERE  GT_C022_P.CSS_MGRNU = A.MGRNU) AS "횡단<br>보도<br>조명",
 							(SELECT COUNT(*) FROM   GT_A004_A WHERE  GT_A004_A.CSS_MGRNU = A.MGRNU) AS "횡단<br>보도"
-						FROM SMARTTGIS.GT_A008_A A
+						FROM GT_A008_A A
 						WHERE A.CSS_NAM IS NOT NULL
 		]]>
 			<if test="guCde   != null and guCde   != ''">
@@ -294,6 +294,52 @@
 			</if>
 		<![CDATA[
 					ORDER BY CSS_NAM) TEMP)TEMP WHERE NUM BETWEEN #{rows} * ( #{page} - 1 ) + 1 AND #{rows}* #{page}
+ 		]]>
+	</select>
+
+<!-- 교차로 시설물별현황 통계 엑셀-->
+	<select id="selectGbnFcltsExcelDown_GT_A008_A" parameterType="map" resultType="egovMap">
+		<![CDATA[
+				SELECT
+					CSS_NAM AS "구분",
+					TO_CODE('A008_A','CSS_KND',CSS_KND) AS "형태",
+					TO_CODE('A008_A','TYPE_CDE',TYPE_CDE) AS "유형",
+					(SELECT COUNT(*) FROM   GT_A061_P WHERE  GT_A061_P.CSS_MGRNU = A.MGRNU) AS "제어기",
+					(SELECT COUNT(*) FROM   GT_A110_P WHERE  GT_A110_P.CSS_MGRNU = A.MGRNU) AS "신호등",
+					(SELECT COUNT(*) FROM   GT_A057_L WHERE  GT_A057_L.CSS_MGRNU = A.MGRNU) AS "부착대",
+					(SELECT COUNT(*) FROM   GT_A062_P WHERE  GT_A062_P.CSS_MGRNU = A.MGRNU) AS "지주",
+					(SELECT COUNT(*) FROM   GT_A119_P WHERE  GT_A119_P.CSS_MGRNU = A.MGRNU) AS "음향<br>신호기",
+					(SELECT COUNT(*) FROM   GT_A090_P WHERE  GT_A090_P.CSS_MGRNU = A.MGRNU) AS "보행자버튼",
+					(SELECT COUNT(*) FROM   GT_A049_P WHERE  GT_A049_P.CSS_MGRNU = A.MGRNU) AS "검지기",
+					(SELECT COUNT(*) FROM   GT_C022_P WHERE  GT_C022_P.CSS_MGRNU = A.MGRNU) AS "횡단<br>보도<br>조명",
+					(SELECT COUNT(*) FROM   GT_A004_A WHERE  GT_A004_A.CSS_MGRNU = A.MGRNU) AS "횡단<br>보도"
+
+					FROM SMARTTGIS.GT_A008_A A
+					WHERE A.CSS_NAM IS NOT NULL
+		]]>
+			<if test="guCde   != null and guCde   != ''">
+				AND A.GU_CDE  IN 	<foreach collection="guCde" item="item" open="(" close=")" separator=",">#{item}</foreach>
+			</if>
+			<if test="dongCde   != null and dongCde   != ''">
+				AND A.DONG_CDE  IN 	<foreach collection="dongCde" item="item" open="(" close=")" separator=",">#{item}</foreach>
+			</if>
+			<if test="policeCde   != null and policeCde   != ''">
+				AND A.PE_CDE  IN 	<foreach collection="policeCde" item="item" open="(" close=")" separator=",">#{item}</foreach>
+			</if>
+			<if test="statGbn   != null and statGbn   != ''">
+				AND A.SCH_KND  IN 	<foreach collection="statGbn" item="item" open="(" close=")" separator=",">#{item}</foreach>
+			</if>
+			<if test="stYmd   != null and stYmd   != ''">
+				<![CDATA[AND A.ESB_YMD >= #{stYmd}]]>
+			</if>
+			<if test="enYmd   != null and enYmd   != ''">
+				<![CDATA[AND A.ESB_YMD <= #{enYmd}]]>
+			</if>
+			<if test="cssNam != null and cssNam != ''">
+				<![CDATA[AND A.CSS_NAM LIKE '%' || #{cssNam} || '%']]>
+			</if>
+		<![CDATA[
+					ORDER BY SCH_NAM
  		]]>
 	</select>
 

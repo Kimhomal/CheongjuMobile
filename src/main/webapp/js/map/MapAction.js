@@ -870,7 +870,7 @@
             var geojsonFormat = new ol.format.GeoJSON();
             var features = null;
             $.ajax({
-                url: this._mapMaker.config.noProxyWfs,
+                url: this._mapMaker.config.proxyWfs,
                 dataType: 'json',
                 async: false,
                 data: {
@@ -898,7 +898,7 @@
             var geojsonFormat = new ol.format.GeoJSON();
             var features = null;
             $.ajax({
-                url:  this._mapMaker.config.noProxyWfs,
+                url:  this._mapMaker.config.proxyWfs,
                 dataType: 'json',
                 async: false,
                 data:{

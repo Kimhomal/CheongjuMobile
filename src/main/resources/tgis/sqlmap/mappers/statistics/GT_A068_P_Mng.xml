@@ -14,7 +14,7 @@
 					SELECT
 						A.GU_NAM AS NAME,
 						COUNT(*) AS TOTAL
-					FROM SMARTTGIS.GT_A068_P A
+					FROM GT_A068_P A
 		]]>
 		<where>
 			<if test="guCde   != null and guCde   != ''">
@@ -49,7 +49,7 @@
 				FROM  (
 				SELECT  A.PE_NAM AS NAME,
 						COUNT(*) AS TOTAL
-				FROM SMARTTGIS.GT_A068_P A
+				FROM GT_A068_P A
 		]]>
 		<where>
 			<if test="guCde   != null and guCde   != ''">
@@ -84,7 +84,7 @@
 				FROM  (
 			SELECT  G.EMD_KOR_NM AS NAME,
 					COUNT(*) AS TOTAL
-			FROM SMARTTGIS.GT_A068_P A, SMARTTGIS.GT_LP_AA_EMD G
+			FROM GT_A068_P A, GT_LP_AA_EMD G
 			WHERE A.DONG_NAM(+) = G.EMD_KOR_NM
 				]]>
 		<if test="guCde   != null and guCde   != ''">
@@ -125,7 +125,7 @@
 		                                TO_CHAR(ESB_YMD ,'YYYY-MM-DD') AS ESB_YMD,
 		                                XCE,
 		                                YCE
-						FROM	SMARTTGIS.GT_A068_P A
+						FROM	GT_A068_P A
 		]]>
 		<where>
 			<if test="guCde   != null and guCde   != ''">
@@ -164,7 +164,7 @@
 		                    TO_CHAR(ESB_YMD ,'YYYY-MM-DD') AS ESB_YMD,
 		                    XCE,
 		                    YCE
-						FROM	SMARTTGIS.GT_A068_P A
+						FROM	GT_A068_P A
 		]]>
 		<where>
 			<if test="guCde   != null and guCde   != ''">
@@ -204,7 +204,7 @@
 					SELECT
 						A.CSS_NAM AS NAME,
 						COUNT(*) AS TOTAL
-					FROM SMARTTGIS.GT_A068_P A
+					FROM GT_A068_P A
 					WHERE A.CSS_NAM IS NOT NULL
 		]]>
 			<if test="guCde   != null and guCde   != ''">
@@ -228,6 +228,44 @@
 		<![CDATA[
 				GROUP BY ROLLUP(A.CSS_NAM)
 					ORDER BY NAME NULLS FIRST  ) TEMP)TEMP)TEMP WHERE NUM BETWEEN #{rows} * ( #{page} - 1 ) + 1 AND #{rows}* #{page}
+ 		]]>
+	</select>
+
+<!-- 횡단보도예고표시 교차로기준 통계 엑셀-->
+	<select id="selectCrossFcltsExcelDown_GT_A068_P" parameterType="map" resultType="egovMap">
+		<![CDATA[
+				SELECT
+					DECODE(NAME, NULL, '합계', NAME) AS  "구분",
+					TO_CHAR(TOTAL, '999,999,999,999') AS "합계",
+					TO_CHAR(TOTAL, '999,999,999,999') AS "계"
+				FROM (
+					SELECT
+						A.CSS_NAM AS NAME,
+						COUNT(*) AS TOTAL
+					FROM GT_A068_P A
+					WHERE A.CSS_NAM IS NOT NULL
+		]]>
+			<if test="guCde   != null and guCde   != ''">
+				AND A.GU_CDE  IN 	<foreach collection="guCde" item="item" open="(" close=")" separator=",">#{item}</foreach>
+			</if>
+			<if test="dongCde   != null and dongCde   != ''">
+				AND A.DONG_CDE  IN 	<foreach collection="dongCde" item="item" open="(" close=")" separator=",">#{item}</foreach>
+			</if>
+			<if test="policeCde   != null and policeCde   != ''">
+				AND A.PE_CDE  IN 	<foreach collection="policeCde" item="item" open="(" close=")" separator=",">#{item}</foreach>
+			</if>
+			<if test="stYmd   != null and stYmd   != ''">
+				<![CDATA[AND A.ESB_YMD >= #{stYmd}]]>
+			</if>
+			<if test="enYmd   != null and enYmd   != ''">
+				<![CDATA[AND A.ESB_YMD <= #{enYmd}]]>
+			</if>
+			<if test="cssNam   != null and cssNam   != ''">
+		      <![CDATA[AND A.CSS_NAM LIKE '%' || #{cssNam} || '%']]>
+		    </if>
+		<![CDATA[
+					GROUP BY ROLLUP(A.CSS_NAM)
+					ORDER BY NAME NULLS FIRST) TEMP
  		]]>
 	</select>
 

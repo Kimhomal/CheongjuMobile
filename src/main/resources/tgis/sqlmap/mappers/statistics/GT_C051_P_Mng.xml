@@ -19,7 +19,7 @@
 						COUNT(DECODE(MIRR_FRM, '1', 1, NULL)) AS A01,
 						COUNT(DECODE(MIRR_FRM, '2', 1, NULL)) AS A02,
 						COUNT(DECODE(MIRR_FRM, '3', 1, NULL)) AS A03
-					FROM SMARTTGIS.GT_C051_P A
+					FROM GT_C051_P A
 		]]>
 		<where>
 			<if test="guCde   != null and guCde   != ''">
@@ -68,7 +68,7 @@
 						COUNT(DECODE(MIRR_FRM, '1', 1, NULL)) AS A01,
 						COUNT(DECODE(MIRR_FRM, '2', 1, NULL)) AS A02,
 						COUNT(DECODE(MIRR_FRM, '3', 1, NULL)) AS A03
-				FROM SMARTTGIS.GT_C051_P A
+				FROM GT_C051_P A
 		]]>
 		<where>
 			<if test="guCde   != null and guCde   != ''">
@@ -117,7 +117,7 @@
 					COUNT(DECODE(MIRR_FRM, '1', 1, NULL)) AS A01,
 					COUNT(DECODE(MIRR_FRM, '2', 1, NULL)) AS A02,
 					COUNT(DECODE(MIRR_FRM, '3', 1, NULL)) AS A03
-			FROM SMARTTGIS.GT_C051_P A, SMARTTGIS.GT_LP_AA_EMD G
+			FROM GT_C051_P A, GT_LP_AA_EMD G
 			WHERE A.DONG_NAM(+) = G.EMD_KOR_NM
 				]]>
 		<if test="guCde   != null and guCde   != ''">
@@ -168,7 +168,7 @@
 							TO_CHAR(ESB_YMD, 'YYYY-MM-DD') AS ESB_YMD,
 							XCE,
 							YCE
-						FROM	SMARTTGIS.GT_C051_P A
+						FROM	GT_C051_P A
 		]]>
 		<where>
 			<if test="guCde   != null and guCde   != ''">
@@ -217,7 +217,7 @@
 							TO_CHAR(ESB_YMD, 'YYYY-MM-DD') AS ESB_YMD,
 							XCE,
 							YCE
-					  FROM	SMARTTGIS.GT_C051_P A
+					  FROM	GT_C051_P A
 		]]>
 		<where>
 			<if test="guCde   != null and guCde   != ''">
@@ -269,7 +269,7 @@
 									COUNT(DECODE(MIRR_FRM, '1', 1, NULL)) AS A01,
 									COUNT(DECODE(MIRR_FRM, '2', 1, NULL)) AS A02,
 									COUNT(DECODE(MIRR_FRM, '3', 1, NULL)) AS A03
-							   FROM SMARTTGIS.GT_C051_P A
+							   FROM GT_C051_P A
 							   WHERE A.CSS_NAM IS NOT NULL
 		]]>
 			<if test="guCde   != null and guCde   != ''">
@@ -302,6 +302,58 @@
 		<![CDATA[
 				GROUP BY ROLLUP(A.CSS_NAM)
 					ORDER BY NAME NULLS FIRST  ) TEMP)TEMP)TEMP WHERE NUM BETWEEN #{rows} * ( #{page} - 1 ) + 1 AND #{rows}* #{page}
+ 		]]>
+	</select>
+
+<!-- 도로반사경 교차로기준 통계 엑셀-->
+	<select id="selectCrossFcltsExcelDown_GT_C051_P" parameterType="map" resultType="egovMap">
+		<![CDATA[
+				SELECT
+					DECODE(NAME, NULL, '합계', NAME) AS  "구분",
+					TO_CHAR(TOTAL, '999,999,999,999') AS "합계",
+					TO_CHAR(A01, '999,999,999,999') AS "원형",
+					TO_CHAR(A02, '999,999,999,999') AS "사각형",
+					TO_CHAR(A03, '999,999,999,999') AS "기타"
+				FROM (
+					SELECT
+						A.CSS_NAM AS NAME,
+						(COUNT(DECODE(MIRR_FRM, '1', 1, NULL)) + COUNT(DECODE(MIRR_FRM, '2', 1, NULL)) + COUNT(DECODE(MIRR_FRM, '3', 1, NULL))) AS TOTAL,
+						COUNT(DECODE(MIRR_FRM, '1', 1, NULL)) AS A01,
+						COUNT(DECODE(MIRR_FRM, '2', 1, NULL)) AS A02,
+						COUNT(DECODE(MIRR_FRM, '3', 1, NULL)) AS A03
+					FROM GT_C051_P A
+					WHERE A.CSS_NAM IS NOT NULL
+		]]>
+			<if test="guCde   != null and guCde   != ''">
+				AND A.GU_CDE  IN 	<foreach collection="guCde" item="item" open="(" close=")" separator=",">#{item}</foreach>
+			</if>
+			<if test="dongCde   != null and dongCde   != ''">
+				AND A.DONG_CDE  IN 	<foreach collection="dongCde" item="item" open="(" close=")" separator=",">#{item}</foreach>
+			</if>
+			<if test="policeCde   != null and policeCde   != ''">
+				AND A.PE_CDE  IN 	<foreach collection="policeCde" item="item" open="(" close=")" separator=",">#{item}</foreach>
+			</if>
+			<if test="statGbn   != null and statGbn   != ''">
+				AND A.MIRR_FRM  IN 	<foreach collection="statGbn" item="item" open="(" close=")" separator=",">#{item}</foreach>
+			</if>
+			<if test="mirrKndCde   != null and mirrKndCde   != ''">
+				AND A.MIRR_KND  IN 	<foreach collection="mirrKndCde" item="item" open="(" close=")" separator=",">#{item}</foreach>
+			</if>
+			<if test="jijuTypeCde   != null and jijuTypeCde   != ''">
+				AND A.JIJU_TYPE  IN 	<foreach collection="jijuTypeCde" item="item" open="(" close=")" separator=",">#{item}</foreach>
+			</if>
+			<if test="stYmd   != null and stYmd   != ''">
+				<![CDATA[AND A.ESB_YMD >= #{stYmd}]]>
+			</if>
+			<if test="enYmd   != null and enYmd   != ''">
+				<![CDATA[AND A.ESB_YMD <= #{enYmd}]]>
+			</if>
+			<if test="cssNam   != null and cssNam   != ''">
+		      <![CDATA[AND A.CSS_NAM LIKE '%' || #{cssNam} || '%']]>
+		    </if>
+		<![CDATA[
+					GROUP BY ROLLUP(A.CSS_NAM)
+					ORDER BY NAME NULLS FIRST) TEMP
  		]]>
 	</select>
 

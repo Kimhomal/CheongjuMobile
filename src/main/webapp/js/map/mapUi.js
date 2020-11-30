@@ -336,6 +336,69 @@ $(function(e){
 }());
 
 (function($, undefined) {
+	$.fn.extend({
+		popupWindow : function(href, options, method) {
+			if($(this).get(0).tagName != "FORM")  {
+				alert("form 태그가 아닙니다.");
+				return;
+			}
+	
+			var options = $.extend({}, {
+				id		: "_popup",
+				width	: screen.availWidth,
+				height	: screen.availHeight,
+				scrollbars : 0
+			}, options);
+			if(options.open == "ConstSelect"){//준공 도면에서 시설물 관리와 시설물 입력창을 2개 동시에 볼수 있게 구분값을 줌
+				options.id = "ConstSelect";
+			}else if(options.open == "ConstUpdate"){//준공 도면에서 시설물 관리와 시설물 입력창을 2개 동시에 볼수 있게 구분값을 줌
+				options.id = "ConstUpdate";
+			}else if(options.open == "MapModify"){//준공 도면에서 시설물 관리와 지도수정에서 지도수정버튼  2개 동시에 볼수 있게 구분값을 줌
+				options.id = "MapModify";
+			}
+			var winparam = 'resizable=1,status=1,dependent=1';
+			$.each(options, function(key, val) {
+				if (key != "id") winparam += ", " + key + "=" + val;
+			});
+	
+			var dualScreenLeft = window.screenLeft != undefined ? window.screenLeft : screen.left;
+			var dualScreenTop = window.screenTop != undefined ? window.screenTop : screen.top;
+	
+			var width = window.innerWidth ? window.innerWidth : document.documentElement.clientWidth ? document.documentElement.clientWidth : screen.width;
+			var height = window.innerHeight ? window.innerHeight : document.documentElement.clientHeight ? document.documentElement.clientHeight : screen.height;
+	
+			var left = ((width / 2) - (options.width / 2)) + dualScreenLeft;
+			var top = ((height / 2) - (options.height / 2)) + dualScreenTop;
+	
+			if (!options.hasOwnProperty("top")) winparam += ', top=' + top;
+			if (!options.hasOwnProperty("left")) winparam += ', left=' + left;
+	
+			$(this).attr("target", options.id) ;
+	
+			if(!method) method = "post";
+	
+			$(this).attr({action : href, method : method});
+	
+//			window.open('',options.id,winparam);
+	
+//			$(this).submit();
+			
+			var dataList = $(this).formToArray();
+			var obj = {};
+			for(var i in dataList){
+				obj[dataList[i].name] = dataList[i].value;
+			}
+			
+			$('#history-modal .modal-content').load(href, obj, function(){
+				console.log(this);
+				document.querySelector('#history-modal').show();
+			});
+			// return popUp;
+		}
+	});
+})(jQuery);
+
+(function($, undefined) {
 	// ------------- 객체정보 모달 생성 모듈 start ------------- //
 	var infoModal = function(options){
 		var that = this;
@@ -343,9 +406,11 @@ $(function(e){
 		this.target = opt.target || 'body';
 		
 		this.modalId = '';
+		this.subModalId = '';
 		this._closeFunc = undefined;
 		
 		this._createInfoModal(this.target);
+		this._createSubModal(this.target);
 	}
 	
 	infoModal.prototype = {
@@ -400,6 +465,76 @@ $(function(e){
 			
 			document.querySelector('#' + this.modalId).setAttribute('animation', 'lift'); // modal show&hide animation
 		},
+		_createSubModal: function(target){
+			var target = $('body');
+			var html = '';
+			var id = 'history-modal';
+			
+			html += '<ons-modal id="' + id + '" direction="up">';
+			
+			html += '<ons-navigator swipeable id="myNavigator" page="subModalPage1.html"></ons-navigator>';
+			
+			html += '<template id="subModalPage1.html">';
+			html += '<ons-page>';
+			html += '<ons-toolbar>';
+			html += '<div class="center">이력목록</div>';
+			html += '<div class="right">';
+			html += '<ons-toolbar-button onclick="$(this).closest(' + "'ons-modal'" + ')[0].hide(); document.querySelector(' + "'#myNavigator'" + ').resetToPage(' + "'subModalPage1.html'" + ')">닫기</ons-toolbar-button>';
+			html += '</div>';
+			html += '</ons-toolbar>';
+			html += '<div class="ui container lp_wrap modal-content"></div>';
+			html += '</ons-page>';
+			html += '</template>';
+			
+			html += '<template id="subModalPage2-1.html">';
+			html += '<ons-page>';
+			html += '<ons-toolbar>';
+			html += '<div class="left"><ons-back-button>뒤로</ons-back-button></div>';
+			html += '<div class="center">이력상세</div>';
+			html += '<div class="right">';
+			html += '<ons-toolbar-button onclick="$(this).closest(' + "'ons-modal'" + ')[0].hide(); document.querySelector(' + "'#myNavigator'" + ').resetToPage(' + "'subModalPage1.html'" + ')">닫기</ons-toolbar-button>';
+			html += '</div>';
+			html += '</ons-toolbar>';
+			html += '<div class="ui container lp_wrap history-detail"></div>';
+			html += '</ons-page>';
+			html += '</template>';
+			
+			html += '<template id="subModalPage2-2.html">';
+			html += '<ons-page>';
+			html += '<ons-toolbar>';
+			html += '<div class="left"><ons-back-button>뒤로</ons-back-button></div>';
+			html += '<div class="center">이력등록</div>';
+			html += '<div class="right">';
+			html += '<ons-toolbar-button onclick="$(this).closest(' + "'ons-modal'" + ')[0].hide(); document.querySelector(' + "'#myNavigator'" + ').resetToPage(' + "'subModalPage1.html'" + ')">닫기</ons-toolbar-button>';
+			html += '</div>';
+			html += '</ons-toolbar>';
+			html += '<div class="ui container lp_wrap history-register"></div>';
+			html += '</ons-page>';
+			html += '</template>';
+			
+			html += '<template id="subModalPage3.html">';
+			html += '<ons-page>';
+			html += '<ons-toolbar>';
+			html += '<div class="left"><ons-back-button>뒤로</ons-back-button></div>';
+			html += '<div class="center">이력수정</div>';
+			html += '<div class="right">';
+			html += '<ons-toolbar-button onclick="$(this).closest(' + "'ons-modal'" + ')[0].hide(); document.querySelector(' + "'#myNavigator'" + ').resetToPage(' + "'subModalPage1.html'" + ')">닫기</ons-toolbar-button>';
+			html += '</div>';
+			html += '</ons-toolbar>';
+			html += '<div class="ui container lp_wrap history-modify"></div>';
+			html += '</ons-page>';
+			html += '</template>';
+			
+			html += '</ons-modal>';
+
+			target.append(html);
+			
+			// 모바일 코드에서의 정보보기창 닫기 이벤트 바인딩 (정보보기창 닫기)
+			$('#' + id).find('.close-btn').on('click', function(){
+				console.log(this);
+				$(this).closest('ons-modal')[0].hide();
+			});
+		},
 		open: function(url, params){
 			var that = this;
 			this._closeFunc = params.closeFunc;
@@ -407,7 +542,10 @@ $(function(e){
 			$('#' + this.modalId + ' .modal-content').load(url, params.reqData, function(){
 				var $self = $(this);
 				
-				if ($self.find("input.datapicker_open").length > 0) $self.find("input.datapicker_open").datepicker();
+				if ($self.find("input.datapicker_open").length > 0){
+//					$self.find("input.datapicker_open").datepicker();
+					$self.find('input.datapicker_open').prop('type', 'date');
+				}
 				
 				if (params.reqData.method == "select") {
 					$self.find(".btn_wrap.tp2 > a").on("click", function(){//수정및 조회 버튼
@@ -443,6 +581,14 @@ $(function(e){
 				}
 				
 				document.querySelector('#' + that.modalId).show();
+				
+				$('#' + that.modalId).find('#safePop').closest('li').remove();
+				$('#' + that.modalId).find('.modal_close').click(function(){
+					document.querySelector('#' + that.modalId).hide({
+						callback: that.close,
+						instance: that
+					});
+				})
 			});
 		},
 		close: function(){
@@ -487,6 +633,8 @@ $(function(e){
 		this.target = opt.target || 'body';
 		this.manages = opt.manages || ['layerMng', 'totalSearch', 'facilitySearch', 'coordSearch'];
 		this.map = opt.map || undefined;
+		this.orientation = undefined; // 위치 서비스 객체. _activeOrientation 함수 실행 시 갱신
+		var positionActive = opt.position || false;
 		
 		this._dial = this._createDial(this.target);
 		this._modalList = {};
@@ -498,6 +646,11 @@ $(function(e){
 		
 		$('.clone-list').remove();
 		$.setPanel();
+		
+		this._activeOrientation();
+		if(positionActive){
+			this.orientation.requestPositionPermission();
+		}
 	}
 	
 	managePanels.prototype = {
@@ -592,11 +745,19 @@ $(function(e){
 				}
 			});
 		},
-		_activeOrientation: {
-			// 모바일 기기 위치 추적 기능 활성화
+		_activeOrientation: function(){
+			var that = this;
 			this.orientation = new Orientation({
 				map: this.map
-			})
+			});
+			
+			this._addDialItem('fa-crosshairs', function(e){
+				that.orientation.coordinatePopup(e);
+			});
+			
+			this._addDialItem('fa-compass', function(e){
+				that.orientation.toggleOrientation(e);
+			});
 		}
 	}
 	

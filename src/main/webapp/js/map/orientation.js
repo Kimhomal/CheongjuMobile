@@ -7,6 +7,8 @@
 		arrowRotate: 0, // 기기 방향 각도
 		geolocation: undefined, // geolocation watchPosition event 반환 id
 		position: undefined, // 현재 위치 좌표
+		coordinatePopup: false, // 현재 위치 popup 기능 활성화 여부
+		popupCallback: undefined, // moveend 이벤트 발생 시 실행할 popup 함수
 		map: undefined
 	} 
 	
@@ -19,6 +21,59 @@
 			console.error("gb.interaction.MeasureTip: 'map' is a required field.");
 			return;
 		}
+		
+		// 현재 위치
+		this.position_ = undefined;
+		
+		var iconStyle = new ol.style.Style({
+			image: new ol.style.Icon({
+				anchor: [0.5, 46],
+				anchorXUnits: 'fraction',
+				anchorYUnits: 'pixels',
+				src: (G.ctxPath || '') + '/images/pin.png'
+			})
+		});
+		
+		// 현재 위치 아이콘
+		this.iconFeature_ = new ol.Feature(new ol.geom.Point([0, 0]));
+		this.iconFeature_.set('style', iconStyle);
+		
+		/**
+		 * 임시 vector source
+		 * @type {ol.source.Vector}
+		 * @private
+		 */
+		this.cameraSource_ = new ol.source.Vector({
+			features: [this.iconFeature_]
+		});
+		
+		/**
+		 * 임시 vector layer
+		 * @type {ol.layer.Vector}
+		 * @private
+		 */
+		this.cameraVector_ = new ol.layer.Vector({
+			source : this.cameraSource_,
+			style: function(feature){
+				return feature.get('style');
+			}
+		});
+		
+		
+		this.popupId_ = 'mapPopup';
+		
+		/**
+		 * 현재 좌표 popup
+		 * @type {ol.Overlay}
+		 * @private
+		 */
+		this.popup_ = new ol.Overlay({
+			element: document.getElementById(this.popupId_),
+			positioning: 'bottom-center',
+			stopEvent: false,
+			offset: [0, -50]
+		});
+		this.map_.addOverlay(this.popup_);
 		
 		var strokes = {
 			'line' : new ol.style.Stroke({
@@ -85,13 +140,80 @@
 		});
 	}
 	
+	orientation.prototype.setPositionMarker_ = function(position){
+		if(!(position instanceof Array)){
+			return;
+		}
+		
+		if(position.length != 2){
+			return;
+		}
+		
+		this.position_ = position;
+		this.map_.getView().setCenter(position);
+		
+		var features = this.cameraSource_.getFeatures();
+		for(var i in features){
+			features[i].getGeometry().setCoordinates(position);
+		}
+		
+		document.getElementById('mapPopup-content').innerHTML = 
+			'<table class="ui very basic unstackable table"><tbody>' + 
+			'<tr><td class="label">x</td><td class="value">' + position[0].toFixed(3) + '</td></tr>' + 
+			'<tr><td class="label">y</td><td class="value">' + position[1].toFixed(3) + '</td></tr>' + 
+			'</tbody></table>';
+		this.popup_.setPosition(position);
+	}
+	
+	orientation.prototype.coordinatePopup = function(evt){
+		var that = this;
+		
+		if(!statics.coordinatePopup){
+			statics.popupCallback = function(evt){
+				var center = that.map_.getView().getCenter();
+				
+				that.setPositionMarker_(center);
+			}
+			
+			this.cameraVector_.setMap(this.map_);
+			evt.currentTarget.className = evt.currentTarget.className + ' active'; // 버튼 스타일 변경(활성화)
+			
+			if (navigator.geolocation) {
+				navigator.geolocation.getCurrentPosition(function(position, e) {
+					var center = ol.proj.transform([position.coords.longitude, position.coords.latitude], 'EPSG:4326', that.map_.getView().getProjection().getCode());
+					
+					that.setPositionMarker_(center);
+					
+				}, onErrorGeolocation);
+			} else {
+				ons.notification.alert('현재 위치가 제공되지않는 기기(또는 브라우저)입니다.');
+			}
+			
+			this.map_.on('moveend', statics.popupCallback);
+			
+			statics.coordinatePopup = true;
+		} else {
+			
+			this.cameraVector_.setMap(null);
+			evt.currentTarget.className = evt.currentTarget.className.replace(/\s*active/g, ''); // 버튼 스타일 변경(비활성화)
+			this.popup_.setPosition(undefined);
+			
+			this.map_.un('moveend', statics.popupCallback);
+			statics.coordinatePopup = false;
+		}
+	}
+	
 	// 기기 위치,방향 추적 기능 toggle 함수
 	orientation.prototype.toggleOrientation = function(evt){
 		var bool = statics.orientation;
 		
 		if(!bool){
+			if(statics.coordinatePopup){
+				this.coordinatePopup(evt);
+			}
+			
 			this.requestOrientationPermission(); // 기기 방향 감지 이벤트 생성
-			evt.parentElement.className = evt.parentElement.className + ' active'; // 버튼 스타일 변경(활성화)
+			evt.currentTarget.className = evt.currentTarget.className + ' active'; // 버튼 스타일 변경(활성화)
 		} else {
 			// iOS 외 기기들 orientation event 해제
 			window.removeEventListener('deviceorientationabsolute', orientationHandler_, true);
@@ -104,7 +226,7 @@
 			
 			statics.orientation = false;
 			
-			evt.parentElement.className = evt.parentElement.className.replace(/\s*active/g, ''); // 버튼 스타일 변경(비활성화)
+			evt.currentTarget.className = evt.currentTarget.className.replace(/\s*active/g, ''); // 버튼 스타일 변경(비활성화)
 			
 			if(navigator.geolocation){
 				// watchPosition event 비활성

@@ -1,7 +1,7 @@
 <%@ page language="java" contentType="text/html; charset=utf-8" pageEncoding="utf-8"%>
 <%@ include file="/common/taglibs.jsp" %>
 
-<form id="insertFrm" name="insertFrm">
+<form id="insertWorkFrm" name="insertWorkFrm">
 	<input type="hidden" id="mgrnu" name="mgrnu" value="${params.mgrnu}" />
 	<input type="hidden" id="method" name="method" value="${params.method}" />
 	<input type="hidden" id="facId" name="facId" value="<c:out value='${params.facId}'/>" />
@@ -16,7 +16,7 @@
 				<tbody>
 					<tr>
 	                    <th scope="row">시공일자</th>
-	                    <td><input id="worktm" name="worktm" type="text" class="ico_calendar datapicker_open" value="" style="width:100%"></td>
+	                    <td><input id="worktm" name="worktm" type="date" style="width:100%"></td>
                		 </tr>
 					<tr>
 						<th scope="row">시공자</th>
@@ -48,10 +48,12 @@ $(function() {
 		baseItem	: {name: "--- 선택 ---", value: ""}
 	}).load();
 
-	var $frm = $("#insertFrm");
+	var $frm = $("#insertWorkFrm");
 
 	$("#save").click(function() {
 		if(confirm("등록하시겠습니까?")) {
+			var modal = $(this).closest('ons-modal');
+			
 			var workBg = $("#workBg").val().replace(/(\n|\r\n)/g, '<br>');
 			$("#workBg").val(workBg);
 
@@ -62,7 +64,13 @@ $(function() {
 				success			:  function(json) {
 					if(json.cnt == 1){
 						alert("정상적으로 등록되었습니다.");
-						location.href="${context}/fclts/workListPopW.do?mgrnu="+$("#mgrnu").val()+"&method=select" + "&facId="+$("#facId").val();
+						var url="${context}/fclts/workListPopW.do?mgrnu="+$("#insertWorkFrm input[name=mgrnu]").val()+"&method=select" + "&facId="+$("#insertWorkFrm input[name=facId]").val();
+						var a = document.getElementById('myNavigator');
+						a.resetToPage('subModalPage1.html').then(function(){
+							modal.find('.modal-content').load(url, {}, function(){
+								console.log(this);
+							});
+						});
 					} else {
 						alert("오류발생, 다시 시도하여 주십시오1");
 					}
@@ -77,7 +85,15 @@ $(function() {
 	});
 
 	$("#list").click(function(){
-		location.href="${context}/fclts/workListPopW.do?mgrnu="+$("#mgrnu").val()+"&method=select" + "&facId="+$("#facId").val();
+		var modal = $(this).closest('ons-modal');
+		var url = "${context}/fclts/workListPopW.do?mgrnu="+$("#insertWorkFrm input[name=mgrnu]").val()+"&method=select" + "&facId="+$("#insertWorkFrm input[name=facId]").val();
+		var a = document.getElementById('myNavigator');
+		
+		a.resetToPage('subModalPage1.html').then(function(){
+			modal.find('.modal-content').load(url, {}, function(){
+				console.log(this);
+			});
+		});
 	});
 
 

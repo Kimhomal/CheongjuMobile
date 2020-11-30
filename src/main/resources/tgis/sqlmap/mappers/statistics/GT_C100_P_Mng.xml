@@ -9,15 +9,15 @@
 				SELECT
 					DECODE(NAME, NULL, '합계', NAME) AS  "구분",
 					TO_CHAR(TOTAL, '999,999,999,999') AS "합계",
-					TO_CHAR(A01, '999,999,999,999') AS "연속조명",
-					TO_CHAR(A02, '999,999,999,999') AS "국부조명"
+					TO_CHAR(A01, '999,999,999,999') AS "백열등",
+					TO_CHAR(A02, '999,999,999,999') AS "LED"
 				FROM (
 					SELECT
 						A.GU_NAM AS NAME,
-						(COUNT(DECODE(GBN, '0', 1, NULL)) + COUNT(DECODE(GBN, '1', 1, NULL))) AS TOTAL,
-						COUNT(DECODE(GBN, '0', 1, NULL)) AS A01,
-						COUNT(DECODE(GBN, '1', 1, NULL)) AS A02
-					FROM SMARTTGIS.GT_C100_P A
+						(COUNT(DECODE(GBN, '1', 1, NULL)) + COUNT(DECODE(GBN, '2', 1, NULL))) AS TOTAL,
+						COUNT(DECODE(GBN, '1', 1, NULL)) AS A01,
+						COUNT(DECODE(GBN, '2', 1, NULL)) AS A02
+					FROM GT_C100_P A
 		]]>
 		<where>
 			<if test="guCde   != null and guCde   != ''">
@@ -51,14 +51,14 @@
 		    	SELECT
 					DECODE(NAME, NULL, '합계', NAME) AS  "구분",
 					TO_CHAR(TOTAL, '999,999,999,999') AS "합계",
-					TO_CHAR(A01, '999,999,999,999') AS "연속조명",
-					TO_CHAR(A02, '999,999,999,999') AS "국부조명"
+					TO_CHAR(A01, '999,999,999,999') AS "백열등",
+					TO_CHAR(A02, '999,999,999,999') AS "LED"
 				FROM  (
 				SELECT  A.PE_NAM AS NAME,
-						(COUNT(DECODE(GBN, '0', 1, NULL)) + COUNT(DECODE(GBN, '1', 1, NULL))) AS TOTAL,
-						COUNT(DECODE(GBN, '0', 1, NULL)) AS A01,
-						COUNT(DECODE(GBN, '1', 1, NULL)) AS A02
-				FROM SMARTTGIS.GT_C100_P A
+						(COUNT(DECODE(GBN, '1', 1, NULL)) + COUNT(DECODE(GBN, '2', 1, NULL))) AS TOTAL,
+						COUNT(DECODE(GBN, '1', 1, NULL)) AS A01,
+						COUNT(DECODE(GBN, '2', 1, NULL)) AS A02
+				FROM GT_C100_P A
 		]]>
 		<where>
 			<if test="guCde   != null and guCde   != ''">
@@ -92,14 +92,14 @@
 		SELECT
 					DECODE(NAME, NULL, '합계', NAME) AS  "구분",
 					TO_CHAR(TOTAL, '999,999,999,999') AS "합계",
-					TO_CHAR(A01, '999,999,999,999') AS "연속조명",
-					TO_CHAR(A02, '999,999,999,999') AS "국부조명"
+					TO_CHAR(A01, '999,999,999,999') AS "백열등",
+					TO_CHAR(A02, '999,999,999,999') AS "LED"
 				FROM  (
 			SELECT  G.EMD_KOR_NM AS NAME,
-					(COUNT(DECODE(GBN, '0', 1, NULL)) + COUNT(DECODE(GBN, '1', 1, NULL))) AS TOTAL,
-					COUNT(DECODE(GBN, '0', 1, NULL)) AS A01,
-					COUNT(DECODE(GBN, '1', 1, NULL)) AS A02
-			FROM SMARTTGIS.GT_C100_P A, SMARTTGIS.GT_LP_AA_EMD G
+					(COUNT(DECODE(GBN, '1', 1, NULL)) + COUNT(DECODE(GBN, '2', 1, NULL))) AS TOTAL,
+					COUNT(DECODE(GBN, '1', 1, NULL)) AS A01,
+					COUNT(DECODE(GBN, '2', 1, NULL)) AS A02
+			FROM GT_C100_P A, GT_LP_AA_EMD G
 			WHERE A.DONG_NAM(+) = G.EMD_KOR_NM
 				]]>
 		<if test="guCde   != null and guCde   != ''">
@@ -143,7 +143,7 @@
 							TO_CODE('C100_P','GBN',GBN) AS GBN_NAM,
 							XCE,
 							YCE
-						FROM	SMARTTGIS.GT_C100_P A
+						FROM	GT_C100_P A
 		]]>
 		<where>
 			<if test="guCde   != null and guCde   != ''">
@@ -185,7 +185,7 @@
 							TO_CODE('C100_P','GBN',GBN) AS GBN_NAM,
 							XCE,
 							YCE
-					  FROM	SMARTTGIS.GT_C100_P A
+					  FROM	GT_C100_P A
 		]]>
 		<where>
 			<if test="guCde   != null and guCde   != ''">
@@ -222,14 +222,14 @@
 				 FROM	(SELECT
 							DECODE(NAME, NULL, '합계', NAME) AS  "구분",
 							TO_CHAR(TOTAL, '999,999,999,999') AS "합계",
-							TO_CHAR(A01, '999,999,999,999') AS "연속조명",
-							TO_CHAR(A02, '999,999,999,999') AS "국부조명"
+							TO_CHAR(A01, '999,999,999,999') AS "백열등",
+							TO_CHAR(A02, '999,999,999,999') AS "LED"
 						 FROM (SELECT
 									A.CSS_NAM AS NAME,
-									(COUNT(DECODE(GBN, '0', 1, NULL)) + COUNT(DECODE(GBN, '1', 1, NULL))) AS TOTAL,
-									COUNT(DECODE(GBN, '0', 1, NULL)) AS A01,
-									COUNT(DECODE(GBN, '1', 1, NULL)) AS A02
-							   FROM SMARTTGIS.GT_C100_P A
+									(COUNT(DECODE(GBN, '1', 1, NULL)) + COUNT(DECODE(GBN, '2', 1, NULL))) AS TOTAL,
+									COUNT(DECODE(GBN, '1', 1, NULL)) AS A01,
+									COUNT(DECODE(GBN, '2', 1, NULL)) AS A02
+							   FROM GT_C100_P A
 							   WHERE A.CSS_NAM IS NOT NULL
 		]]>
 			<if test="guCde   != null and guCde   != ''">
@@ -256,6 +256,50 @@
 		<![CDATA[
 				GROUP BY ROLLUP(A.CSS_NAM)
 					ORDER BY NAME NULLS FIRST  ) TEMP)TEMP)TEMP WHERE NUM BETWEEN #{rows} * ( #{page} - 1 ) + 1 AND #{rows}* #{page}
+ 		]]>
+	</select>
+
+<!-- 가로등 교차로기준 통계 엑셀-->
+	<select id="selectCrossFcltsExcelDown_GT_C100_P" parameterType="map" resultType="egovMap">
+		<![CDATA[
+				SELECT
+					DECODE(NAME, NULL, '합계', NAME) AS  "구분",
+					TO_CHAR(TOTAL, '999,999,999,999') AS "합계",
+					TO_CHAR(A01, '999,999,999,999') AS "백열등",
+					TO_CHAR(A02, '999,999,999,999') AS "LED"
+				FROM (
+					SELECT
+						A.CSS_NAM AS NAME,
+						(COUNT(DECODE(GBN, '0', 1, NULL)) + COUNT(DECODE(GBN, '1', 1, NULL))) AS TOTAL,
+						COUNT(DECODE(GBN, '0', 1, NULL)) AS A01,
+						COUNT(DECODE(GBN, '1', 1, NULL)) AS A02
+					FROM GT_C100_P A
+					WHERE A.CSS_NAM IS NOT NULL
+		]]>
+			<if test="guCde   != null and guCde   != ''">
+				AND A.GU_CDE  IN 	<foreach collection="guCde" item="item" open="(" close=")" separator=",">#{item}</foreach>
+			</if>
+			<if test="dongCde   != null and dongCde   != ''">
+				AND A.DONG_CDE  IN 	<foreach collection="dongCde" item="item" open="(" close=")" separator=",">#{item}</foreach>
+			</if>
+			<if test="policeCde   != null and policeCde   != ''">
+				AND A.PE_CDE  IN 	<foreach collection="policeCde" item="item" open="(" close=")" separator=",">#{item}</foreach>
+			</if>
+			<if test="statGbn   != null and statGbn   != ''">
+				AND A.GBN  IN 	<foreach collection="statGbn" item="item" open="(" close=")" separator=",">#{item}</foreach>
+			</if>
+			<if test="stYmd   != null and stYmd   != ''">
+				<![CDATA[AND A.ESB_YMD >= #{stYmd}]]>
+			</if>
+			<if test="enYmd   != null and enYmd   != ''">
+				<![CDATA[AND A.ESB_YMD <= #{enYmd}]]>
+			</if>
+			<if test="cssNam   != null and cssNam   != ''">
+		      <![CDATA[AND A.CSS_NAM LIKE '%' || #{cssNam} || '%']]>
+		    </if>
+		<![CDATA[
+					GROUP BY ROLLUP(A.CSS_NAM)
+					ORDER BY NAME NULLS FIRST) TEMP
  		]]>
 	</select>
 

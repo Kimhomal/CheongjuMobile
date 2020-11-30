@@ -47,7 +47,6 @@
 
 	<!-- 공통 윈도우 팝업 템플릿(1단계) -->
 	<definition name="**/*PopW" template="/WEB-INF/jsp/tiles/popW/layout.jsp">
-		<put-attribute name="header" value="/WEB-INF/jsp/tiles/popW/header.jsp" />
 		<put-attribute name="content" value="/WEB-INF/jsp/{1}/{2}PopW.jsp" />
 	</definition>
 

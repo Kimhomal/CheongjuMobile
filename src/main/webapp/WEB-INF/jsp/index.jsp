@@ -16,13 +16,13 @@
 <div class="ui container content-wrap">
 	<div class="ui raised segments">
 		<div class="ui horizontal segments">
-			<div class="ui segment">
+			<div class="ui segment ripple-effect">
 				<div class="ui list">
 					<div class="item">
 						<!-- <div class="right floated content">
 							<div class="description">2020-11-10</div>
 						</div> -->
-						<img class="ui avatar image" src="<c:url value='/images/main/ico_notice_small.png'/>" alt="notice">
+						<img class="ui mini image" src="<c:url value='/images/main/ico_notice_small.png'/>" alt="notice">
 						<div class="content">
 							<a class="header">공지사항</a>
 							<div class="description">청주시 교통안전시설정보 제공</div>
@@ -33,22 +33,22 @@
 			</div>
 		</div>
 		<div class="ui horizontal two segments">
-			<div class="ui center aligned segment" onclick="location.href='<c:url value='/board/notice/selectNoticeList.do'/>'">
-				<img class="ui centered image" src="<c:url value='/images/main/ico_notice.png'/>" alt="notice">
+			<div class="ui center aligned segment ripple-effect" onclick="location.href='<c:url value='/board/notice/selectNoticeList.do'/>'">
+				<img class="ui centered image main" src="<c:url value='/images/main/ico_notice.png'/>" alt="notice">
 				<div class="content-txt">공지사항</div>
 			</div>
-			<div class="ui center aligned segment" onclick="location.href='<c:url value='/introduce/introduce01.do'/>'">
-				<img class="ui centered image" src="<c:url value='/images/main/ico_traffic.png'/>" alt="notice">
+			<div class="ui center aligned segment ripple-effect" onclick="location.href='<c:url value='/introduce/introduce01.do'/>'">
+				<img class="ui centered image main" src="<c:url value='/images/main/ico_traffic.png'/>" alt="notice">
 				<div class="content-txt">교통안전시설물이란?</div>
 			</div>
 		</div>
 		<div class="ui horizontal two segments">
-			<div class="ui center aligned segment" onclick="location.href='<c:url value='/map/mapMain.do'/>'">
-				<img class="ui centered image" src="<c:url value='/images/main/ico_map.png'/>" alt="notice">
+			<div class="ui center aligned segment ripple-effect" onclick="location.href='<c:url value='/map/mapMain.do'/>'">
+				<img class="ui centered image main" src="<c:url value='/images/main/ico_map.png'/>" alt="notice">
 				<div class="content-txt">지도서비스</div>
 			</div>
-			<div class="ui center aligned segment">
-				<img class="ui centered image" src="<c:url value='/images/main/ico_pin.png'/>" alt="notice">
+			<div class="ui center aligned segment ripple-effect" onclick="location.href='<c:url value='/map/mapMain.do?position=true'/>'">
+				<img class="ui centered image main" src="<c:url value='/images/main/ico_pin.png'/>" alt="notice">
 				<div class="content-txt">위치기반 시설물 검색</div>
 			</div>
 		</div>

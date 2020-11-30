@@ -1,7 +1,7 @@
 <%@ page language="java" contentType="text/html; charset=utf-8" pageEncoding="utf-8"%>
 <%@ include file="/common/taglibs.jsp" %>
 
-<form id="updateFrm" name="updateFrm">
+<form id="updateWorkFrm" name="updateWorkFrm">
 	<input type="hidden" id="mgrnu" name="mgrnu" value="${params.mgrnu}" />
 	<input type="hidden" id="method" name="method" value="${params.method}" />
 	<input type="hidden" id="facId" name="facId" value="<c:out value='${params.facId}'/>" />
@@ -37,7 +37,7 @@
 			</table>
 					<div class="btn_wrap area_r">
 				<a href="#this" id="save" class="btn sml blue">수정완료</a>
-				<a href="#this" id="list" class="btn sml gray">취소</a>
+				<a href="#this" id="cancelUpdate" class="btn sml gray">취소</a>
 			</div>
 		</form>
 
@@ -51,11 +51,12 @@ $(function() {
 		baseItem	: {name: "--- 선택 ---", value: ""}
 	}).load({select: "${result.workCde}"});
 
-	var $frm = $("#updateFrm");
+	var $frm = $("#updateWorkFrm");
 
 	$("#save").click(function() {
 		if(confirm("수정하시겠습니까?")) {
-
+			var modal = $(this).closest('ons-modal');
+			debugger;
 			var options = {
 				url				: "${context}/fclts/updateWorkList.json",
 				type			: "post",
@@ -63,7 +64,14 @@ $(function() {
 				success			:  function(json) {
 					if(json.cnt == 1){
 						alert("정상적으로 수정되었습니다.");
-						location.href="${context}/fclts/crudPopW.do?mgrnu="+$("#mgrnu").val()+"&method=select" + "&facId="+$("#facId").val() + "&mgrnuIdx="+$("#mgrnuIdx").val();
+						var url = "${context}/fclts/crudPopW.do?mgrnu="+$("#updateWorkFrm input[name=mgrnu]").val()+"&method=select" + "&facId="+$("#updateWorkFrm input[name=facId]").val() + "&mgrnuIdx="+$("#updateWorkFrm input[name=mgrnuIdx]").val();
+						var a = document.getElementById('myNavigator');
+						a.popPage().then(function(){
+							modal.find('.history-detail').load(url, {}, function(){
+								console.log(this);
+								$(this).find('.area_l').remove();
+							});
+						});
 					} else {
 						alert("오류발생, 다시 시도하여 주십시오1");
 					}
@@ -77,10 +85,17 @@ $(function() {
 		}
 	});
 
-	$("#list").click(function(){
+	$("#cancelUpdate").click(function(){
 		if(confirm("취소하시겠습니까?")) {
-			$("#method").val("select");
-	 		$("#updateFrm").submit();
+	 		var modal = $(this).closest('ons-modal');
+			var url = "${context}/fclts/workListPopW.do?mgrnu="+$("#updateWorkFrm input[name=mgrnu]").val()+"&method=select" + "&facId="+$("#updateWorkFrm input[name=facId]").val();
+			var a = document.getElementById('myNavigator');
+			
+			a.resetToPage('subModalPage1.html').then(function(){
+				modal.find('.modal-content').load(url, {}, function(){
+					console.log(this);
+				});
+			});
 		}
 	});
 

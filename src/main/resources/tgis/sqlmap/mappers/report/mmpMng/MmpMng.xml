@@ -2,164 +2,187 @@
 <!DOCTYPE mapper   PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
 <mapper namespace="tgis.report.mmpMng.service.MmpMngMapper">
-	<select id="selectFacilCntList" parameterType="map" resultType="egovMap">
+
+	<select id="selectMonthInfo" parameterType="map" resultType="egovMap">
 		<![CDATA[
-			SELECT MTN_YYYYMM.KND, SUM(CNT) as cnt, M_CODE.CMMT AS KND_NAME
-			FROM MTN_YYYYMM LEFT JOIN M_CODE ON (M_CODE.CD=MTN_YYYYMM.KND AND (M_CODE.REFCDTP='MTN_YYYYMM' AND M_CODE.CDN='KND'))
-			WHERE 1=1
-			AND MTN_YYYYMM.GUBUN IN ('교통안전시설물', '도로안전시설물', '특수교통운영구역')
+			WITH TEMP AS (
+				SELECT
+					YEAR,
+					MONTH,
+					COUNT(DECODE(LEN,NULL,DECODE(FACIL_GBN,'교통안전시설물',1,NULL),NULL)) AS TRAFFIC_CNT1,
+					TRUNC(SUM(DECODE(DECODE(FACIL_GBN,'교통안전시설물',LEN,NULL),NULL,0,LEN)),2) AS TRAFFIC_CNT2,
+					COUNT(DECODE(LEN,NULL,DECODE(FACIL_GBN,'도로안전시설물',1,NULL),NULL)) AS ROD_CNT1,
+					TRUNC(SUM(DECODE(DECODE(FACIL_GBN,'도로안전시설물',LEN,NULL),NULL,0,LEN)),2) AS ROD_CNT2,
+					COUNT(DECODE(LEN,NULL,DECODE(FACIL_GBN,'특수교통운영구역',1,NULL),NULL)) AS SPECIAL_CNT1,
+					TRUNC(SUM(DECODE(DECODE(FACIL_GBN,'특수교통운영구역',LEN,NULL),NULL,0,LEN)),2) AS SPECIAL_CNT2
+				FROM TBL_FACIL_HIS
+				WHERE 1=1
 		]]>
 
-		<if test="fromDate != null and fromDate != ''">
-			<![CDATA[
-				AND MTN_YM >= #{fromDate}
-			]]>
+		<if test="fromDate != '' and fromDate != null">
+			<![CDATA[ AND SUBSTR(TO_CHAR(REG_YMD,'YYYY-MM-DD'), 0, 7) >= (SUBSTR(#{fromDate}, 0, 7)) ]]>
 		</if>
-		<if test="toDate != null and toDate != ''">
-			<![CDATA[
-				AND MTN_YM <= #{toDate}
-			]]>
+
+		<if test="toDate != '' and toDate != null">
+			<![CDATA[ AND SUBSTR(TO_CHAR(REG_YMD,'YYYY-MM-DD'), 0, 7) <= (SUBSTR(#{toDate}, 0, 7)) ]]>
 		</if>
 
 		<![CDATA[
-			GROUP BY KND, M_CODE.CMMT
+				GROUP BY YEAR, MONTH
+				ORDER BY YEAR, MONTH)
+
+			SELECT	DECODE(YEAR, NULL, '합계', YEAR) AS YEAR,
+					MONTH,
+					TRAFFIC_CNT1_TOTAL,
+					TRAFFIC_CNT2_TOTAL,
+					ROD_CNT1_TOTAL,
+					ROD_CNT2_TOTAL,
+					SPECIAL_CNT1_TOTAL,
+					SPECIAL_CNT2_TOTAL
+			FROM	(
+					SELECT
+						YEAR,
+						MONTH,
+						SUM(TRAFFIC_CNT1) AS TRAFFIC_CNT1_TOTAL,
+						SUM(TRAFFIC_CNT2) AS TRAFFIC_CNT2_TOTAL,
+						SUM(ROD_CNT1) AS ROD_CNT1_TOTAL,
+						SUM(ROD_CNT2) AS ROD_CNT2_TOTAL,
+						SUM(SPECIAL_CNT1) AS SPECIAL_CNT1_TOTAL,
+						SUM(SPECIAL_CNT2) AS SPECIAL_CNT2_TOTAL
+					FROM TEMP
+					GROUP BY ROLLUP(YEAR, MONTH) HAVING GROUPING_ID(YEAR, MONTH) IN (0,3)
+					ORDER BY YEAR NULLS FIRST, MONTH)
 		]]>
 	</select>
 
-	<select id="selectMonthCnt" parameterType="map" resultType="egovMap">
+	<select id="selectFacilCnt" parameterType="map" resultType="egovMap">
 		<![CDATA[
+			SELECT *
+			FROM (
 			SELECT
-				SUM (DECODE(KND,
-					'제어기',CNT,
-					'신호등',CNT,
-					'지주',CNT,
-					'부착대',CNT ,
-					'검지기',CNT,
-					'안전표지',CNT,
-					'유턴구역',CNT,
-					'정지선',CNT,
-					'노면방향표시',CNT,
-					'노면문자표시',CNT,
-					'횡단보도',CNT,
-					'횡단보도예고표시',CNT,
-					'정차금지지대',CNT,
-					'주차구획',CNT
-				) )  AS SUM1 ,
-
-				SUM (DECODE(KND,
-					'중앙선',CNT,
-					'차선',CNT,
-					'주차금지',CNT
-				) )  AS SUM2,
-
-				SUM (DECODE(KND,
-					'CCTV',CNT,
-					'전광판',CNT,
-					'음향신호기',CNT,
-					'과속방지턱',CNT,
-					'도로반사경',CNT,
-					'충격흡수시설',CNT,
-					'장애물표적표시',CNT ,
-					'시선유도봉',CNT,
-					'갈매기표지',CNT,
-					'고원식교차로',CNT,
-					'교통섬',CNT,
-					'조명시설',CNT
-				) )  AS SUM3,
-
-				SUM (DECODE(KND,
-					'표지병',CNT,
-					'방호울타리',CNT,
-					'칼라포장',CNT,
-					'미끄럼방지시설',CNT
-				) )  AS SUM4,
-
-				SUM (DECODE(KND,
-					'시선유도표지',CNT,
-					'입체횡단시설',CNT,
-					'어린이보호구역',CNT,
-					'노인보호구역',CNT,
-					'일방통행',CNT
-				) )  AS SUM5,
-
-				SUM (DECODE(KND,
-					'자전거전용도로',CNT
-				) )  AS SUM6
-
-			FROM MTN_YYYYMM
-			LEFT JOIN M_CODE ON (M_CODE.CD=MTN_YYYYMM.KND AND (M_CODE.REFCDTP='MTN_YYYYMM' AND M_CODE.CDN='KND'))
+				(SELECT COUNT(*) FROM TBL_FACIL_HIS WHERE FACIL_NAM = '검지기') AS A049_CNT,
+				(SELECT COUNT(*) FROM TBL_FACIL_HIS WHERE FACIL_NAM = '공영주차장') AS A111_CNT,
+				(SELECT COUNT(*) FROM TBL_FACIL_HIS WHERE FACIL_NAM = '노면문자표시') AS A054_CNT,
+				(SELECT COUNT(*) FROM TBL_FACIL_HIS WHERE FACIL_NAM = '노면방향표시') AS A055_CNT,
+				DECODE((SELECT SUM(LEN) FROM TBL_FACIL_HIS WHERE FACIL_NAM = '배선도'),NULL,0,(SELECT SUM(LEN) FROM TBL_FACIL_HIS WHERE FACIL_NAM = '배선도')) AS A078_CNT,
+				(SELECT COUNT(*) FROM TBL_FACIL_HIS WHERE FACIL_NAM = '부착대') AS A057_CNT,
+				(SELECT COUNT(*) FROM TBL_FACIL_HIS WHERE FACIL_NAM = '신호등') AS A110_CNT,
+				(SELECT COUNT(*) FROM TBL_FACIL_HIS WHERE FACIL_NAM = '보행등보조장치') AS BOHAENG_CNT,
+				(SELECT COUNT(*) FROM TBL_FACIL_HIS WHERE FACIL_NAM = '안전지대') AS A005_CNT,
+				(SELECT COUNT(*) FROM TBL_FACIL_HIS WHERE FACIL_NAM = '안전표지') AS A064_CNT,
+				(SELECT COUNT(*) FROM TBL_FACIL_HIS WHERE FACIL_NAM = '음향신호기') AS A119_CNT,
+				(SELECT COUNT(*) FROM TBL_FACIL_HIS WHERE FACIL_NAM = '보행자버튼') AS A090_CNT,
+				DECODE((SELECT SUM(LEN) FROM TBL_FACIL_HIS WHERE FACIL_NAM = '유턴구역'),NULL,0,(SELECT SUM(LEN) FROM TBL_FACIL_HIS WHERE FACIL_NAM = '유턴구역')) AS A079_CNT,
+				DECODE((SELECT SUM(LEN) FROM TBL_FACIL_HIS WHERE FACIL_NAM = '정지선'),NULL,0,(SELECT SUM(LEN) FROM TBL_FACIL_HIS WHERE FACIL_NAM = '정지선')) AS A081_CNT,
+				(SELECT COUNT(*) FROM TBL_FACIL_HIS WHERE FACIL_NAM = '정차금지지대') AS A085_CNT,
+				(SELECT COUNT(*) FROM TBL_FACIL_HIS WHERE FACIL_NAM = '제어기') AS A061_CNT,
+				(SELECT COUNT(*) FROM TBL_FACIL_HIS WHERE FACIL_NAM = '주차구획') AS A080_CNT,
+				DECODE((SELECT SUM(LEN) FROM TBL_FACIL_HIS WHERE FACIL_NAM = '주차금지'),NULL,0,(SELECT SUM(LEN) FROM TBL_FACIL_HIS WHERE FACIL_NAM = '주차금지')) AS A082_CNT,
+				DECODE((SELECT SUM(LEN) FROM TBL_FACIL_HIS WHERE FACIL_NAM = '중앙선'),NULL,0,(SELECT SUM(LEN) FROM TBL_FACIL_HIS WHERE FACIL_NAM = '중앙선')) AS A083_CNT,
+				(SELECT COUNT(*) FROM TBL_FACIL_HIS WHERE FACIL_NAM = '지주') AS A062_CNT,
+				DECODE((SELECT SUM(LEN) FROM TBL_FACIL_HIS WHERE FACIL_NAM = '차선'),NULL,0,(SELECT SUM(LEN) FROM TBL_FACIL_HIS WHERE FACIL_NAM = '차선')) AS A084_CNT,
+				(SELECT COUNT(*) FROM TBL_FACIL_HIS WHERE FACIL_NAM = '통신맨홀') AS C024_CNT,
+				(SELECT COUNT(*) FROM TBL_FACIL_HIS WHERE FACIL_NAM = '횡단보도') AS A004_CNT,
+				(SELECT COUNT(*) FROM TBL_FACIL_HIS WHERE FACIL_NAM = '횡단보도예고표시') AS A068_CNT,
+				(SELECT COUNT(*) FROM TBL_FACIL_HIS WHERE FACIL_NAM = '횡단보도조명') AS C022_CNT,
+				(SELECT COUNT(*) FROM TBL_FACIL_HIS WHERE FACIL_NAM = '보행신호 음성안내 보조장치') AS C131_CNT,
+				(SELECT COUNT(*) FROM TBL_FACIL_HIS WHERE FACIL_NAM = 'CCTV') AS A069_CNT,
+				(SELECT COUNT(*) FROM TBL_FACIL_HIS WHERE FACIL_NAM = '가로등') AS C100_CNT,
+				(SELECT COUNT(*) FROM TBL_FACIL_HIS WHERE FACIL_NAM = '갈매기표지') AS C088_CNT,
+				(SELECT COUNT(*) FROM TBL_FACIL_HIS WHERE FACIL_NAM = '고원식교차로') AS C104_CNT,
+				(SELECT COUNT(*) FROM TBL_FACIL_HIS WHERE FACIL_NAM = '과속방지턱') AS A067_CNT,
+				(SELECT COUNT(*) FROM TBL_FACIL_HIS WHERE FACIL_NAM = '교통섬') AS C109_CNT,
+				(SELECT COUNT(*) FROM TBL_FACIL_HIS WHERE FACIL_NAM = '도로반사경') AS C051_CNT,
+				(SELECT COUNT(*) FROM TBL_FACIL_HIS WHERE FACIL_NAM = '미끄럼방지시설') AS C091_CNT,
+				(SELECT COUNT(*) FROM TBL_FACIL_HIS WHERE FACIL_NAM = '방호울타리') AS C059_CNT,
+				(SELECT COUNT(*) FROM TBL_FACIL_HIS WHERE FACIL_NAM = '시선유도봉') AS C092_CNT,
+				(SELECT COUNT(*) FROM TBL_FACIL_HIS WHERE FACIL_NAM = '시선유도표지') AS C093_CNT,
+				(SELECT COUNT(*) FROM TBL_FACIL_HIS WHERE FACIL_NAM = '입체횡단시설') AS C095_CNT,
+				(SELECT COUNT(*) FROM TBL_FACIL_HIS WHERE FACIL_NAM = '장애물표적표지') AS C096_CNT,
+				(SELECT COUNT(*) FROM TBL_FACIL_HIS WHERE FACIL_NAM = '전광판') AS C097_CNT,
+				(SELECT COUNT(*) FROM TBL_FACIL_HIS WHERE FACIL_NAM = '점자블럭') AS C094_CNT,
+				(SELECT COUNT(*) FROM TBL_FACIL_HIS WHERE FACIL_NAM = '충격흡수시설') AS C098_CNT,
+				(SELECT COUNT(*) FROM TBL_FACIL_HIS WHERE FACIL_NAM = '컬러포장') AS C107_CNT,
+				DECODE((SELECT SUM(LEN) FROM TBL_FACIL_HIS WHERE FACIL_NAM = '표지병'),NULL,0,(SELECT SUM(LEN) FROM TBL_FACIL_HIS WHERE FACIL_NAM = '표지병')) AS A065_CNT,
+				(SELECT COUNT(*) FROM TBL_FACIL_HIS WHERE FACIL_NAM = '투광기(횡단보도조명)') AS C130_CNT,
+				(SELECT COUNT(*) FROM TBL_FACIL_HIS WHERE FACIL_NAM = '노인보호구역') AS C115_CNT,
+				(SELECT COUNT(*) FROM TBL_FACIL_HIS WHERE FACIL_NAM = '어린이보호구역') AS C101_CNT,
+				(SELECT COUNT(*) FROM TBL_FACIL_HIS WHERE FACIL_NAM = '일방통행') AS C103_CNT,
+				(SELECT COUNT(*) FROM TBL_FACIL_HIS WHERE FACIL_NAM = '장애인보호구역') AS C117_CNT,
+				(SELECT COUNT(*) FROM TBL_FACIL_HIS WHERE FACIL_NAM = '교차로') AS A008_CNT,
+				(SELECT COUNT(*) FROM TBL_FACIL_HIS WHERE FACIL_NAM = '자전거전용도로') AS C114_CNT,
+				(SELECT COUNT(*) FROM TBL_FACIL_HIS WHERE FACIL_NAM = 'BIS단말기') AS C118_CNT,
+				(SELECT COUNT(*) FROM TBL_FACIL_HIS WHERE FACIL_NAM = '승강장') AS C111_CNT
+			FROM TBL_FACIL_HIS
 			WHERE 1=1
 		]]>
 
 		<if test="fromDate != '' and fromDate != null">
-			<![CDATA[ AND SUBSTR(MTN_YM, 0, 7) >= (SUBSTR(#{fromDate}, 0, 7)) ]]>
+			<![CDATA[ AND SUBSTR(TO_CHAR(REG_YMD,'YYYY-MM-DD'), 0, 7) >= (SUBSTR(#{fromDate}, 0, 7)) ]]>
 		</if>
 
 		<if test="toDate != '' and toDate != null">
-			<![CDATA[ AND SUBSTR(MTN_YM, 0, 7) <= (SUBSTR(#{toDate}, 0, 7)) ]]>
+			<![CDATA[ AND SUBSTR(TO_CHAR(REG_YMD,'YYYY-MM-DD'), 0, 7) <= (SUBSTR(#{toDate}, 0, 7)) ]]>
 		</if>
+
+		<![CDATA[
+			) GROUP BY A049_CNT, A111_CNT, A054_CNT, A055_CNT, A078_CNT, A057_CNT, A110_CNT, BOHAENG_CNT,
+			A005_CNT, A064_CNT, A119_CNT, A090_CNT, A079_CNT, A081_CNT, A085_CNT, A061_CNT, A080_CNT, A082_CNT,
+			A083_CNT, A062_CNT, A084_CNT, C024_CNT, A004_CNT, A068_CNT, C022_CNT, C131_CNT, A069_CNT, C100_CNT,
+			C088_CNT, C104_CNT, A067_CNT, C109_CNT, C051_CNT, C091_CNT, C059_CNT, C092_CNT, C093_CNT, C095_CNT,
+			C096_CNT, C097_CNT, C094_CNT, C098_CNT, C107_CNT, A065_CNT,C130_CNT, C115_CNT, C101_CNT, C103_CNT,
+			C117_CNT, A008_CNT, C114_CNT, C118_CNT, C111_CNT
+		]]>
 	</select>
 
-	<select id="selectYearCnt" parameterType="map" resultType="egovMap">
+	<select id="selectDetailList_GT_A049_P" parameterType="map" resultType="egovMap">
 		<![CDATA[
-			SELECT
-				SUM (DECODE(KND,
-					'제어기',CNT,
-					'신호등',CNT,
-					'지주',CNT,
-					'부착대',CNT ,
-					'검지기',CNT,
-					'안전표지',CNT,
-					'유턴구역',CNT,
-					'정지선',CNT,
-					'노면방향표시',CNT,
-					'노면문자표시',CNT,
-					'횡단보도',CNT,
-					'횡단보도예고표시',CNT,
-					'정차금지지대',CNT,
-					'주차구획',CNT,
-					'CCTV',CNT,
-					'전광판',CNT,
-					'음향신호기',CNT,
-					'과속방지턱',CNT,
-					'도로반사경',CNT,
-					'충격흡수시설',CNT,
-					'장애물표적표시',CNT ,
-					'시선유도봉',CNT,
-					'갈매기표지',CNT,
-					'고원식교차로',CNT,
-					'교통섬',CNT,
-					'조명시설',CNT,
-					'시선유도표지',CNT,
-					'입체횡단시설',CNT,
-					'어린이보호구역',CNT,
-					'노인보호구역',CNT,
-					'일방통행',CNT
-				) )  AS SUM1 ,
-
-				SUM (DECODE(KND,
-					'중앙선',CNT,
-					'차선',CNT,
-					'주차금지',CNT,
-					'표지병',CNT,
-					'방호울타리',CNT,
-					'칼라포장',CNT,
-					'미끄럼방지시설',CNT,
-					'자전거전용도로',CNT
-				) )  AS SUM2
-
-			FROM MTN_YYYYMM
-			LEFT JOIN M_CODE ON (M_CODE.CD=MTN_YYYYMM.KND AND (M_CODE.REFCDTP='MTN_YYYYMM' AND M_CODE.CDN='KND'))
-			WHERE 1=1
+			SELECT	TEMP.*
+			FROM	(
+				SELECT	ROWNUM AS NUM,
+						TEMP.*,
+						COUNT(*) OVER() AS TOTALROWS
+				FROM (
+					SELECT	TEMP.*
+					FROM (
+						SELECT
+							A.MGRNU,
+							A.FACIL_NAM,
+							TO_CHAR(A.REG_YMD, 'YYYY-MM-DD') AS REG_YMD,
+							DECODE(A.WORK_GBN, 'C', '신규', 'U', '수정', 'D', '삭제') AS WORK_GBN_NAM,
+							(SELECT CMMT FROM M_CODE WHERE CDTP = 'A049_P' AND CDN = 'Q_USE' AND CD = B.Q_USE) AS Q_USE_NAM,
+							(SELECT CMMT FROM M_CODE WHERE CDTP = 'A049_P' AND CDN = 'DR_TYPE' AND CD = B.DR_TYPE) AS DR_TYPE_NAM,
+							(SELECT CMMT FROM M_CODE WHERE CDTP = 'A049_P' AND CDN = 'DR_KND' AND CD = B.DR_KND) AS DR_KND_NAM
+						FROM TBL_FACIL_HIS A, GT_A049_P B
+						WHERE A.MGRNU = B.MGRNU
+						UNION ALL
+						SELECT
+							MGRNU,
+							FACIL_NAM,
+							TO_CHAR(REG_YMD, 'YYYY-MM-DD') AS REG_YMD,
+							'삭제' AS WORK_GBN_NAM,
+							'-' AS Q_USE,
+							'-' AS DR_TYPE,
+							'-' AS DR_KND
+						FROM TBL_FACIL_HIS
+						WHERE FACIL_NAM ='검지기'
+						AND WORK_GBN = 'D'
+					) TEMP
+					WHERE 1=1
 		]]>
 
 		<if test="fromDate != '' and fromDate != null">
-			<![CDATA[ AND SUBSTR(MTN_YM, 0, 4) >= (SUBSTR(#{fromDate}, 0, 4)) ]]>
+			<![CDATA[ AND SUBSTR(REG_YMD, 0, 7) >= (SUBSTR(#{fromDate}, 0, 7)) ]]>
 		</if>
 
 		<if test="toDate != '' and toDate != null">
-			<![CDATA[ AND SUBSTR(MTN_YM, 0, 4) <= (SUBSTR(#{toDate}, 0, 4)) ]]>
+			<![CDATA[ AND SUBSTR(REG_YMD, 0, 7) <= (SUBSTR(#{toDate}, 0, 7)) ]]>
 		</if>
+
+		<![CDATA[
+					ORDER BY REG_YMD DESC)TEMP
+				ORDER BY NUM) TEMP WHERE NUM BETWEEN #{rows} * ( #{page} - 1 ) + 1 AND #{rows}* #{page}
+		]]>
 	</select>
 
 </mapper>

@@ -53,7 +53,7 @@
 
 
 							$.ajax({
-								url : _self._mapMaker.config.noProxyWfs,
+								url : _self._mapMaker.config.proxyWfs,
 								dataType : "json",
 								cache : false,
 //								async : false,
@@ -104,7 +104,7 @@
 				source : new ol.source.TileWMS({
 					projection: this._mapMaker.config.facilityCrsCode,
 //					url : "http://1.234.21.200:8080/geoserver/seoul/wms",
-					url : this._mapMaker.config.noProxyWms,
+					url : this._mapMaker.config.proxyWms,
 					params : {
 						LAYERS : lyrName,
 						VERSION : '1.1.0',

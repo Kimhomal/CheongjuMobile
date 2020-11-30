@@ -1,0 +1,299 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper   PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="tgis.statistics.service.StatisticsMngMapper">
+
+<!-- 음향신호기 구별 전체 통계 -->
+	<select id="selectGuStatistics_GT_A119_P" parameterType="map" resultType="egovMap">
+		<![CDATA[
+				SELECT
+					DECODE(NAME, NULL, '합계', NAME) AS  "구분",
+					TO_CHAR(TOTAL, '999,999,999,999') AS "합계",
+					TO_CHAR(TOTAL, '999,999,999,999') AS "계"
+				FROM (
+					SELECT
+						A.GU_NAM AS NAME,
+						COUNT(*) AS TOTAL
+					FROM GT_A119_P A
+		]]>
+		<where>
+			<if test="guCde   != null and guCde   != ''">
+				AND A.GU_CDE  IN 	<foreach collection="guCde" item="item" open="(" close=")" separator=",">#{item}</foreach>
+			</if>
+			<if test="dongCde   != null and dongCde   != ''">
+				AND A.DONG_CDE  IN 	<foreach collection="dongCde" item="item" open="(" close=")" separator=",">#{item}</foreach>
+			</if>
+			<if test="policeCde   != null and policeCde   != ''">
+				AND A.PE_CDE  IN 	<foreach collection="policeCde" item="item" open="(" close=")" separator=",">#{item}</foreach>
+			</if>
+			<if test="statGbn   != null and statGbn   != ''">
+				AND A.FORM  IN 	<foreach collection="statGbn" item="item" open="(" close=")" separator=",">#{item}</foreach>
+			</if>
+			<if test="stYmd   != null and stYmd   != ''">
+				<![CDATA[AND A.ESB_YMD >= #{stYmd}]]>
+			</if>
+			<if test="enYmd   != null and enYmd   != ''">
+				<![CDATA[AND A.ESB_YMD <= #{enYmd}]]>
+			</if>
+		</where>
+		<![CDATA[
+					GROUP BY ROLLUP(A.GU_NAM)
+					ORDER BY NAME NULLS FIRST) TEMP
+ 		]]>
+	</select>
+
+<!-- 음향신호기 경찰서별 전체 통계 -->
+	<select id="selectPoliceStatistics_GT_A119_P" parameterType="map" resultType="egovMap">
+		<![CDATA[
+		    	SELECT
+					DECODE(NAME, NULL, '합계', NAME) AS  "구분",
+					TO_CHAR(TOTAL, '999,999,999,999') AS "합계",
+					TO_CHAR(TOTAL, '999,999,999,999') AS "계"
+				FROM  (
+				SELECT  A.PE_NAM AS NAME,
+						COUNT(*) AS TOTAL
+				FROM GT_A119_P A
+		]]>
+		<where>
+			<if test="guCde   != null and guCde   != ''">
+				AND A.GU_CDE  IN 	<foreach collection="guCde" item="item" open="(" close=")" separator=",">#{item}</foreach>
+			</if>
+			<if test="dongCde   != null and dongCde   != ''">
+				AND A.DONG_CDE  IN 	<foreach collection="dongCde" item="item" open="(" close=")" separator=",">#{item}</foreach>
+			</if>
+			<if test="policeCde   != null and policeCde   != ''">
+				AND A.PE_CDE  IN 	<foreach collection="policeCde" item="item" open="(" close=")" separator=",">#{item}</foreach>
+			</if>
+			<if test="statGbn   != null and statGbn   != ''">
+				AND A.FORM  IN 	<foreach collection="statGbn" item="item" open="(" close=")" separator=",">#{item}</foreach>
+			</if>
+			<if test="stYmd   != null and stYmd   != ''">
+				<![CDATA[AND A.ESB_YMD >= #{stYmd}]]>
+			</if>
+			<if test="enYmd   != null and enYmd   != ''">
+				<![CDATA[AND A.ESB_YMD <= #{enYmd}]]>
+			</if>
+		</where>
+		<![CDATA[
+				GROUP BY ROLLUP(A.PE_NAM)
+				ORDER BY NAME NULLS FIRST) TEMP
+ 		]]>
+	</select>
+
+<!-- 음향신호기 동별 전체 통계 -->
+	<select id="selectDongStatistics_GT_A119_P" parameterType="map" resultType="egovMap">
+		<![CDATA[
+		SELECT
+					DECODE(NAME, NULL, '합계', NAME) AS  "구분",
+					TO_CHAR(TOTAL, '999,999,999,999') AS "합계",
+					TO_CHAR(TOTAL, '999,999,999,999') AS "계"
+				FROM  (
+			SELECT  G.EMD_KOR_NM AS NAME,
+					COUNT(*) AS TOTAL
+			FROM GT_A119_P A, GT_LP_AA_EMD G
+			WHERE A.DONG_NAM(+) = G.EMD_KOR_NM
+				]]>
+		<if test="guCde   != null and guCde   != ''">
+			AND A.GU_CDE  IN 	<foreach collection="guCde" item="item" open="(" close=")" separator=",">#{item}</foreach>
+		</if>
+		<if test="dongCde   != null and dongCde   != ''">
+			AND A.DONG_CDE  IN 	<foreach collection="dongCde" item="item" open="(" close=")" separator=",">#{item}</foreach>
+		</if>
+		<if test="policeCde   != null and policeCde   != ''">
+			AND A.PE_CDE  IN 	<foreach collection="policeCde" item="item" open="(" close=")" separator=",">#{item}</foreach>
+		</if>
+		<if test="statGbn   != null and statGbn   != ''">
+			AND A.FORM  IN 	<foreach collection="statGbn" item="item" open="(" close=")" separator=",">#{item}</foreach>
+		</if>
+		<if test="stYmd   != null and stYmd   != ''">
+			<![CDATA[AND A.ESB_YMD >= #{stYmd}]]>
+		</if>
+		<if test="enYmd   != null and enYmd   != ''">
+			<![CDATA[AND A.ESB_YMD <= #{enYmd}]]>
+		</if>
+		<![CDATA[
+			GROUP BY ROLLUP(G.EMD_KOR_NM)
+			ORDER BY NAME NULLS FIRST) TEMP
+				]]>
+	</select>
+
+<!-- 음향신호기 상세내역 전체 통계 -->
+	<select id="selectDetailFcltsList_GT_A119_P" parameterType="map" resultType="egovMap">
+		<![CDATA[
+		SELECT  TEMP.*
+		FROM   (SELECT  ROWNUM  AS NUM,
+		               TEMP.*,
+		                COUNT(*) OVER() AS TOTALROWS
+		        FROM   (SELECT
+								 		MGRNU,
+                                         PE_NAM,
+                                         GU_NAM,
+                                         DONG_NAM,
+                                         JIBUN,
+                                         CSS_NAM,
+                                         TO_CODE('A119_P','FORM',FORM) AS FORM_NAM,
+		                                TO_CHAR(ESB_YMD ,'YYYY-MM-DD') AS ESB_YMD,
+		                                ESB_CPY,
+		                    			MK_CPY,
+		                                XCE,
+		                                YCE
+						FROM	GT_A119_P A
+		]]>
+		<where>
+			<if test="guCde   != null and guCde   != ''">
+				AND A.GU_CDE  IN 	<foreach collection="guCde" item="item" open="(" close=")" separator=",">#{item}</foreach>
+			</if>
+			<if test="dongCde   != null and dongCde   != ''">
+				AND A.DONG_CDE  IN 	<foreach collection="dongCde" item="item" open="(" close=")" separator=",">#{item}</foreach>
+			</if>
+			<if test="policeCde   != null and policeCde   != ''">
+				AND A.PE_CDE  IN 	<foreach collection="policeCde" item="item" open="(" close=")" separator=",">#{item}</foreach>
+			</if>
+			<if test="statGbn   != null and statGbn   != ''">
+				AND A.FORM  IN 	<foreach collection="statGbn" item="item" open="(" close=")" separator=",">#{item}</foreach>
+			</if>
+			<if test="stYmd   != null and stYmd   != ''">
+				<![CDATA[AND A.ESB_YMD >= #{stYmd}]]>
+			</if>
+			<if test="enYmd   != null and enYmd   != ''">
+				<![CDATA[AND A.ESB_YMD <= #{enYmd}]]>
+			</if>
+		</where>
+		<![CDATA[
+		                ORDER BY MGRNU DESC
+		                ) TEMP)TEMP WHERE NUM BETWEEN #{rows} * ( #{page} - 1 ) + 1 AND #{rows}* #{page}
+	]]>
+	</select>
+
+	<select id="selectDetailFcltsExcelDown_GT_A119_P" parameterType="map" resultType="egovMap">
+		<![CDATA[
+			SELECT  ROWNUM  AS NUM,
+		               TEMP.*
+		        FROM   (SELECT
+							MGRNU,
+                            PE_NAM,
+                            GU_NAM,
+                            DONG_NAM,
+                            JIBUN,
+                            CSS_NAM,
+                            TO_CODE('A119_P','FORM',FORM) AS FORM_NAM,
+		                    TO_CHAR(ESB_YMD ,'YYYY-MM-DD') AS ESB_YMD,
+		                    ESB_CPY,
+		                    MK_CPY,
+		                    XCE,
+		                    YCE
+						FROM	GT_A119_P A
+		]]>
+		<where>
+			<if test="guCde   != null and guCde   != ''">
+				AND A.GU_CDE  IN 	<foreach collection="guCde" item="item" open="(" close=")" separator=",">#{item}</foreach>
+			</if>
+			<if test="dongCde   != null and dongCde   != ''">
+				AND A.DONG_CDE  IN 	<foreach collection="dongCde" item="item" open="(" close=")" separator=",">#{item}</foreach>
+			</if>
+			<if test="policeCde   != null and policeCde   != ''">
+				AND A.PE_CDE  IN 	<foreach collection="policeCde" item="item" open="(" close=")" separator=",">#{item}</foreach>
+			</if>
+			<if test="statGbn   != null and statGbn   != ''">
+				AND A.FORM  IN 	<foreach collection="statGbn" item="item" open="(" close=")" separator=",">#{item}</foreach>
+			</if>
+			<if test="stYmd   != null and stYmd   != ''">
+				<![CDATA[AND A.ESB_YMD >= #{stYmd}]]>
+			</if>
+			<if test="enYmd   != null and enYmd   != ''">
+				<![CDATA[AND A.ESB_YMD <= #{enYmd}]]>
+			</if>
+		</where>
+		<![CDATA[
+		                ORDER BY MGRNU DESC) TEMP
+	]]>
+	</select>
+
+<!-- 음향신호기 교차로기준 통계 -->
+	<select id="selectCrossStatistics_GT_A119_P" parameterType="map" resultType="egovMap">
+		<![CDATA[
+		SELECT  TEMP.*
+		FROM   (SELECT  ROWNUM  AS NUM,
+		               TEMP.*,
+		                COUNT(*) OVER() AS TOTALROWS
+		        FROM   (
+				SELECT
+					DECODE(NAME, NULL, '합계', NAME) AS  "구분",
+					TO_CHAR(TOTAL, '999,999,999,999') AS "합계",
+					TO_CHAR(TOTAL, '999,999,999,999') AS "계"
+				FROM (
+					SELECT
+						A.CSS_NAM AS NAME,
+						COUNT(*) AS TOTAL
+					FROM GT_A119_P A
+					WHERE A.CSS_NAM IS NOT NULL
+		]]>
+			<if test="guCde   != null and guCde   != ''">
+				AND A.GU_CDE  IN 	<foreach collection="guCde" item="item" open="(" close=")" separator=",">#{item}</foreach>
+			</if>
+			<if test="dongCde   != null and dongCde   != ''">
+				AND A.DONG_CDE  IN 	<foreach collection="dongCde" item="item" open="(" close=")" separator=",">#{item}</foreach>
+			</if>
+			<if test="policeCde   != null and policeCde   != ''">
+				AND A.PE_CDE  IN 	<foreach collection="policeCde" item="item" open="(" close=")" separator=",">#{item}</foreach>
+			</if>
+			<if test="statGbn   != null and statGbn   != ''">
+				AND A.FORM  IN 	<foreach collection="statGbn" item="item" open="(" close=")" separator=",">#{item}</foreach>
+			</if>
+			<if test="stYmd   != null and stYmd   != ''">
+				<![CDATA[AND A.ESB_YMD >= #{stYmd}]]>
+			</if>
+			<if test="enYmd   != null and enYmd   != ''">
+				<![CDATA[AND A.ESB_YMD <= #{enYmd}]]>
+			</if>
+			<if test="cssNam != null and cssNam != ''">
+				<![CDATA[AND A.CSS_NAM LIKE '%' || #{cssNam} || '%']]>
+			</if>
+		<![CDATA[
+				GROUP BY ROLLUP(A.CSS_NAM)
+					ORDER BY NAME NULLS FIRST  ) TEMP)TEMP)TEMP WHERE NUM BETWEEN #{rows} * ( #{page} - 1 ) + 1 AND #{rows}* #{page}
+ 		]]>
+	</select>
+
+<!-- 음향신호기 교차로기준 통계 엑셀-->
+	<select id="selectCrossFcltsExcelDown_GT_A119_P" parameterType="map" resultType="egovMap">
+		<![CDATA[
+				SELECT
+					DECODE(NAME, NULL, '합계', NAME) AS  "구분",
+					TO_CHAR(TOTAL, '999,999,999,999') AS "합계",
+					TO_CHAR(TOTAL, '999,999,999,999') AS "계"
+				FROM (
+					SELECT
+						A.CSS_NAM AS NAME,
+						COUNT(*) AS TOTAL
+					FROM GT_A119_P A
+					WHERE A.CSS_NAM IS NOT NULL
+		]]>
+			<if test="guCde   != null and guCde   != ''">
+				AND A.GU_CDE  IN 	<foreach collection="guCde" item="item" open="(" close=")" separator=",">#{item}</foreach>
+			</if>
+			<if test="dongCde   != null and dongCde   != ''">
+				AND A.DONG_CDE  IN 	<foreach collection="dongCde" item="item" open="(" close=")" separator=",">#{item}</foreach>
+			</if>
+			<if test="policeCde   != null and policeCde   != ''">
+				AND A.PE_CDE  IN 	<foreach collection="policeCde" item="item" open="(" close=")" separator=",">#{item}</foreach>
+			</if>
+			<if test="statGbn   != null and statGbn   != ''">
+				AND A.FORM  IN 	<foreach collection="statGbn" item="item" open="(" close=")" separator=",">#{item}</foreach>
+			</if>
+			<if test="stYmd   != null and stYmd   != ''">
+				<![CDATA[AND A.ESB_YMD >= #{stYmd}]]>
+			</if>
+			<if test="enYmd   != null and enYmd   != ''">
+				<![CDATA[AND A.ESB_YMD <= #{enYmd}]]>
+			</if>
+			<if test="cssNam   != null and cssNam   != ''">
+		      <![CDATA[AND A.CSS_NAM LIKE '%' || #{cssNam} || '%']]>
+		    </if>
+		<![CDATA[
+					GROUP BY ROLLUP(A.CSS_NAM)
+					ORDER BY NAME NULLS FIRST) TEMP
+ 		]]>
+	</select>
+
+</mapper>

@@ -618,7 +618,7 @@
 	]]>
 </select>
 
-<!-- 압버튼/보행자버튼통합 -->
+<!-- 보행자버튼 -->
 <select id="selectFacil_GT_A090_P" parameterType="map" resultType="egovMap">
 	<![CDATA[
 	SELECT * FROM(
@@ -1229,6 +1229,126 @@
 	FROM(
 		SELECT A.MGRNU, A.JIBUN
 		FROM GT_C118_P A
+		WHERE 1=1
+	]]>
+	<if test='searchKeyword != null and searchKeyword != ""'>
+		<![CDATA[
+			AND A.MGRNU LIKE '%'|| #{searchKeyword} ||'%'
+		]]>
+	</if>
+	<![CDATA[
+		ORDER BY A.MGRNU
+		) TB ) WHERE NUM BETWEEN #{rows} * ( #{page} - 1 ) + 1 AND #{rows} * #{page}
+	]]>
+</select>
+
+<!-- 음향신호기 -->
+<select id="selectFacil_GT_A119_P" parameterType="map" resultType="egovMap">
+	<![CDATA[
+	SELECT * FROM(
+	SELECT
+		ROWNUM AS NUM,
+		TO_CHAR(LAST_VALUE(ROWNUM) OVER ( ORDER BY ROWNUM ROWS BETWEEN CURRENT ROW AND UNBOUNDED FOLLOWING )) AS TOTALROWS,
+		TB.*
+	FROM(
+		SELECT A.MGRNU, A.JIBUN
+		FROM GT_A119_P A
+		WHERE 1=1
+	]]>
+	<if test='searchKeyword != null and searchKeyword != ""'>
+		<![CDATA[
+			AND A.MGRNU LIKE '%'|| #{searchKeyword} ||'%'
+		]]>
+	</if>
+	<![CDATA[
+		ORDER BY A.MGRNU
+		) TB ) WHERE NUM BETWEEN #{rows} * ( #{page} - 1 ) + 1 AND #{rows} * #{page}
+	]]>
+</select>
+
+<!-- 횡단보도조명 -->
+<select id="selectFacil_GT_C022_P" parameterType="map" resultType="egovMap">
+	<![CDATA[
+	SELECT * FROM(
+	SELECT
+		ROWNUM AS NUM,
+		TO_CHAR(LAST_VALUE(ROWNUM) OVER ( ORDER BY ROWNUM ROWS BETWEEN CURRENT ROW AND UNBOUNDED FOLLOWING )) AS TOTALROWS,
+		TB.*
+	FROM(
+		SELECT A.MGRNU, A.JIBUN
+		FROM GT_C022_P A
+		WHERE 1=1
+	]]>
+	<if test='searchKeyword != null and searchKeyword != ""'>
+		<![CDATA[
+			AND A.MGRNU LIKE '%'|| #{searchKeyword} ||'%'
+		]]>
+	</if>
+	<![CDATA[
+		ORDER BY A.MGRNU
+		) TB ) WHERE NUM BETWEEN #{rows} * ( #{page} - 1 ) + 1 AND #{rows} * #{page}
+	]]>
+</select>
+
+<!-- 투광기(횡단보도조명) -->
+<select id="selectFacil_GT_C130_P" parameterType="map" resultType="egovMap">
+	<![CDATA[
+	SELECT * FROM(
+	SELECT
+		ROWNUM AS NUM,
+		TO_CHAR(LAST_VALUE(ROWNUM) OVER ( ORDER BY ROWNUM ROWS BETWEEN CURRENT ROW AND UNBOUNDED FOLLOWING )) AS TOTALROWS,
+		TB.*
+	FROM(
+		SELECT A.MGRNU, A.JIBUN
+		FROM GT_C130_P A
+		WHERE 1=1
+	]]>
+	<if test='searchKeyword != null and searchKeyword != ""'>
+		<![CDATA[
+			AND A.MGRNU LIKE '%'|| #{searchKeyword} ||'%'
+		]]>
+	</if>
+	<![CDATA[
+		ORDER BY A.MGRNU
+		) TB ) WHERE NUM BETWEEN #{rows} * ( #{page} - 1 ) + 1 AND #{rows} * #{page}
+	]]>
+</select>
+
+<!-- 보행신호 음성안내 보조장치 -->
+<select id="selectFacil_GT_C131_P" parameterType="map" resultType="egovMap">
+	<![CDATA[
+	SELECT * FROM(
+	SELECT
+		ROWNUM AS NUM,
+		TO_CHAR(LAST_VALUE(ROWNUM) OVER ( ORDER BY ROWNUM ROWS BETWEEN CURRENT ROW AND UNBOUNDED FOLLOWING )) AS TOTALROWS,
+		TB.*
+	FROM(
+		SELECT A.MGRNU, A.JIBUN
+		FROM GT_C131_P A
+		WHERE 1=1
+	]]>
+	<if test='searchKeyword != null and searchKeyword != ""'>
+		<![CDATA[
+			AND A.MGRNU LIKE '%'|| #{searchKeyword} ||'%'
+		]]>
+	</if>
+	<![CDATA[
+		ORDER BY A.MGRNU
+		) TB ) WHERE NUM BETWEEN #{rows} * ( #{page} - 1 ) + 1 AND #{rows} * #{page}
+	]]>
+</select>
+
+<!-- ATMS -->
+<select id="selectFacil_GT_C132_P" parameterType="map" resultType="egovMap">
+	<![CDATA[
+	SELECT * FROM(
+	SELECT
+		ROWNUM AS NUM,
+		TO_CHAR(LAST_VALUE(ROWNUM) OVER ( ORDER BY ROWNUM ROWS BETWEEN CURRENT ROW AND UNBOUNDED FOLLOWING )) AS TOTALROWS,
+		TB.*
+	FROM(
+		SELECT A.MGRNU, A.JIBUN
+		FROM GT_C132_P A
 		WHERE 1=1
 	]]>
 	<if test='searchKeyword != null and searchKeyword != ""'>

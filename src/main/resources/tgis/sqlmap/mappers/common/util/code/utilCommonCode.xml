@@ -65,6 +65,23 @@
 	]]>
 	</select>
 
+	<!-- 리 코드 -->
+	<select id="getRiCde" parameterType="map" resultType="map">
+		<![CDATA[
+		SELECT	LI_CD AS VALUE,
+				LI_KOR_NM AS NAME
+		FROM	GT_LP_AA_RI
+			]]>
+		<where>
+			<if test='emdCd != null and emdCd != ""'>
+				<![CDATA[ LI_CD LIKE #{emdCd} || '%' ]]>
+			</if>
+		</where>
+		<![CDATA[
+		ORDER BY NAME
+	]]>
+	</select>
+
 	<!-- 동 코드(선택 시군구 동) -->
 	<select id="getEmdCdeByGu" parameterType="map" resultType="map">
 		<![CDATA[
@@ -81,7 +98,7 @@
 			ORDER BY NAME
 		]]>
 	</select>
-	
+
 	<!-- 안전표지 -->
 	<select id="getMrkKnd" parameterType="map" resultType="map">
 	<![CDATA[

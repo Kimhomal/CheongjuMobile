@@ -19,6 +19,28 @@
 			</button>
 		</div>
 		<div class="center">지도서비스</div>
+		<!-- <div class="right">
+			<button class="ui tertiary fluid icon button map-btn">
+				<i class="map icon"></i>
+			</button>
+			<div class="ui popup hidden">
+				<div class="header">지도 설정</div>
+				<div class="ui form">
+					<div class="field">
+						<label>베이스맵</label>
+						<div class="ui selection dropdown basemap-selector">
+							<input name="basemap" type="hidden" value="naver">
+							<i class="dropdown icon"></i>
+							<div class="text">Default Value</div>
+							<div class="menu">
+								<div class="item" data-value="naver">네이버</div>
+								<div class="item" data-value="kakao">카카오</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div> -->
 	</div>
 </div>
 
@@ -42,6 +64,9 @@
 		<!-- //layer_inner -->
 	</div>
 	<!--//레이어 선택 팝업 -->
+	<div id="mapPopup" class="ol-popup">
+		<div id="mapPopup-content"></div>
+	</div>
 </div>
 
 <script>
@@ -103,8 +128,16 @@ $(function() {
 	$("#choose").hide();
 	
 	window.managePanels = new ManagePanels({
-		map: mapMaker.map
+		map: mapMaker.map,
+		position: '${params.position}'
 	});
+	
+	/* $('.map-btn').popup({
+		on: 'click',
+		position: 'bottom right'
+	});
+	
+	$('.basemap-selector').dropdown(); */
 });
 
 

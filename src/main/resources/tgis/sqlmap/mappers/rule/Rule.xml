@@ -1,0 +1,1102 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper   PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="tgis.rule.service.RuleMapper">
+
+<!-- 	규제관리 리스트 조회 -->
+<select id="selectRuleList" parameterType="map" resultType="egovMap">
+	<![CDATA[
+			SELECT *	FROM(
+							SELECT
+							ROWNUM AS NUM,
+							TO_CHAR( LAST_VALUE( ROWNUM ) OVER ( ORDER BY ROWNUM ROWS BETWEEN CURRENT ROW AND UNBOUNDED FOLLOWING )) AS TOTALROWS,
+							TB.*
+					FROM	( SELECT
+										 RM.RULEMGEID,
+										 SUBSTR(RM.DEDATE, 0, 4) || '-' || SUBSTR(RM.DEDATE, 5, 2) || '-' || SUBSTR(RM.DEDATE, 7, 2) AS DEDATE,
+										 RM.RULE_MGRNU_NUM,
+										 RR.LOCA2,
+										 RR.DTL_CTT,
+										 RR.SI_MU_CDE,
+										 RR.LOCA1,
+										 TO_CODE('ALL','SI_MU_CDE',RR.SI_MU_CDE) AS SI_MU_NAM,
+										 TO_CODE('ALL','CTK_KND_CDE',RR.CTK_KND_CDE) AS CTK_KND_NAM,
+										 TO_CODE('ALL','CTK_VCN_CDE',RR.CTK_VCN_CDE) AS CTK_VCN_NAM,
+										 RM.SUBJECT,
+										 RR.RG_NAM,
+										 SUBSTR(RR.INDATE, 0, 4) || '-' || SUBSTR(RR.INDATE, 5, 2) || '-' || SUBSTR(RR.INDATE, 7, 2) AS INDATE,
+										 SUBSTR(RR.DN_RG_YMD, 0, 4) || '-' || SUBSTR(RR.DN_RG_YMD, 5, 2) || '-' || SUBSTR(RR.DN_RG_YMD, 7, 2) AS DN_RG_YMD,
+										 RR.DN_RG_NAM,
+										 SUBSTR(RR.DN_ED_YMD, 0, 4) || '-' || SUBSTR(RR.DN_ED_YMD, 5, 2) || '-' || SUBSTR(RR.DN_ED_YMD, 7, 2) AS DN_ED_YMD,
+										 RR.DN_ED_NAM,
+										 SUBSTR(RR.CK_ST_YMD, 0, 4) || '-' || SUBSTR(RR.CK_ST_YMD, 5, 2) || '-' || SUBSTR(RR.CK_ST_YMD, 7, 2) AS CK_ST_YMD,
+										 RR.CK_ST_NAM,
+										 SUBSTR(RR.CK_ED_YMD, 0, 4) || '-' || SUBSTR(RR.CK_ED_YMD, 5, 2) || '-' || SUBSTR(RR.CK_ED_YMD, 7, 2) AS CK_ED_YMD,
+										 RR.CK_ED_NAM,
+										 BSS_NAM,
+										 RULE_TYPE_CDE,
+										 TO_CODE('ALL','RULE_TYPE_CDE',RR.RULE_TYPE_CDE) AS RULE_TYPE_NAM
+							 FROM	TBL_RULE_MGE RM, TBL_RULE_RST RR
+							 WHERE  RM.RULEMGEID = RR.RULEMGEID (+)
+							 ]]>
+							<choose>
+								<when test='searchCondition == "0"'>
+									<if test='schsDate != "" and schsDate != null'>
+										<![CDATA[
+																	 AND RM.DEDATE >= REPLACE(#{schsDate},'-')
+															]]>
+									</if>
+									<if test='schlDate != "" and schlDate != null'>
+										<![CDATA[
+																	 AND RM.DEDATE <= REPLACE(#{schlDate},'-')
+															]]>
+									</if>
+								</when>
+								<when test='searchCondition == "1"'>
+									<if test='schsDate != "" and schsDate != null'>
+										<![CDATA[
+																	 AND RR.INDATE >= REPLACE(#{schsDate},'-')
+															]]>
+									</if>
+									<if test='schlDate != "" and schlDate != null'>
+										<![CDATA[
+																	 AND RR.INDATE <= REPLACE(#{schlDate},'-')
+															]]>
+									</if>
+								</when>
+							</choose>
+							<if test='schSimu != "" and schSimu != null'>
+								<![CDATA[
+																 AND RR.SI_MU_CDE = #{schSimu}
+								]]>
+							</if>
+							<if test='searchMgrkw != "" and searchMgrkw != null'>
+								<![CDATA[
+											 AND NVL(RR.RULE_MGRNU_NUM,RM.RULE_MGRNU_NUM)) LIKE '%' || #{searchMgrkw} || '%'
+								]]>
+							</if>
+							<if test='schRuleGbn != "" and schRuleGbn != null'>
+								<![CDATA[
+																 AND RULE_TYPE_CDE = #{schRuleGbn}
+								]]>
+							</if>
+							<if test='schCtk != "" and schCtk != null'>
+								<![CDATA[
+																AND RR.CTK_KND_CDE = #{schCtk}
+								]]>
+							</if>
+							<if test='schVcn != "" and schVcn != null'>
+								<![CDATA[
+																AND RR.CTK_VCN_CDE = #{schVcn}
+								]]>
+							</if>
+							<choose>
+								<when test='searchCn == "1"'>
+									AND RM.SUBJECT LIKE '%' || #{searchKeyword} || '%'
+								</when>
+								<when test='searchCn == "2"'>
+									AND (RR.LOCA1 LIKE '%' || #{searchKeyword} || '%' OR RR.LOCA2 LIKE '%' || #{searchKeyword} || '%')
+								</when>
+								<when test='searchCn == "3"'>
+									AND RR.RG_NAM 	LIKE '%' || #{searchKeyword} || '%'
+								</when>
+							</choose>
+	<![CDATA[
+							ORDER BY RR.RULE_MGRNU_NUM DESC
+					) TB
+		) WHERE NUM BETWEEN #{rows} * ( #{page} - 1 ) + 1 AND #{rows}* #{page}
+	]]>
+</select>
+
+<!-- 	규제관리 리스트 조회 엑셀 -->
+<select id="selectRuleListExcel" parameterType="map" resultType="egovMap">
+	<![CDATA[
+			SELECT *	FROM(
+							SELECT
+							ROWNUM AS NUM,
+							TB.*
+					FROM	( SELECT
+										SUBSTR(RM.DEDATE, 0, 4) || '-' || SUBSTR(RM.DEDATE, 5, 2) || '-' || SUBSTR(RM.DEDATE, 7, 2) AS DEDATE,
+										 RM.RULE_MGRNU_NUM,
+										RR.LOCA2 || '' || RR.LOCA1 AS LOCA,
+										RM.SUBJECT,
+										RR.DTL_CTT,
+										 TO_CODE('ALL','SI_MU_CDE',RR.SI_MU_CDE) AS SI_MU_NAM,
+										 TO_CODE('ALL','CTK_KND_CDE',RR.CTK_KND_CDE) AS CTK_KND_NAM,
+										RR.CAUSER_KND,
+										SUBSTR(RR.INDATE, 0, 4) || '-' || SUBSTR(RR.INDATE, 5, 2) || '-' || SUBSTR(RR.INDATE, 7, 2) AS INDATE,
+										SUBSTR(RR.DN_RG_YMD, 0, 4) || '-' || SUBSTR(RR.DN_RG_YMD, 5, 2) || '-' || SUBSTR(RR.DN_RG_YMD, 7, 2) AS DN_RG_YMD,
+										SUBSTR(RR.DN_ED_YMD, 0, 4) || '-' || SUBSTR(RR.DN_ED_YMD, 5, 2) || '-' || SUBSTR(RR.DN_ED_YMD, 7, 2) AS DN_ED_YMD,
+										RR.DT_CTT
+							 FROM	TBL_RULE_MGE RM, TBL_RULE_RST RR
+							 WHERE RM.RULEMGEID = RR.RULEMGEID (+)
+							 ]]>
+							<choose>
+								<when test='searchCondition == "0"'>
+									<if test='schsDate != "" and schsDate != null'>
+										<![CDATA[
+																							 AND RM.DEDATE >= REPLACE(#{schsDate},'-')
+																					]]>
+									</if>
+									<if test='schlDate != "" and schlDate != null'>
+										<![CDATA[
+																							 AND RM.DEDATE <= REPLACE(#{schlDate},'-')
+																					]]>
+									</if>
+								</when>
+								<when test='searchCondition == "1"'>
+									<if test='schsDate != "" and schsDate != null'>
+										<![CDATA[
+																							 AND RR.INDATE >= REPLACE(#{schsDate},'-')
+																					]]>
+									</if>
+									<if test='schlDate != "" and schlDate != null'>
+										<![CDATA[
+																							 AND RR.INDATE <= REPLACE(#{schlDate},'-')
+																					]]>
+									</if>
+								</when>
+							</choose>
+							<if test='schSimu != "" and schSimu != null'>
+								<![CDATA[
+																						 AND RR.SI_MU_CDE = #{schSimu}
+														]]>
+							</if>
+							<if test='searchMgrkw != "" and searchMgrkw != null'>
+								<![CDATA[
+																	 AND NVL(RR.RULE_MGRNU_NUM,RM.RULE_MGRNU_NUM)) LIKE '%' || #{searchMgrkw} || '%'
+														]]>
+							</if>
+							<if test='schRuleGbn != "" and schRuleGbn != null'>
+								<![CDATA[
+																						 AND RULE_TYPE_CDE = #{schRuleGbn}
+														]]>
+							</if>
+							<if test='schCtk != "" and schCtk != null'>
+								<![CDATA[
+																						AND RR.CTK_KND_CDE = #{schCtk}
+														]]>
+							</if>
+							<if test='schVcn != "" and schVcn != null'>
+								<![CDATA[
+																						AND RR.CTK_VCN_CDE = #{schVcn}
+														]]>
+							</if>
+							<choose>
+								<when test='searchCn == "1"'>
+									AND RM.SUBJECT LIKE '%' || #{searchKeyword} || '%'
+								</when>
+								<when test='searchCn == "2"'>
+									AND (RR.LOCA1 LIKE '%' || #{searchKeyword} || '%' OR RR.LOCA2 LIKE '%' || #{searchKeyword} || '%')
+								</when>
+								<when test='searchCn == "3"'>
+									AND RR.RG_NAM 	LIKE '%' || #{searchKeyword} || '%'
+								</when>
+							</choose>
+	<![CDATA[
+						ORDER BY	RR.RULE_MGRNU_NUM DESC
+					) TB
+		)
+	]]>
+</select>
+
+	<select id="ruleRstList" parameterType="map" resultType="egovMap">
+	<![CDATA[
+		SELECT
+					R.RULEMGEID, R.RULERSTID, R.RULE_TYPE_CDE, R.DTL_CTT, R.LOCA1, R.LOCA2, R.XCE, R.YCE,
+ 					TO_CODE('ALL','CTK_KND_CDE',R.CTK_KND_CDE) AS CTK_KND_NAM,
+					TO_CODE('ALL','CTK_VCN_CDE',R.CTK_VCN_CDE) AS CTK_VCN_NAM,
+					R.SI_MU_CDE,
+					F.RULEFILEID,
+					F.OGL_NAM,
+					R.RG_NAM, SUBSTR(R.INDATE,0,4) || '-' || SUBSTR(R.INDATE,5,2) || '-' || SUBSTR(R.INDATE,7,2) AS INDATE,
+					SUBSTR(R.DN_RG_YMD,0,4) || '-' || SUBSTR(R.DN_RG_YMD,5,2) || '-' || SUBSTR(R.DN_RG_YMD,7,2) AS DN_RG_YMD, R.DN_RG_NAM,
+					SUBSTR(R.DN_ED_YMD,0,4) || '-' || SUBSTR(R.DN_ED_YMD,5,2) || '-' || SUBSTR(R.DN_ED_YMD,7,2) AS DN_ED_YMD, R.DN_ED_NAM,
+					SUBSTR(R.CK_ST_YMD ,0,4) || '-' || SUBSTR(R.CK_ST_YMD ,5,2) || '-' || SUBSTR(R.CK_ST_YMD ,7,2) AS CK_ST_YMD, R.CK_ST_NAM,
+					SUBSTR(R.CK_ED_YMD,0,4) || '-' || SUBSTR(R.CK_ED_YMD,5,2) || '-' || SUBSTR(R.CK_ED_YMD,7,2) AS CK_ED_YMD, R.CK_ED_NAM,
+					BSS_NAM
+			FROM		TBL_RULE_RST R, TBL_RULE_FILE F, TBL_RULE_MGE M
+			WHERE	R.RULE_MGRNU_NUM=( SELECT DISTINCT RULE_MGRNU_NUM FROM TBL_RULE_RST WHERE RULEMGEID=#{rulemgeid} )
+			AND		M.DEDATE = ( SELECT DISTINCT DEDATE FROM TBL_RULE_MGE WHERE RULEMGEID=#{rulemgeid} )
+			AND		R.SI_MU_CDE = #{siMuCde} AND		R.RULE_TYPE_CDE = #{ruleTypeCde}
+			AND		R.RULERSTID = F.RULERSTID(+) AND R.RULEMGEID = M.RULEMGEID
+			ORDER BY R.RULERSTID DESC
+	]]>
+</select>
+
+
+	<select id="selectRuleMgeView" parameterType="map" resultType="egovMap">
+	<![CDATA[
+			SELECT
+				RULEMGEID,
+				REG_NAM,
+				SUBJECT,
+				RULE_MGRNU_NUM,
+				SUBSTR(DEDATE, 0, 4) || '-' || SUBSTR(DEDATE, 5, 2) || '-' || SUBSTR(DEDATE, 7, 2) AS DEDATE,
+				SUBSTR(INDATE, 0, 4) || '-' || SUBSTR(INDATE, 5, 2) || '-' || SUBSTR(INDATE, 7, 2) AS RMINDATE,
+				FILE_PATH,
+				FILE_NAM,
+				OGL_NAM,
+				REG_ID
+			FROM
+				TBL_RULE_MGE
+			WHERE
+				RULEMGEID = #{rulemgeid}
+	]]>
+</select>
+
+
+	<select id="selectRuleListCnt" parameterType="map" resultType="java.lang.Integer">
+	<![CDATA[
+		SELECT COUNT(RM.RULEMGEID)
+		FROM   TBL_RULE_MGE RM, TBL_RULE_RST RR
+		WHERE RM.RULEMGEID = RR.RULEMGEID(+)
+	]]>
+</select>
+
+<select id="selectCtkAllStat" parameterType="map" resultType="egovMap">
+	<![CDATA[
+		SELECT
+			COUNT(DECODE(RR.CTK_VCN_CDE, '009', 1, NULL)) AS C009,
+			COUNT(DECODE(RR.CTK_VCN_CDE, '010', 1, NULL)) AS C010,
+			COUNT(DECODE(RR.CTK_VCN_CDE, '011', 1, NULL)) AS C011,
+			COUNT(DECODE(RR.CTK_VCN_CDE, '012', 1, NULL)) AS C012,
+			COUNT(DECODE(RR.CTK_VCN_CDE, '001', 1, NULL)) AS C001,
+			COUNT(DECODE(RR.CTK_VCN_CDE, '002', 1, NULL)) AS C002,
+			COUNT(DECODE(RR.CTK_VCN_CDE, '003', 1, NULL)) AS C003,
+			COUNT(DECODE(RR.CTK_VCN_CDE, '004', 1, NULL)) AS C004,
+			COUNT(DECODE(RR.CTK_VCN_CDE, '005', 1, NULL)) AS C005,
+			COUNT(DECODE(RR.CTK_VCN_CDE, '008', 1, NULL)) AS C008,
+			COUNT(DECODE(RR.CTK_VCN_CDE, '006', 1, NULL)) AS C006
+		FROM 	TBL_RULE_MGE RM, TBL_RULE_RST RR
+		WHERE 	RM.RULEMGEID = RR.RULEMGEID AND SUBSTR(RR.INDATE, 1, 4) > (SELECT MAX(SUBSTR(INDATE, 1, 4))-1 FROM TBL_RULE_RST)
+	]]>
+</select>
+
+
+<select id="selectRuleView" parameterType="map" resultType="egovMap">
+	<![CDATA[
+			SELECT
+				*
+			FROM
+				TBL_RULE_FILE
+			WHERE
+				RULEFILEID = #{rulefileid}
+	]]>
+</select>
+
+		<!-- 규제관리 > 규제관리 리스트 > 규제 삭제 -->
+	<delete id="deleteRstInfo" parameterType="map">
+	<![CDATA[
+		DELETE FROM TBL_RULE_FILE WHERE RULEFILEID=#{rulefileid}
+	]]>
+	</delete>
+
+<select id="selectSimuList" parameterType="map" resultType="egovMap">
+	<![CDATA[
+		SELECT * FROM ( SELECT ROWNUM RN, TB.* FROM (
+			SELECT	DISTINCT R.SI_MU_CDE,
+						 TO_CODE('ALL','SI_MU_CDE',R.SI_MU_CDE) AS SI_MU_NAM
+			FROM		TBL_RULE_RST R, TBL_RULE_MGE M
+			WHERE	R.RULE_MGRNU_NUM=( SELECT DISTINCT RULE_MGRNU_NUM FROM TBL_RULE_RST WHERE RULEMGEID=#{rulemgeid}) AND
+						M.DEDATE = ( SELECT DISTINCT DEDATE FROM TBL_RULE_MGE WHERE RULEMGEID=#{rulemgeid} ) AND
+						R.RULEMGEID = M.RULEMGEID
+	]]>
+
+	<if test="ruleRstId != null and ruleRstId != ''">
+		<![CDATA[
+			AND 	R.RULERSTID = #{ruleRstId}
+		]]>
+	</if>
+
+	<![CDATA[
+			ORDER BY 	R.SI_MU_CDE ASC
+		) TB )
+	]]>
+</select>
+
+<select id="ruleRstTotCnt" parameterType="map" resultType="java.lang.Integer">
+	<![CDATA[
+		SELECT	COUNT(RULERSTID)
+		FROM		TBL_RULE_RST
+		WHERE	RULEMGEID=#{rulemgeid}
+	]]>
+</select>
+
+
+
+<select id="selectOrderNo" parameterType="map" resultType="java.lang.Integer">
+	<![CDATA[
+		SELECT MAX(S.ORDERNO) AS ORDERNO
+		FROM TBL_RULE_MGE M, TBL_RULE_RST R, (SELECT CDE_VAL, ORDERNO FROM TBL_SYS_CDE WHERE CDE_TYPE='CTK_VCN_CDE') S
+		WHERE M.RULEMGEID = R.RULEMGEID
+		AND R.CTK_VCN_CDE = S.CDE_VAL
+		AND M.RULEMGEID = #{rulemgeid}
+	]]>
+</select>
+
+	<!-- [게시판 -> 설계도면관리(과거) 목록] -->
+	<select id="selectInfoList" parameterType="map" resultType="egovMap">
+				<![CDATA[
+						SELECT *
+					FROM	(SELECT ROWNUM RN,
+									TB.*,
+									COUNT(*) OVER() AS TOTALROWS
+							 FROM	(SELECT
+							R.RULEMGEID,
+							R.SUBJECT,
+							SUBSTR(R.DEDATE, 0, 4) || '-' || SUBSTR(R.DEDATE, 5, 2) || '-' || SUBSTR(R.DEDATE, 7, 2) AS DEDATE,
+							FN_GETCODEINFO('RULE_MGRNU_CDE',
+							R.RULE_MGRNU_CDE) AS RULE_MGRNU_NAM,
+							R.RULE_MGRNU_CDE,
+							TO_NUMBER2(R.RULE_MGRNU_NUM) AS RULE_MGRNU_NUM,
+							ROUND(SYSDATE - TO_DATE(R.INDATE, 'yyyy-MM-dd'), 0) AS FILECNT,
+							S.DTL_CTT,
+							S.RULERSTID,
+							FN_GETCODEINFO('SI_MU_CDE',
+							S.SI_MU_CDE) AS SIMUNAM,
+							S.RG_NAM,
+							SUBSTR(S.INDATE, 0, 4) || '-' || SUBSTR(S.INDATE, 5, 2) || '-' || SUBSTR(S.INDATE, 7, 2) AS INDATE,
+							SUBSTR(S.DN_RG_YMD, 0, 4) || '-' || SUBSTR(S.DN_RG_YMD, 5, 2) || '-' || SUBSTR(S.DN_RG_YMD, 7, 2) AS DN_RG_YMD,
+							S.DN_RG_NAM,
+							SUBSTR(S.DN_ED_YMD, 0, 4) || '-' || SUBSTR(S.DN_ED_YMD, 5, 2) || '-' || SUBSTR(S.DN_ED_YMD, 7, 2) AS DN_ED_YMD,
+							S.DN_ED_NAM,
+							SUBSTR(S.WK_IN_YMD, 0, 4) || '-' || SUBSTR(S.WK_IN_YMD, 5, 2) || '-' || SUBSTR(S.WK_IN_YMD, 7, 2) AS WK_IN_YMD,
+							S.WK_IN_NAM,
+							SUBSTR(S.CK_ST_YMD , 0, 4) || '-' || SUBSTR(S.CK_ST_YMD , 5, 2) || '-' || SUBSTR(S.CK_ST_YMD , 7, 2) AS CK_ST_YMD,
+							S.CK_ST_NAM,
+							SUBSTR(S.CK_ED_YMD, 0, 4) || '-' || SUBSTR(S.CK_ED_YMD, 5, 2) || '-' || SUBSTR(S.CK_ED_YMD, 7, 2) AS CK_ED_YMD,
+							S.CK_ED_NAM,
+							S.LOCA1,
+							S.LOCA2,
+							(
+							SELECT
+								CPY_NAM
+							FROM
+								TBL_BSS_MGE
+							WHERE
+								BSS_NUM = S.BSS_NUM ) AS BSS_NAM,
+							FN_GETCODEINFO('CTK_KND_CDE',
+							S.CTK_KND_CDE) AS CTK_KND_CDE,
+							S.RULE_TYPE_NAM
+						FROM TBL_RULE_MGE R,
+						(
+				]]>
+				<choose>
+					<when test='ctkVcnCde == "" or ctkVcnCde == null'>
+						<![CDATA[
+							SELECT
+				T.RULEMGEID,
+				T.RULERSTID,
+				T.DTL_CTT,
+				T.SI_MU_CDE,
+				T.BSS_NUM,
+				T.RG_NAM,
+				T.INDATE,
+				T.DN_RG_YMD,
+				T.DN_RG_NAM,
+				T.DN_ED_YMD,
+				T.DN_ED_NAM,
+				T.WK_IN_YMD,
+				T.WK_IN_NAM,
+				T.CK_ST_YMD,
+				T.CK_ST_NAM,
+				T.CK_ED_YMD,
+				T.CK_ED_NAM,
+				T.CTK_KND_CDE,
+				T.LOCA1,
+				T.LOCA2,
+				FN_GETCODEINFO('RULE_TYPE_CDE',
+				T.RULE_TYPE_CDE) AS RULE_TYPE_NAM
+			FROM
+				TBL_RULE_RST T,
+				TBL_DESN_FILE D
+			WHERE
+				T.RULERSTID = D.RULERSTID
+						]]>
+
+						<if test='siMuCde != "" and siMuCde != null'>
+							<![CDATA[
+								AND T.SI_MU_CDE = #{siMuCde}
+							]]>
+						</if>
+
+						<if test='ruleTypeNam != "" and ruleTypeNam != null'>
+							<![CDATA[
+								AND T.RULE_TYPE_CDE = #{ruleTypeNam}
+							]]>
+						</if>
+
+						<![CDATA[
+							UNION ALL
+							SELECT
+								RULEMGEID,
+								RULERSTID,
+								DTL_CTT,
+								SI_MU_CDE,
+								BSS_NUM,
+								RG_NAM,
+								INDATE,
+								DN_RG_YMD,
+								DN_RG_NAM,
+								DN_ED_YMD,
+								DN_ED_NAM,
+								WK_IN_YMD,
+								WK_IN_NAM,
+								CK_ST_YMD,
+								CK_ST_NAM,
+								CK_ED_YMD,
+								CK_ED_NAM,
+								CTK_KND_CDE,
+								LOCA1,
+								LOCA2,
+								FN_GETCODEINFO('RULE_TYPE_CDE',
+								RULE_TYPE_CDE) AS RULE_TYPE_NAM
+							FROM
+								TBL_RULE_RST
+							WHERE
+								CTK_VCN_CDE = '010'
+						]]>
+
+						<if test='siMuCde != "" and siMuCde != null'>
+							<![CDATA[
+								AND SI_MU_CDE = #{siMuCde}
+							]]>
+						</if>
+
+						<if test='ruleTypeNam != "" and ruleTypeNam != null'>
+							<![CDATA[
+								AND RULE_TYPE_CDE = #{ruleTypeNam}
+							]]>
+						</if>
+					</when>
+					<otherwise>
+						<if test='ctkVcnCde == "1"'>
+							<![CDATA[
+								SELECT
+									T.RULEMGEID,
+									T.RULERSTID,
+									T.DTL_CTT,
+									T.SI_MU_CDE,
+									T.BSS_NUM,
+									T.RG_NAM,
+									T.INDATE,
+									T.DN_RG_YMD,
+									T.DN_RG_NAM,
+									T.DN_ED_YMD,
+									T.DN_ED_NAM,
+									T.WK_IN_YMD,
+									T.WK_IN_NAM,
+									T.CK_ST_YMD,
+									T.CK_ST_NAM,
+									T.CK_ED_YMD,
+									T.CK_ED_NAM,
+									T.CTK_KND_CDE,
+									T.LOCA1,
+									T.LOCA2,
+									FN_GETCODEINFO('RULE_TYPE_CDE',
+									T.RULE_TYPE_CDE) AS RULE_TYPE_NAM
+								FROM
+									TBL_RULE_RST T,
+									TBL_DESN_FILE D
+								WHERE
+									T.RULERSTID = D.RULERSTID
+							]]>
+							<if test='siMuCde != "" and siMuCde != null'>
+								<![CDATA[
+									AND T.SI_MU_CDE = #{siMuCde}
+								]]>
+							</if>
+							<if test='ruleTypeNam != "" and ruleTypeNam != null'>
+								<![CDATA[
+									AND T.RULE_TYPE_CDE = #{ruleTypeNam}
+								]]>
+							</if>
+						</if>
+
+						<if test='ctkVcnCde == "0"'>
+							<![CDATA[
+								SELECT
+									RULEMGEID,
+									RULERSTID,
+									DTL_CTT,
+									SI_MU_CDE,
+									BSS_NUM,
+									RG_NAM,
+									INDATE,
+									DN_RG_YMD,
+									DN_RG_NAM,
+									DN_ED_YMD,
+									DN_ED_NAM,
+									WK_IN_YMD,
+									WK_IN_NAM,
+									CK_ST_YMD,
+									CK_ST_NAM,
+									CK_ED_YMD,
+									CK_ED_NAM,
+									CTK_KND_CDE,
+									LOCA1,
+									LOCA2,
+									FN_GETCODEINFO('RULE_TYPE_CDE',
+									RULE_TYPE_CDE) AS RULE_TYPE_NAM
+								FROM
+									TBL_RULE_RST
+								WHERE
+									CTK_VCN_CDE = '010'
+							]]>
+
+							<if test='siMuCde != "" and siMuCde != null'>
+								<![CDATA[
+									AND SI_MU_CDE = #{siMuCde}
+								]]>
+							</if>
+
+							<if test='ruleTypeNam != "" and ruleTypeNam != null'>
+								<![CDATA[
+									AND RULE_TYPE_CDE = #{ruleTypeNam}
+								]]>
+							</if>
+						</if>
+					</otherwise>
+				</choose>
+
+				<![CDATA[
+									) S
+							 WHERE R.RULEMGEID = S.RULEMGEID
+				]]>
+
+				<if test='searchCondition == "0"'>
+					<if test='schsDate != "" and schsDate != null'>
+						<![CDATA[
+							AND TO_DATE(R.DEDATE) >= #{schsDate}
+						]]>
+					</if>
+
+					<if test='schlDate != "" and schlDate != null'>
+						<![CDATA[
+							AND TO_DATE(R.DEDATE) <= #{schlDate}
+						]]>
+					</if>
+				</if>
+
+				<if test='searchCondition == "1"'>
+					<if test='schsDate != "" and schsDate != null'>
+						<![CDATA[
+							AND TO_DATE(S.INDATE) >= #{schsDate}
+						]]>
+					</if>
+
+					<if test='schlDate != "" and schlDate != null'>
+						<![CDATA[
+							AND TO_DATE(S.INDATE) <= #{schlDate}
+						]]>
+					</if>
+				</if>
+
+				<if test='ruleMgrnuNam != "" and ruleMgrnuNam != null'>
+					<![CDATA[
+						AND RULE_MGRNU_CDE = #{ruleMgrnuNam}
+					]]>
+				</if>
+
+				<if test='searchMgrkw != "" and searchMgrkw != null'>
+					<![CDATA[
+						AND TO_NUMBER2(RULE_MGRNU_NUM) LIKE '%' || #{searchMgrkw} || '%'
+					]]>
+				</if>
+
+				<if test='bssNum != "" and bssNum != null'>
+					<![CDATA[
+						AND BSS_NUM=#{bssNum}
+					]]>
+				</if>
+
+				<if test='loca2 != "" and loca2 != null'>
+					<![CDATA[
+						AND S.LOCA2 LIKE '%' || #{loca2} || '%'
+					]]>
+				</if>
+				<![CDATA[
+									 ORDER BY S.DN_ED_YMD DESC, S.DN_RG_YMD DESC, S.RULERSTID DESC
+									) TB
+							)
+					WHERE RN BETWEEN #{rows} * ( #{page} - 1 ) + 1 AND #{rows}* #{page}
+				]]>
+	</select>
+
+<select id="selectPlanRuleView" parameterType="map" resultType="egovMap">
+	<![CDATA[
+		SELECT 	A.RULEMGEID,	A.REG_NAM, A.SUBJECT, SUBSTR(A.INDATE,0,4) || '-' || SUBSTR(A.INDATE,5,2) || '-' || SUBSTR(A.INDATE,7,2) AS RMINDATE,
+					SUBSTR(A.DEDATE,0,4) || '-' || SUBSTR(A.DEDATE,5,2) || '-' || SUBSTR(A.DEDATE,7,2) AS DEDATE, A.PW,
+					A.FILE_NAM, A.OGL_NAM, A.FILE_PATH, A.RULE_MGRNU_CDE, B.CTK_VCN_CDE,
+					FN_GETCODEINFO('RULE_MGRNU_CDE', A.RULE_MGRNU_CDE) AS RULE_MGRNU_NAM,
+					FN_GETCODEINFO('SI_MU_CDE', B.SI_MU_CDE) AS SI_MU_NAM, SI_MU_CDE,
+					TO_NUMBER2(A.RULE_MGRNU_NUM) AS RULE_MGRNU_NUM, A.REG_ID, B.RULERSTID , B.DTL_CTT ,B.LOCA2,B.LOCA1, B.DN_ED_ID
+		FROM 	TBL_RULE_MGE A, TBL_RULE_RST B
+		WHERE 	A.RULEMGEID= B.RULEMGEID AND B.RULEMGEID=#{rulemgeid} AND B.RULERSTID=#{rulerstid}
+	]]>
+</select>
+
+<!-- 상세규제 진생상황 설계완료 수정 -->
+<update id="updateDned">
+	<![CDATA[
+		UPDATE TBL_RULE_RST
+		SET DN_ED_YMD = #{regYmd}, DN_ED_NAM = #{regNam}, DN_ED_ID = #{regId}, CTK_VCN_CDE = '011'
+		WHERE RULEMGEID=#{rulemgeid} AND RULERSTID=#{rulerstid}
+		AND SI_MU_CDE=#{siMuCde}
+	]]>
+</update>
+
+
+<!-- 규제관리 > 규제관리 리스트 > 규제 등록 -->
+<insert id="insertRstFile"  parameterType="map" useGeneratedKeys="true" keyProperty="rulemgeid">
+	<selectKey resultType="string" keyProperty="rulefileid" order="BEFORE">
+		<![CDATA[
+		SELECT NVL(MAX(RULEFILEID)+1, 1) AS RULEFILEID FROM TBL_RULE_FILE
+		]]>
+	</selectKey>
+	INSERT INTO
+			TBL_RULE_FILE (
+			RULEFILEID,
+			FILE_NAM,
+			OGL_NAM,
+			FILE_PATH,
+			RULERSTID
+			)
+		VALUES (
+		#{rulefileid},
+		#{fileNam},
+		#{oglNam},
+		#{filePath},
+		#{rulerstid}
+		)
+</insert>
+
+
+<!-- 규제관리 > 규제관리 리스트 > 규제 등록 -->
+<insert id="insertRule"  parameterType="map" useGeneratedKeys="true" keyProperty="rulemgeid">
+	<selectKey resultType="string" keyProperty="rulemgeid" order="BEFORE">
+		<![CDATA[
+		SELECT NVL(MAX(RULEMGEID)+1, 1) AS RULEMGEID FROM TBL_RULE_MGE
+		]]>
+	</selectKey>
+	INSERT INTO
+			TBL_RULE_MGE (
+			RULEMGEID,
+			REG_NAM,
+			SUBJECT,
+			INDATE,
+			DEDATE,
+			FILE_NAM,
+			OGL_NAM,
+			FILE_PATH,
+			RULE_MGRNU_NUM,
+			REG_ID )
+		VALUES (
+		#{rulemgeid},
+		#{regNam},
+		#{subject},
+		TO_CHAR( SYSDATE, 'YYYYMMDD' ),
+		REPLACE(#{dedate},'-'),
+		#{fileNam},
+		#{oglNam},
+		#{filePath},
+		#{ruleMgrnuNum},
+		#{regId}
+		)
+</insert>
+
+<!-- 규제관리 > 규제관리 리스트 > 규제 상세 등록 -->
+<insert id="insertRuleRST"  parameterType="map" useGeneratedKeys="true" keyProperty="rulerstid">
+	<selectKey resultType="string" keyProperty="rulerstid" order="BEFORE">
+		<![CDATA[
+		SELECT NVL(MAX(RULERSTID)+1, 1) AS RULERSTID FROM TBL_RULE_RST
+		]]>
+	</selectKey>
+INSERT INTO TBL_RULE_RST
+				( 	RULERSTID,
+					DTL_CTT,
+					LOCA2,
+					XCE,
+					YCE,
+					DN_RG_YMD,
+					DN_RG_NAM,
+					CK_ST_YMD,
+					CK_ST_NAM,
+					CK_ED_YMD,
+					CK_ED_NAM,
+					DT_CTT,
+					CTK_KND_CDE,
+					BSS_NAM,
+					INDATE,
+					DN_ED_YMD,
+					DN_ED_NAM,
+					FL_MY_NAM,
+					RULEMGEID,
+					SI_MU_CDE,
+					DT_CG_NAM,
+					DT_CG_YMD,
+					RULE_MGRNU_NUM,
+					RULE_TYPE_CDE,
+					DN_RG_ID,
+					DN_ED_ID,
+					CK_ST_ID,
+					CK_ED_ID,
+					CTK_VCN_CDE,
+					RG_NAM,
+					RG_ID,
+					LOCA1,
+					CAUSER_KND	 )
+			VALUES (	#{rulerstid},
+						#{dtlCtt},
+						#{loca2},
+						#{xce},
+						#{yce},
+						REPLACE(#{dnRgYmd},'-'),
+						#{dnRgNam},
+						REPLACE(#{ckStYmd},'-'),
+						#{ckStNam},
+						REPLACE(#{ckEdYmd},'-'),
+						#{ckEdNam},
+						#{dtCtt},
+						#{ctkKndCde},
+						#{bssNam},
+						TO_CHAR(SYSDATE, 'YYYYMMDD'),
+						REPLACE(#{dnEdYmd},'-'),
+						#{dnEdNam},
+						#{flMyNam},
+						#{rulemgeid},
+						#{siMuCde},
+						#{dtCgNam},
+						REPLACE(#{dtCgYmd},'-'),
+						#{ruleMgrnuNum},
+						#{ruleTypeCde},
+						#{dnRgId},
+						#{dnEdId},
+						#{ckStId},
+						#{ckEdId},
+						#{ctkVcnCde},
+						#{regNam},
+						#{regId},
+						#{loca1},
+						#{causerKnd}	)
+</insert>
+
+<!-- 규제관리 > 규제관리 리스트 > 규제 등록 -->
+<insert id="insertRuleFile"  parameterType="map">
+	<selectKey resultType="string" keyProperty="rulefileid" order="BEFORE">
+		<![CDATA[
+		SELECT NVL(MAX(RULEFILEID)+1, 1) AS RULEFILEID FROM TBL_RULE_FILE
+		]]>
+	</selectKey>
+		INSERT INTO TBL_RULE_FILE (
+				RULEFILEID,
+				FILE_NAM,
+				FILE_PATH,
+				OGL_NAM,
+				RULERSTID )
+			VALUES (
+			#{rulefileid},
+			#{fileNam},
+			#{filePath},
+			#{oglNam},
+			#{rulerstid} )
+</insert>
+
+	<!-- 규제관리 > 규제관리 리스트 > 규제 첨부 파일 수정 -->
+	<update id="updateRuleFile" parameterType="map">
+	<![CDATA[
+			UPDATE TBL_RULE_MGE SET
+				FILE_NAM = #{fileNam} ,
+				FILE_PATH = #{filePath} ,
+				OGL_NAM = #{oglNam}
+			WHERE RULEMGEID =#{rulemgeid}
+	]]>
+	</update>
+
+	<!-- 규제관리 > 규제관리 리스트 > 규제 첨부 파일 수정 -->
+	<update id="updateRuleFile2" parameterType="map">
+	<![CDATA[
+			UPDATE TBL_RULE_MGE SET
+				FILE_NAM2 = #{fileNam2} ,
+				FILE_PATH2 = #{filePath2} ,
+				OGL_NAM2 = #{oglNam2}
+			WHERE RULEMGEID =#{rulemgeid}
+	]]>
+	</update>
+
+
+
+
+	<!-- 규제관리 > 규제관리 리스트 > 규제 수정 -->
+	<update id="updateRule" parameterType="map">
+		<![CDATA[
+			UPDATE TBL_RULE_MGE
+			SET
+				SUBJECT =#{subject},
+				DEDATE =	REPLACE(#{dedate},'-'),
+				RULE_MGRNU_CDE =#{ruleMgrnuCde},
+				RULE_MGRNU_NUM =#{ruleMgrnuNum}
+			WHERE RULEMGEID =#{rulemgeid}
+		]]>
+	</update>
+
+	<!-- 규제관리 > 규제관리 리스트 > 규제 상세 수정 -->
+	<update id="updateRuleDetail" parameterType="map">
+		<![CDATA[
+			UPDATE TBL_RULE_RST
+			SET
+				RULE_MGRNU_CDE =#{ruleMgrnuCde},
+				RULE_MGRNU_NUM =#{ruleMgrnuNum}
+			WHERE RULEMGEID =#{rulemgeid}
+		]]>
+	</update>
+
+
+	<!-- 규제관리 > 규제관리 리스트 >  규제 조회 > 규제 상세 조회 > 진행일수정 -->
+	<update id="updateRstInfo" parameterType="map">
+		<![CDATA[
+			UPDATE TBL_RULE_RST SET
+				DTL_CTT =#{dtlCtt},
+				LOCA2 =#{loca2},
+				XCE =#{xce},
+				YCE =#{yce},
+				DN_RG_YMD =REPLACE(#{dnRgYmd},'-'),
+				DN_RG_NAM =#{dnRgNam},
+				CK_ST_YMD =REPLACE(#{ckStYmd},'-'),
+				CK_ST_NAM =#{ckStNam},
+				CK_ED_YMD =REPLACE(#{ckEdYmd},'-'),
+				CK_ED_NAM =#{ckEdNam},
+				DT_CTT = #{dtCtt},
+				CTK_KND_CDE =#{ctkKndCde},
+				BSS_NAM =#{bssNam},
+				DN_ED_YMD =REPLACE(#{dnEdYmd},'-'),
+				DN_ED_NAM =#{dnEdNam},
+				FL_MY_NAM =#{flMyNam},
+				RULEMGEID =#{rulemgeid},
+				SI_MU_CDE =#{siMuCde},
+				DT_CG_NAM =#{dtCgNam},
+				DT_CG_YMD =REPLACE(#{dtCgYmd},'-'),
+				RULE_MGRNU_NUM =#{ruleMgrnuNum},
+				RULE_TYPE_CDE =#{ruleTypeCde},
+				DN_RG_ID =#{dnRgId},
+				DN_ED_ID =#{dnEdId},
+				CK_ST_ID =#{ckStId},
+				CK_ED_ID =#{ckEdId},
+				CTK_VCN_CDE =#{ctkVcnCde},
+				LOCA1 =#{loca1},
+				CAUSER_KND = #{causerKnd}
+			WHERE RULERSTID =#{rulerstid}
+		]]>
+	</update>
+
+		<!-- 규제관리 > 규제관리 리스트 >  규제 조회 > 규제 상세 조회 > 내용수정 -->
+	<update id="updateRstCttInfo" parameterType="map">
+		<![CDATA[
+			UPDATE TBL_RULE_RST SET
+				DTL_CTT =#{dtlCtt},
+				LOCA2 =#{loca2},
+				XCE =#{xce},
+				YCE =#{yce},
+				DT_CTT = #{dtCtt},
+				CTK_KND_CDE =#{ctkKndCde},
+				BSS_NAM =#{bssNam},
+				FL_MY_NAM =#{flMyNam},
+				RULEMGEID =#{rulemgeid},
+				SI_MU_CDE =#{siMuCde},
+				DT_CG_NAM =#{dtCgNam},
+				DT_CG_YMD =REPLACE(#{dtCgYmd},'-'),
+				RULE_MGRNU_NUM =#{ruleMgrnuNum},
+				RULE_TYPE_CDE =#{ruleTypeCde},
+				LOCA1 =#{loca1},
+				INDATE =REPLACE(#{indate},'-'),
+				RG_NAM =#{rgNam},
+				DN_RG_YMD =REPLACE(#{dnRgYmd},'-'),
+				DN_RG_NAM =#{dnRgNam},
+				DN_ED_YMD =REPLACE(#{dnEdYmd},'-'),
+				DN_ED_NAM =#{dnEdNam},
+				CK_ST_YMD =REPLACE(#{ckStYmd},'-'),
+				CK_ST_NAM =#{ckStNam},
+				CK_ED_YMD =REPLACE(#{ckEdYmd},'-'),
+				CK_ED_NAM =#{ckEdNam},
+				CAUSER_KND = #{causerKnd}
+			WHERE RULERSTID =#{rulerstid}
+		]]>
+	</update>
+
+
+		<!-- 규제관리 > 규제 상세 조회 > 상세 규제 첨부 파일 정보-->
+	<select id="selectRSTFileInfo" parameterType="map" resultType="egovMap">
+		<![CDATA[
+				SELECT * FROM TBL_RULE_FILE
+				WHERE 1=1
+				]]>
+			<if test='rulemgeid != "" and rulemgeid != null'>
+				<![CDATA[
+					AND	RULERSTID IN
+						(
+							SELECT RULERSTID
+							FROM TBL_RULE_RST
+							WHERE RULEMGEID =#{rulemgeid}
+						 )
+				 	]]>
+			</if>
+			<if test='rulefileid != "" and rulefileid != null'>
+				<![CDATA[
+					AND	RULEFILEID = #{rulefileid}
+				 	]]>
+			</if>
+	</select>
+
+		<!-- 교통량관리 > 규제관리 리스트 > 규제 첨부 파일 삭제 -->
+	<delete id="deleteRuleRSTFile" parameterType="map">
+	<![CDATA[
+			DELETE FROM TBL_RULE_FILE
+			WHERE RULERSTID IN
+			(
+				SELECT RULERSTID
+				FROM TBL_RULE_RST
+				WHERE RULEMGEID =#{rulemgeid}
+			 )
+	]]>
+	</delete>
+
+	<!-- 규제관리 > 규제관리 리스트 > 상세 규제 삭제 -->
+	<delete id="deleteRuleRST" parameterType="map">
+	<![CDATA[
+			DELETE FROM TBL_RULE_RST WHERE  RULERSTID=#{rulerstid}
+	]]>
+	</delete>
+
+		<!-- 규제관리 > 규제관리 리스트 > 상세 규제 전부 삭제 -->
+	<delete id="deleteAllRuleRST" parameterType="map">
+	<![CDATA[
+			DELETE FROM TBL_RULE_RST WHERE  RULEMGEID=#{rulemgeid}
+	]]>
+	</delete>
+
+	<!-- 규제관리 > 규제관리 리스트 > 규제 삭제 -->
+	<delete id="deleteRuleInfo" parameterType="map">
+	<![CDATA[
+		DELETE FROM TBL_RULE_MGE WHERE RULEMGEID=#{rulemgeid}
+	]]>
+	</delete>
+
+		<!-- 규제관리 > 규제관리 리스트 > 규제 조회 > 규제 상세 조회 -->
+	<select id="selectRuleDetail" parameterType="map" resultType="egovMap">
+	<![CDATA[
+					SELECT
+						R.RULERSTID,
+						R.DTL_CTT,
+						R.LOCA1,
+						R.LOCA2,
+						R.XCE,
+						R.YCE,
+						R.DTL_CTT,
+						NVL2(R.DN_RG_YMD, SUBSTR(R.DN_RG_YMD, 0, 4) || '-' || SUBSTR(R.DN_RG_YMD, 5, 2) || '-' || SUBSTR(R.DN_RG_YMD, 7, 2), R.DN_RG_YMD) AS DN_RG_YMD,
+						R.DN_RG_NAM,
+						NVL2(R.CK_ST_YMD, SUBSTR(R.CK_ST_YMD, 0, 4) || '-' || SUBSTR(R.CK_ST_YMD, 5, 2) || '-' || SUBSTR(R.CK_ST_YMD, 7, 2), R.CK_ST_YMD) AS CK_ST_YMD,
+						R.CK_ST_NAM,
+						NVL2(R.CK_ED_YMD, SUBSTR(R.CK_ED_YMD, 0, 4) || '-' || SUBSTR(R.CK_ED_YMD, 5, 2) || '-' || SUBSTR(R.CK_ED_YMD, 7, 2), R.CK_ED_YMD) AS CK_ED_YMD,
+						R.CK_ED_NAM,
+						R.LOCA1,
+						R.DT_CTT,
+						R.CAUSER_KND,
+						CTK_KND_CDE,
+						BSS_NAM,
+						NVL2(R.INDATE, SUBSTR(R.INDATE, 0, 4) || '-' || SUBSTR(R.INDATE, 5, 2) || '-' || SUBSTR(R.INDATE, 7, 2), R.INDATE) AS INDATE,
+						R.DN_ED_NAM,
+						R.FL_MY_NAM,
+						R.SI_MU_CDE,
+						NVL2(R.DN_ED_YMD, SUBSTR(R.DN_ED_YMD, 0, 4) || '-' || SUBSTR(R.DN_ED_YMD, 5, 2) || '-' || SUBSTR(R.DN_ED_YMD, 7, 2), R.DN_ED_YMD) AS DN_ED_YMD,
+						RULEMGEID,
+						R.DT_CG_NAM,
+						R.DT_CG_YMD,
+						R.RULE_MGRNU_NUM,
+						R.RULE_TYPE_CDE,
+						R.DN_RG_ID,
+						R.DN_ED_ID,
+						R.CK_ST_ID,
+						R.CK_ED_ID,
+						CTK_VCN_CDE,
+						F.RULEFILEID,
+						F.OGL_NAM,
+						R.RG_ID,
+						R.RG_NAM ,
+						TO_CODE('ALL','SI_MU_CDE',R.SI_MU_CDE) AS SI_MU_NAM,
+						TO_CODE('ALL','CTK_KND_CDE',R.CTK_KND_CDE) AS CTK_KND_NAM,
+						TO_CODE('ALL','CTK_VCN_CDE',R.CTK_VCN_CDE) AS CTK_VCN_NAM
+					FROM
+						TBL_RULE_RST R,TBL_RULE_FILE F
+					WHERE
+						R.RULERSTID = #{rulerstid}
+						AND R.RULERSTID = F.RULERSTID(+)
+	]]>
+	</select>
+
+	<!-- 규제관리 > 규제관리 리스트 > 규제 조회 > 공사번호 조회 -->
+	<select id="getCtkMgrnu" parameterType="map" resultType="egovMap">
+		<![CDATA[
+			SELECT
+				CTK_MGRNU AS CTKMGRNU
+			FROM
+				TBL_CTK_MGE
+			WHERE
+				RULEMGEID = #{rulemgeid}
+				AND RULERSTID = #{rulerstid}
+		]]>
+	</select>
+
+	<!-- 규제관리 > 규제관리 리스트 > 규제 조회 > 공사번호 조회 -->
+	<select id="getCtkMgrnuList" parameterType="map" resultType="egovMap">
+		<![CDATA[
+			SELECT
+				CTK_MGRNU AS CTKMGRNU
+			FROM
+				TBL_CTK_MGE
+			WHERE
+				RULEMGEID = #{rulemgeid}
+				AND RULERSTID = #{rulerstid}
+		]]>
+	</select>
+
+	<!-- 규제관리 > 규제관리 리스트 >  규제 조회 > 규제 상세 조회 > 진행일수정 > 진행상태수정 -->
+	<update id="updateCtkvcncde006" parameterType="map">
+		<![CDATA[
+			UPDATE TBL_CTK_MGE SET CTK_VCN_CDE = '006'
+			WHERE RULERSTID=#{rulerstid} AND RULEMGEID=#{rulemgeid}
+		]]>
+	</update>
+
+	<!-- 규제관리 > 규제관리 리스트 >  규제 조회 > 규제 상세 조회 > 진행일수정 > 설계 관할 코드 수정 -->
+	<update id="updateRuleCntRSTDesn" parameterType="map">
+		<![CDATA[
+			UPDATE TBL_DESN_FILE SET
+				SI_MU_CDE =#{siMuCde}
+			WHERE RULERSTID =#{rulerstid}
+		]]>
+	</update>
+
+	<!-- 규제관리 > 규제 등록 > 규제 위치 검색 -->
+	<select id="selectRuleLoc" parameterType="map" resultType="egovMap">
+		<![CDATA[
+	SELECT *	FROM(
+			SELECT
+			ROWNUM AS NUM,
+			TO_CHAR( LAST_VALUE( ROWNUM ) OVER ( ORDER BY ROWNUM ROWS BETWEEN CURRENT ROW AND UNBOUNDED FOLLOWING )) AS TOTALROWS,
+			TB.*
+	FROM	(
+			SELECT
+				LOCA1,
+				LOCA2,
+				XCE,
+				YCE
+			FROM TBL_RULE_RST
+			WHERE RULE_MGRNU_CDE = #{ruleMgrnuCde}
+			AND RULE_MGRNU_NUM = #{ruleMgrnuNum}
+					) TB
+		) WHERE NUM BETWEEN #{rows} * ( #{page} - 1 ) + 1 AND #{rows}* #{page}
+		]]>
+	</select>
+
+</mapper>

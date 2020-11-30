@@ -2,10 +2,10 @@
 <%@ include file="/common/taglibs.jsp" %>
 
 <form id="selectInfoFrm" name="selectInfoFrm">
-	<input type="hidden" id="mgrnu" name="mgrnu" value="${params.mgrnu}" />
-	<input type="hidden" id="method" name="method" value="${params.method}" />
-	<input type="hidden" id="facId" name="facId" value="<c:out value='${params.facId}'/>" />
-	<input type="hidden" id="mgrnuIdx" name="mgrnuIdx" value="<c:out value='${params.mgrnuIdx}'/>" />
+	<input type="hidden" name="mgrnu" value="${params.mgrnu}" />
+	<input type="hidden" name="method" value="${params.method}" />
+	<input type="hidden" name="facId" value="<c:out value='${params.facId}'/>" />
+	<input type="hidden" name="mgrnuIdx" value="<c:out value='${params.mgrnuIdx}'/>" />
 
 		<h2 class="h2_tp1">이력조회</h2>
 			<table class="tbl_row_tp1">
@@ -41,7 +41,7 @@
                 </span>
                 <span class="area_r">
                    <a href="#this" id="update" class="btn sml blue_tp1 r">수정</a>
-                   <a href="#this" id="delete" class="btn sml gray_tp1 r">삭제</a>
+                   <a href="#this" id="deleteWork" class="btn sml gray_tp1 r">삭제</a>
                 </span>
             </div>
 		</form>
@@ -58,13 +58,30 @@ $(function() {
 	var $frm = $("#selectInfoFrm");
 
 	$("#update").click(function(){
-		$("#method").val("update");
-		$("#selectInfoFrm").submit();
+		//$("#method").val("update");
+		//$("#selectInfoFrm").submit();
+		
+		$("#selectInfoFrm input[name=method]").val("update");
+		
+		var modal = $(this).closest('ons-modal');
+		var dataList = $('#selectInfoFrm').formToArray();
+		var obj = {};
+		for(var i in dataList){
+			obj[dataList[i].name] = dataList[i].value;
+		}
+		
+		var a = document.getElementById('myNavigator');
+		a.pushPage('subModalPage3.html').then(function(){
+			modal.find('.history-modify').load('${context}/fclts/crudPopW.do', obj, function(){
+				console.log(this);
+			})
+		});
+		
 	});
-
-	$("#delete").click(function() {
+	
+	$("#deleteWork").click(function() {
 		if(confirm("삭제하시겠습니까?")) {
-
+			var modal = $(this).closest('ons-modal');
 			var options = {
 				url				: "${context}/fclts/deleteWorkList.json",
 				type			: "post",
@@ -72,7 +89,14 @@ $(function() {
 				success			:  function(json) {
 					if(json.cnt == 1){
 						alert("정상적으로 삭제되었습니다.");
-						location.href="${context}/fclts/workListPopW.do?mgrnu="+$("#mgrnu").val()+"&method=select" + "&facId="+$("#facId").val() + "&mgrnuIdx="+$("#mgrnuIdx").val();
+						
+						var url = "${context}/fclts/workListPopW.do?mgrnu="+$("#selectInfoFrm input[name=mgrnu]").val()+"&method=select" + "&facId="+$("#selectInfoFrm input[name=facId]").val() + "&mgrnuIdx="+$("#selectInfoFrm input[name=mgrnuIdx]").val();
+						
+						document.querySelector('#myNavigator').resetToPage('subModalPage1.html').then(function(){
+							modal.find('.modal-content').load(url, {}, function(){
+								console.log(this);
+							})
+						});
 					} else {
 						alert("오류발생, 다시 시도하여 주십시오1");
 					}
@@ -85,12 +109,6 @@ $(function() {
 			$frm.ajaxSubmit( options );
 		}
 	});
-
-	$("#list").click(function(){
-		location.href="${context}/fclts/workListPopW.do?mgrnu="+$("#mgrnu").val()+"&method=select" + "&facId="+$("#facId").val();
-	});
-
-
 });
 
 </script>

@@ -3,7 +3,7 @@
 
 <mapper namespace="tgis.statistics.service.StatisticsMngMapper">
 
-<!-- 검지기 구별 전체 통계 -->
+<!-- 부착대 구별 전체 통계 -->
 	<select id="selectGuStatistics_GT_A057_L" parameterType="map" resultType="egovMap">
 		<![CDATA[
 				SELECT
@@ -23,7 +23,7 @@
 						COUNT(DECODE(ASN_LEN, '3', 1, NULL)) AS A03,
 						COUNT(DECODE(ASN_LEN, '4', 1, NULL)) AS A04,
 						COUNT(DECODE(ASN_LEN, '5', 1, NULL)) AS A05
-					FROM SMARTTGIS.GT_A057_L A
+					FROM GT_A057_L A
 		]]>
 		<where>
 			<if test="guCde   != null and guCde   != ''">
@@ -57,7 +57,7 @@
  		]]>
 	</select>
 
-<!-- 검지기 경찰서별 전체 통계 -->
+<!-- 부착대 경찰서별 전체 통계 -->
 	<select id="selectPoliceStatistics_GT_A057_L" parameterType="map" resultType="egovMap">
 		<![CDATA[
 		    	SELECT
@@ -76,7 +76,7 @@
 						COUNT(DECODE(ASN_LEN, '3', 1, NULL)) AS A03,
 						COUNT(DECODE(ASN_LEN, '4', 1, NULL)) AS A04,
 						COUNT(DECODE(ASN_LEN, '5', 1, NULL)) AS A05
-				FROM SMARTTGIS.GT_A057_L A
+				FROM GT_A057_L A
 		]]>
 		<where>
 			<if test="guCde   != null and guCde   != ''">
@@ -110,7 +110,7 @@
  		]]>
 	</select>
 
-<!-- 검지기 동별 전체 통계 -->
+<!-- 부착대 동별 전체 통계 -->
 	<select id="selectDongStatistics_GT_A057_L" parameterType="map" resultType="egovMap">
 		<![CDATA[
 		SELECT
@@ -129,7 +129,7 @@
 						COUNT(DECODE(ASN_LEN, '3', 1, NULL)) AS A03,
 						COUNT(DECODE(ASN_LEN, '4', 1, NULL)) AS A04,
 						COUNT(DECODE(ASN_LEN, '5', 1, NULL)) AS A05
-			FROM SMARTTGIS.GT_A057_L A, SMARTTGIS.GT_LP_AA_EMD G
+			FROM GT_A057_L A, GT_LP_AA_EMD G
 			WHERE A.DONG_NAM(+) = G.EMD_KOR_NM
 				]]>
 		<if test="guCde   != null and guCde   != ''">
@@ -162,7 +162,7 @@
 				]]>
 	</select>
 
-<!-- 검지기 상세내역 전체 통계 -->
+<!-- 부착대 상세내역 전체 통계 -->
 	<select id="selectDetailFcltsList_GT_A057_L" parameterType="map" resultType="egovMap">
 		<![CDATA[
 		SELECT  TEMP.*
@@ -180,7 +180,7 @@
 		                                TO_CHAR(ESB_YMD ,'YYYY-MM-DD') AS ESB_YMD,
 		                                TO_CODE('A057_L','KND',KND) AS KND_NAM,
 		                                TO_CODE('A057_L','STAT',STAT) AS STAT_NAM
-						FROM	SMARTTGIS.GT_A057_L A
+						FROM	GT_A057_L A
 		]]>
 		<where>
 			<if test="guCde   != null and guCde   != ''">
@@ -229,7 +229,7 @@
 		                    TO_CHAR(ESB_YMD ,'YYYY-MM-DD') AS ESB_YMD,
 		                    TO_CODE('A057_L','KND',KND) AS KND_NAM,
 		                    TO_CODE('A057_L','STAT',STAT) AS STAT_NAM
-						FROM	SMARTTGIS.GT_A057_L A
+						FROM	GT_A057_L A
 		]]>
 		<where>
 			<if test="guCde   != null and guCde   != ''">
@@ -262,7 +262,7 @@
 	]]>
 	</select>
 
-<!-- 검지기 교차로기준 통계 -->
+<!-- 부착대 교차로기준 통계 -->
 	<select id="selectCrossStatistics_GT_A057_L" parameterType="map" resultType="egovMap">
 		<![CDATA[
 		SELECT  TEMP.*
@@ -286,7 +286,7 @@
 						COUNT(DECODE(ASN_LEN, '3', 1, NULL)) AS A03,
 						COUNT(DECODE(ASN_LEN, '4', 1, NULL)) AS A04,
 						COUNT(DECODE(ASN_LEN, '5', 1, NULL)) AS A05
-					FROM SMARTTGIS.GT_A057_L A
+					FROM GT_A057_L A
 					WHERE A.CSS_NAM IS NOT NULL
 		]]>
 			<if test="guCde   != null and guCde   != ''">
@@ -319,6 +319,62 @@
 		<![CDATA[
 				GROUP BY ROLLUP(A.CSS_NAM)
 					ORDER BY NAME NULLS FIRST  ) TEMP)TEMP)TEMP WHERE NUM BETWEEN #{rows} * ( #{page} - 1 ) + 1 AND #{rows}* #{page}
+ 		]]>
+	</select>
+
+<!-- 부착대 교차로기준 전체 통계 -->
+	<select id="selectCrossFcltsExcelDown_GT_A057_L" parameterType="map" resultType="egovMap">
+		<![CDATA[
+				SELECT
+					DECODE(NAME, NULL, '합계', NAME) AS  "구분",
+					TO_CHAR(TOTAL, '999,999,999,999') AS "합계",
+					TO_CHAR(A01, '999,999,999,999') AS "3m",
+					TO_CHAR(A02, '999,999,999,999') AS "5m",
+					TO_CHAR(A03, '999,999,999,999') AS "7m",
+					TO_CHAR(A04, '999,999,999,999') AS "9m",
+					TO_CHAR(A05, '999,999,999,999') AS "11m"
+				FROM (
+					SELECT
+						A.CSS_NAM AS NAME,
+						(COUNT(DECODE(ASN_LEN, '1', 1, NULL)) + COUNT(DECODE(ASN_LEN, '2', 1, NULL)) + COUNT(DECODE(ASN_LEN, '3', 1, NULL)) + COUNT(DECODE(ASN_LEN, '4', 1, NULL)) + COUNT(DECODE(ASN_LEN, '5', 1, NULL))) AS TOTAL,
+						COUNT(DECODE(ASN_LEN, '1', 1, NULL)) AS A01,
+						COUNT(DECODE(ASN_LEN, '2', 1, NULL)) AS A02,
+						COUNT(DECODE(ASN_LEN, '3', 1, NULL)) AS A03,
+						COUNT(DECODE(ASN_LEN, '4', 1, NULL)) AS A04,
+						COUNT(DECODE(ASN_LEN, '5', 1, NULL)) AS A05
+					FROM GT_A057_L A
+					WHERE A.CSS_NAM IS NOT NULL
+		]]>
+			<if test="guCde   != null and guCde   != ''">
+				AND A.GU_CDE  IN 	<foreach collection="guCde" item="item" open="(" close=")" separator=",">#{item}</foreach>
+			</if>
+			<if test="dongCde   != null and dongCde   != ''">
+				AND A.DONG_CDE  IN 	<foreach collection="dongCde" item="item" open="(" close=")" separator=",">#{item}</foreach>
+			</if>
+			<if test="policeCde   != null and policeCde   != ''">
+				AND A.PE_CDE  IN 	<foreach collection="policeCde" item="item" open="(" close=")" separator=",">#{item}</foreach>
+			</if>
+			<if test="statGbn   != null and statGbn   != ''">
+				AND A.ASN_LEN  IN 	<foreach collection="statGbn" item="item" open="(" close=")" separator=",">#{item}</foreach>
+			</if>
+			<if test="kndCde   != null and kndCde   != ''">
+				AND A.KND  IN 	<foreach collection="kndCde" item="item" open="(" close=")" separator=",">#{item}</foreach>
+			</if>
+			<if test="statCde   != null and statCde   != ''">
+				AND A.STAT  IN 	<foreach collection="statCde" item="item" open="(" close=")" separator=",">#{item}</foreach>
+			</if>
+			<if test="stYmd   != null and stYmd   != ''">
+				<![CDATA[AND A.ESB_YMD >= #{stYmd}]]>
+			</if>
+			<if test="enYmd   != null and enYmd   != ''">
+				<![CDATA[AND A.ESB_YMD <= #{enYmd}]]>
+			</if>
+			<if test="cssNam   != null and cssNam   != ''">
+		      <![CDATA[AND A.CSS_NAM LIKE '%' || #{cssNam} || '%']]>
+		    </if>
+		<![CDATA[
+					GROUP BY ROLLUP(A.CSS_NAM)
+					ORDER BY NAME NULLS FIRST) TEMP
  		]]>
 	</select>
 

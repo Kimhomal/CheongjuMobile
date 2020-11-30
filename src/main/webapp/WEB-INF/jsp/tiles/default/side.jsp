@@ -11,7 +11,8 @@
 				</ons-list-item>
 				<ons-list-item modifier="longdivider" onclick="location.href='<c:url value='/introduce/introduce01.do'/>'" tappable>교통안전시설물이란</ons-list-item>
 				<ons-list-item modifier="longdivider" onclick="location.href='<c:url value='/board/notice/selectNoticeList.do'/>'" tappable>공지사항</ons-list-item>
-				<ons-list-item modifier="longdivider" onclick="location.href='<c:url value='/map/mapMain.do'/>'" expandable>지도서비스
+				<ons-list-item modifier="longdivider" onclick="location.href='<c:url value='/map/mapMain.do'/>'" tappable>지도서비스</ons-list-item>
+				<%-- <ons-list-item modifier="longdivider" onclick="location.href='<c:url value='/map/mapMain.do'/>'" expandable>지도서비스
 					<div class="expandable-content">
 						<ons-list>
 							<ons-list-item modifier="longdivider" tappable>교차로 검색</ons-list-item>
@@ -21,7 +22,7 @@
 							<ons-list-item modifier="longdivider" tappable>교통안전시설물 검색</ons-list-item>
 						</ons-list>
 					</div>
-				</ons-list-item>
+				</ons-list-item> --%>
 				<c:choose>
 					<c:when test="${sessionScope.auth == null||sessionScope.auth.usrId eq 'everyone'}">
 						<ons-list-item modifier="longdivider" onclick="location.href='<c:url value='/user/auth/login.do'/>'" tappable>로그인</ons-list-item>

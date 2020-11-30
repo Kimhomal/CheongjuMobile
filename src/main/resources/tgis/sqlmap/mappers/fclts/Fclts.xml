@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper   PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="tgis.fclts.service.FcltsMngMapper">
+
+	<!-- 월별유지관리 이력용 시설물 정보 조회-->
+	<select id="selectFacilInfo" parameterType="map" resultType="egovMap">
+		<![CDATA[
+			SELECT	CDNM AS FACIL_GBN,
+					REFCD AS FACIL_NAM
+			FROM m_code
+			WHERE cdn = 'MGRNU_CDE'
+			AND CMMT = #{facilityId}
+		]]>
+	</select>
+
+	<insert id="insertFacilHis" parameterType="map">
+		<![CDATA[
+			INSERT INTO TBL_FACIL_HIS (
+				HIS_ID,
+				MGRNU,
+				FACIL_NAM,
+				WORK_GBN,
+				YEAR,
+				MONTH,
+				REG_YMD,
+				FACIL_GBN,
+				LEN
+			)
+			VALUES (
+				TBL_FACIL_HIS_HIS_ID_SEQ.NEXTVAL,
+				#{mgrnu},
+				#{facilNam},
+				#{workGbn},
+				SUBSTR(TO_CHAR(SYSDATE, 'YYYY-MM-DD'),0,4),
+				SUBSTR(TO_CHAR(SYSDATE, 'YYYY-MM-DD'),6,2),
+				SYSDATE,
+				#{facilGbn},
+		]]>
+
+		<choose>
+			<when test="leng != '' and leng != null">
+				<![CDATA[				#{leng})]]>
+			</when>
+			<otherwise>
+				<![CDATA[				NULL)]]>
+			</otherwise>
+		</choose>
+	</insert>
+
+</mapper>
